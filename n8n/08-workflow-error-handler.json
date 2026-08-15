@@ -1,0 +1,39 @@
+{
+  "name": "08-CommandFlow-Workflow-Error-Handler",
+  "nodes": [
+    {
+      "parameters": {
+        "events": ["error"]
+      },
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:5000/api/n8n/callback",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "={\n  \"automationId\": \"{{$node['Error Trigger'].json.execution.error.automationId || 'UNKNOWN'}}\",\n  \"status\": \"failed\",\n  \"error\": \"{{$node['Error Trigger'].json.execution.error.message}}\"\n}"
+      },
+      "name": "Callback Error Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [350, 300]
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Callback Error Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "name": "05-CommandFlow-Generate-Document",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-document",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:5000/api/documents/generate",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "={\n  \"type\": \"{{$json.body.documentType}}\",\n  \"title\": \"{{$json.body.content.subject}}\",\n  \"content\": \"{{$json.body.content.body}}\"\n}"
+      },
+      "name": "Call Node PDF Generator",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [350, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call Node PDF Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

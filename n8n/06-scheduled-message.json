@@ -1,0 +1,39 @@
+{
+  "name": "06-CommandFlow-Scheduled-Message",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "scheduled-message",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "hours"
+      },
+      "name": "Wait Node",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [350, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Wait Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

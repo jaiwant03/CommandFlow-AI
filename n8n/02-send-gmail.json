@@ -1,0 +1,42 @@
+{
+  "name": "02-CommandFlow-Send-Gmail",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send-gmail",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "subject": "={{$json.body.content.subject}}",
+        "toEmail": "={{$json.body.recipient.email}}",
+        "body": "={{$json.body.content.body}}"
+      },
+      "name": "Gmail Node",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [350, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

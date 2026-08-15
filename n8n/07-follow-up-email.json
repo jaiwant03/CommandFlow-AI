@@ -1,0 +1,62 @@
+{
+  "name": "07-CommandFlow-Follow-Up-Email",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "follow-up-email",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "amount": 3,
+        "unit": "days"
+      },
+      "name": "Wait 3 Days",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:5000/api/ai/generate",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "={\n  \"prompt\": \"Generate a polite follow-up email regarding the previous request.\"\n}"
+      },
+      "name": "Generate AI Follow-up",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [500, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 3 Days": {
+      "main": [
+        [
+          {
+            "node": "Generate AI Follow-up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

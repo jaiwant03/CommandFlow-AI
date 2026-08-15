@@ -1,0 +1,1080 @@
+/* ============================================================
+   COMMANDFLOW AI — RESPONSIVE DESIGN
+   Reference UI:
+   Clean White + Green + Cyan + Blue + Purple
+   ============================================================ */
+
+
+/* ============================================================
+   TABLET — 1024px
+   ============================================================ */
+
+@media (max-width: 1024px) {
+
+  /* ----------------------------------------------------------
+     SIDEBAR
+     ---------------------------------------------------------- */
+
+  .sidebar {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    z-index: 1200;
+
+    width: 260px;
+
+    height: 100vh;
+
+    transform:
+      translateX(-100%);
+
+    transition:
+      transform 0.25s ease;
+
+    background:
+      #FFFFFF;
+
+    border-right:
+      1px solid #DCE6F0;
+
+    box-shadow:
+      8px 0 25px rgba(15, 23, 42, 0.08);
+  }
+
+  .sidebar.open {
+
+    transform:
+      translateX(0);
+  }
+
+
+  /* ----------------------------------------------------------
+     MAIN CONTENT
+     ---------------------------------------------------------- */
+
+  .main-content {
+
+    width: 100%;
+
+    margin-left:
+      0;
+
+    transition:
+      none;
+  }
+
+
+  /* ----------------------------------------------------------
+     DASHBOARD
+     ---------------------------------------------------------- */
+
+  .dashboard-content-split {
+
+    grid-template-columns:
+      1fr;
+
+    gap:
+      16px;
+  }
+
+
+  /* ----------------------------------------------------------
+     PAGE CONTAINER
+     ---------------------------------------------------------- */
+
+  .page-container {
+
+    width: 100%;
+
+    max-width:
+      1280px;
+
+    margin:
+      0 auto;
+
+    padding:
+      1.5rem;
+  }
+
+
+  /* ----------------------------------------------------------
+     DASHBOARD HEADER
+     ---------------------------------------------------------- */
+
+  .cf-dashboard-header {
+
+    gap:
+      15px;
+  }
+
+  .cf-page-title {
+
+    font-size:
+      29px;
+  }
+
+
+  /* ----------------------------------------------------------
+     COMMAND CARD
+     ---------------------------------------------------------- */
+
+  .cf-command-card-inner {
+
+    padding:
+      22px;
+  }
+
+
+  /* ----------------------------------------------------------
+     STATISTICS
+     ---------------------------------------------------------- */
+
+  .cf-stats-grid {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap:
+      13px;
+  }
+
+
+  /* ----------------------------------------------------------
+     BOTTOM CONTENT
+     ---------------------------------------------------------- */
+
+  .cf-bottom-grid {
+
+    grid-template-columns:
+      1fr;
+
+    gap:
+      16px;
+  }
+
+
+  /* ----------------------------------------------------------
+     NAVBAR
+     ---------------------------------------------------------- */
+
+  .navbar {
+
+    width: 100%;
+
+    padding:
+      0 1.25rem;
+  }
+}
+
+
+/* ============================================================
+   TABLET / SMALL LAPTOP — 900px
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+  .cf-dashboard-inner {
+
+    width:
+      calc(100% - 32px);
+  }
+
+
+  /* Command input */
+
+  .cf-command-card
+  .command-input-row {
+
+    gap:
+      8px;
+  }
+
+
+  /* Services */
+
+  .cf-services-grid {
+
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+
+  /* Preview */
+
+  .cf-preview-grid {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+/* ============================================================
+   MOBILE — 768px
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  /* ----------------------------------------------------------
+     PAGE
+     ---------------------------------------------------------- */
+
+  .page-container {
+
+    padding:
+      1rem;
+  }
+
+
+  /* ----------------------------------------------------------
+     NAVBAR
+     ---------------------------------------------------------- */
+
+  .navbar {
+
+    height:
+      64px;
+
+    padding:
+      0 1rem;
+
+    background:
+      #FFFFFF;
+
+    border-bottom:
+      1px solid #E8EEF5;
+  }
+
+
+  /* ----------------------------------------------------------
+     DASHBOARD CONTAINER
+     ---------------------------------------------------------- */
+
+  .cf-dashboard-inner {
+
+    width:
+      calc(100% - 24px);
+
+    padding:
+      20px 0 30px;
+  }
+
+
+  /* ----------------------------------------------------------
+     DASHBOARD HEADER
+     ---------------------------------------------------------- */
+
+  .cf-dashboard-header {
+
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
+
+    gap:
+      14px;
+
+    margin-bottom:
+      16px;
+  }
+
+  .cf-page-title {
+
+    font-size:
+      25px;
+  }
+
+  .cf-page-subtitle {
+
+    font-size:
+      12px;
+  }
+
+  .cf-sync-btn {
+
+    align-self:
+      flex-start;
+  }
+
+
+  /* ----------------------------------------------------------
+     COMMAND CARD
+     ---------------------------------------------------------- */
+
+  .cf-command-card {
+
+    border-radius:
+      15px;
+  }
+
+  .cf-command-card-inner {
+
+    padding:
+      18px 15px;
+  }
+
+  .cf-command-header {
+
+    flex-direction:
+      column;
+
+    align-items:
+      flex-start;
+
+    gap:
+      12px;
+  }
+
+  .cf-command-title {
+
+    font-size:
+      19px;
+  }
+
+  .cf-voice-btn {
+
+    align-self:
+      flex-start;
+  }
+
+
+  /* ----------------------------------------------------------
+     COMMAND INPUT
+     ---------------------------------------------------------- */
+
+  .cf-command-card
+  .command-input-row {
+
+    min-height:
+      54px;
+
+    padding:
+      5px;
+  }
+
+  .cf-command-card
+  .command-input-row
+  input {
+
+    min-width:
+      0;
+
+    font-size:
+      12px;
+
+    padding:
+      0 5px;
+  }
+
+  .cf-command-card
+  .command-input-row
+  button {
+
+    min-height:
+      43px;
+
+    padding:
+      0 13px;
+
+    flex-shrink:
+      0;
+
+    font-size:
+      10px;
+  }
+
+
+  /* ----------------------------------------------------------
+     EXAMPLE CHIPS
+     ---------------------------------------------------------- */
+
+  .cf-command-card
+  .command-examples {
+
+    gap:
+      6px;
+
+    overflow:
+      hidden;
+  }
+
+  .cf-command-card
+  .command-example-chip {
+
+    max-width:
+      100%;
+
+    font-size:
+      9px;
+  }
+
+
+  /* ----------------------------------------------------------
+     STATISTICS
+     ---------------------------------------------------------- */
+
+  .cf-stats-grid {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap:
+      10px;
+  }
+
+  .cf-stat-card {
+
+    min-height:
+      125px;
+
+    padding:
+      14px;
+
+    border-radius:
+      13px;
+  }
+
+  .cf-stat-value {
+
+    font-size:
+      25px;
+  }
+
+  .cf-stat-chart {
+
+    width:
+      70px;
+
+    height:
+      34px;
+  }
+
+
+  /* ----------------------------------------------------------
+     BOTTOM GRID
+     ---------------------------------------------------------- */
+
+  .cf-bottom-grid {
+
+    grid-template-columns:
+      1fr;
+
+    gap:
+      14px;
+  }
+
+
+  /* ----------------------------------------------------------
+     RECENT AUTOMATIONS
+     ---------------------------------------------------------- */
+
+  .cf-recent-row {
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto;
+
+    column-gap:
+      10px;
+  }
+
+  .cf-recent-middle {
+
+    display:
+      none;
+  }
+
+  .cf-recent-time {
+
+    display:
+      none;
+  }
+
+
+  /* ----------------------------------------------------------
+     CONNECTED SERVICES
+     ---------------------------------------------------------- */
+
+  .cf-services-grid {
+
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap:
+      8px;
+
+    padding:
+      10px;
+  }
+
+  .cf-service {
+
+    min-height:
+      88px;
+
+    padding:
+      8px;
+  }
+
+  .cf-service-icon {
+
+    width:
+      34px;
+
+    height:
+      34px;
+
+    margin-bottom:
+      5px;
+  }
+
+
+  /* ----------------------------------------------------------
+     EXECUTION TRACE
+     ---------------------------------------------------------- */
+
+  .cf-progress-steps {
+
+    overflow-x:
+      auto;
+
+    padding:
+      10px 12px;
+  }
+
+  .cf-preview-grid {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+
+  /* ----------------------------------------------------------
+     MODAL
+     ---------------------------------------------------------- */
+
+  .cf-modal-overlay {
+
+    padding:
+      14px;
+  }
+
+  .cf-trace-modal {
+
+    width:
+      100%;
+
+    max-height:
+      90vh;
+
+    border-radius:
+      15px;
+  }
+
+  .cf-trace-grid {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    padding:
+      14px;
+  }
+}
+
+
+/* ============================================================
+   SMALL MOBILE — 620px
+   ============================================================ */
+
+@media (max-width: 620px) {
+
+  /* ----------------------------------------------------------
+     DASHBOARD
+     ---------------------------------------------------------- */
+
+  .cf-dashboard-inner {
+
+    width:
+      calc(100% - 22px);
+
+    padding-top:
+      17px;
+  }
+
+
+  /* ----------------------------------------------------------
+     HEADER
+     ---------------------------------------------------------- */
+
+  .cf-page-title {
+
+    font-size:
+      23px;
+  }
+
+  .cf-page-subtitle {
+
+    font-size:
+      11px;
+  }
+
+
+  /* ----------------------------------------------------------
+     COMMAND CARD
+     ---------------------------------------------------------- */
+
+  .cf-command-card-inner {
+
+    padding:
+      17px 13px;
+  }
+
+  .cf-command-title {
+
+    font-size:
+      18px;
+  }
+
+
+  /* ----------------------------------------------------------
+     COMMAND INPUT
+     ---------------------------------------------------------- */
+
+  .cf-command-card
+  .command-input-row {
+
+    flex-direction:
+      row;
+
+    min-height:
+      52px;
+  }
+
+  .cf-command-card
+  .command-input-row
+  button {
+
+    min-width:
+      42px;
+
+    padding:
+      0 11px;
+  }
+
+
+  /* ----------------------------------------------------------
+     STATS
+     ---------------------------------------------------------- */
+
+  .cf-stats-grid {
+
+    grid-template-columns:
+      1fr;
+
+    gap:
+      10px;
+  }
+
+  .cf-stat-card {
+
+    min-height:
+      115px;
+  }
+
+
+  /* ----------------------------------------------------------
+     RECENT AUTOMATIONS
+     ---------------------------------------------------------- */
+
+  .cf-recent-row {
+
+    min-height:
+      64px;
+
+    padding:
+      9px 11px;
+  }
+
+  .cf-recent-icon {
+
+    width:
+      36px;
+
+    height:
+      36px;
+
+    flex-basis:
+      36px;
+  }
+
+  .cf-recent-title {
+
+    font-size:
+      11px;
+  }
+
+  .cf-recent-meta {
+
+    font-size:
+      9px;
+  }
+
+
+  /* ----------------------------------------------------------
+     SERVICES
+     ---------------------------------------------------------- */
+
+  .cf-services-grid {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap:
+      8px;
+  }
+
+
+  /* ----------------------------------------------------------
+     EXECUTION PREVIEW
+     ---------------------------------------------------------- */
+
+  .cf-preview-grid {
+
+    grid-template-columns:
+      1fr;
+  }
+
+  .cf-ai-preview {
+
+    margin:
+      10px;
+
+    padding:
+      11px;
+  }
+
+
+  /* ----------------------------------------------------------
+     TRACE
+     ---------------------------------------------------------- */
+
+  .cf-trace-grid {
+
+    grid-template-columns:
+      1fr;
+
+    padding:
+      12px;
+  }
+
+  .cf-trace-section {
+
+    padding:
+      0 12px 12px;
+  }
+
+
+  /* ----------------------------------------------------------
+     SECTION HEADER
+     ---------------------------------------------------------- */
+
+  .cf-section-header {
+
+    min-height:
+      53px;
+
+    padding:
+      0 12px;
+  }
+
+  .cf-section-title {
+
+    font-size:
+      12px;
+  }
+}
+
+
+/* ============================================================
+   VERY SMALL MOBILE — 480px
+   ============================================================ */
+
+@media (max-width: 480px) {
+
+  /* ----------------------------------------------------------
+     PAGE
+     ---------------------------------------------------------- */
+
+  .page-container {
+
+    padding:
+      0.8rem;
+  }
+
+
+  /* ----------------------------------------------------------
+     NAVBAR
+     ---------------------------------------------------------- */
+
+  .navbar {
+
+    padding:
+      0 0.75rem;
+
+    min-height:
+      60px;
+  }
+
+
+  /* ----------------------------------------------------------
+     DASHBOARD
+     ---------------------------------------------------------- */
+
+  .cf-dashboard-inner {
+
+    width:
+      calc(100% - 18px);
+
+    padding-top:
+      14px;
+  }
+
+
+  /* ----------------------------------------------------------
+     TITLE
+     ---------------------------------------------------------- */
+
+  .cf-page-title {
+
+    font-size:
+      21px;
+  }
+
+
+  /* ----------------------------------------------------------
+     COMMAND
+     ---------------------------------------------------------- */
+
+  .cf-command-card {
+
+    border-radius:
+      13px;
+  }
+
+  .cf-command-title {
+
+    font-size:
+      17px;
+  }
+
+
+  /* ----------------------------------------------------------
+     MIC
+     ---------------------------------------------------------- */
+
+  .mic-hero-btn {
+
+    width:
+      68px;
+
+    height:
+      68px;
+  }
+
+  .voice-wave-container {
+
+    width:
+      105px;
+
+    height:
+      105px;
+  }
+
+
+  /* ----------------------------------------------------------
+     STATS
+     ---------------------------------------------------------- */
+
+  .cf-stat-card {
+
+    padding:
+      13px;
+
+    min-height:
+      108px;
+  }
+
+  .cf-stat-value {
+
+    font-size:
+      23px;
+  }
+
+  .cf-stat-title {
+
+    font-size:
+      9px;
+  }
+
+
+  /* ----------------------------------------------------------
+     RECENT
+     ---------------------------------------------------------- */
+
+  .cf-recent-right {
+
+    display:
+      none;
+  }
+
+  .cf-recent-row {
+
+    grid-template-columns:
+      minmax(0, 1fr);
+  }
+
+
+  /* ----------------------------------------------------------
+     SERVICES
+     ---------------------------------------------------------- */
+
+  .cf-services-grid {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    padding:
+      9px;
+  }
+
+  .cf-service {
+
+    min-height:
+      84px;
+  }
+
+
+  /* ----------------------------------------------------------
+     MODAL
+     ---------------------------------------------------------- */
+
+  .voice-modal-card {
+
+    width:
+      100%;
+
+    padding:
+      24px 15px 19px;
+
+    border-radius:
+      15px;
+  }
+
+  .voice-modal-title {
+
+    font-size:
+      19px;
+  }
+
+  .voice-modal-subtitle {
+
+    font-size:
+      11px;
+  }
+
+  .voice-modal-actions {
+
+    flex-direction:
+      column;
+
+    width:
+      100%;
+  }
+
+  .voice-modal-actions .btn {
+
+    width:
+      100%;
+  }
+}
+
+
+/* ============================================================
+   LANDSCAPE MOBILE
+   ============================================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+
+  .cf-dashboard-inner {
+
+    padding-top:
+      14px;
+  }
+
+  .cf-stats-grid {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .cf-bottom-grid {
+
+    grid-template-columns:
+      1fr;
+  }
+
+  .voice-modal-overlay {
+
+    overflow-y:
+      auto;
+
+    align-items:
+      flex-start;
+
+    padding-top:
+      20px;
+  }
+}
+
+
+/* ============================================================
+   TOUCH DEVICES
+   ============================================================ */
+
+@media (hover: none) {
+
+  .glass-card:hover {
+
+    transform:
+      none !important;
+
+    box-shadow:
+      var(--shadow-main);
+  }
+
+  .cf-stat-card:hover {
+
+    transform:
+      none;
+  }
+
+  .cf-service:hover {
+
+    transform:
+      none;
+
+    box-shadow:
+      none;
+  }
+
+  .btn-primary:hover,
+  .btn-gradient:hover {
+
+    transform:
+      none;
+  }
+}

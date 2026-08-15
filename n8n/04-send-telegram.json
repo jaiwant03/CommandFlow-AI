@@ -1,0 +1,39 @@
+{
+  "name": "04-CommandFlow-Send-Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send-telegram",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.body.recipient.telegramId}}",
+        "text": "={{$json.body.content.body}}"
+      },
+      "name": "Telegram Bot Node",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [350, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Telegram Bot Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

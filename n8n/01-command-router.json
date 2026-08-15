@@ -1,0 +1,68 @@
+{
+  "name": "01-CommandFlow-Main-Router",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "command-router",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.body.channel}}",
+              "value2": "gmail"
+            }
+          ]
+        }
+      },
+      "name": "Route by Channel",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:5000/api/n8n/callback",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "={\n  \"automationId\": \"{{$json.body.automationId}}\",\n  \"status\": \"success\",\n  \"channel\": \"{{$json.body.channel}}\",\n  \"executedAt\": \"{{new Date().toISOString()}}\"\n}"
+      },
+      "name": "Status Callback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [550, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Route by Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Channel": {
+      "main": [
+        [
+          {
+            "node": "Status Callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

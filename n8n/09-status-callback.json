@@ -1,0 +1,41 @@
+{
+  "name": "09-CommandFlow-Status-Callback",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "status-callback",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:5000/api/n8n/callback",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "={\n  \"automationId\": \"{{$json.body.automationId}}\",\n  \"status\": \"{{$json.body.status}}\",\n  \"channel\": \"{{$json.body.channel}}\"\n}"
+      },
+      "name": "POST Status to Node Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [350, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "POST Status to Node Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
