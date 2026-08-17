@@ -35,6 +35,10 @@ const initScheduler = () => {
           auto.status = 'PROCESSING';
           await auto.save();
 
+          const recipientsList = auto.recipient?.recipients && auto.recipient.recipients.length > 0
+            ? auto.recipient.recipients
+            : [auto.recipient?.email].filter(Boolean);
+
           // Dispatch payload to published n8n webhook
           const n8nResult = await n8nService.triggerWorkflow({
             automationId: auto.automationId,
@@ -46,8 +50,11 @@ const initScheduler = () => {
               email: auto.recipient?.email,
               chatId: auto.recipient?.telegramId
             },
+            recipients: recipientsList,
             subject: auto.generatedContent?.subject,
             content: auto.generatedContent?.body,
+            htmlContent: auto.generatedContent?.htmlBody || auto.generatedContent?.body,
+            attachments: auto.attachments || [],
             language: auto.language
           });
 

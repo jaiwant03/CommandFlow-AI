@@ -5,8 +5,8 @@ export const parseCommand = async (command) => {
   return response.data;
 };
 
-export const executeCommand = async (command, inputType = 'text') => {
-  const response = await API.post('/automations', { command, inputType });
+export const executeCommand = async (command, inputType = 'text', attachments = []) => {
+  const response = await API.post('/automations', { command, inputType, attachments });
   return response.data;
 };
 

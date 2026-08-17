@@ -8,6 +8,45 @@ const VoiceRecorder = ({ onCommandExecute, onTranscriptComplete, selectedLanguag
   const [statusText, setStatusText] = useState('Click start to speak...');
   const [recognition, setRecognition] = useState(null);
 
+  const silenceTimerRef = React.useRef(null);
+  const hasTriggeredRef = React.useRef(false);
+  const latestTranscriptRef = React.useRef('');
+
+  const executeVoiceCommand = React.useCallback(async (textToExecute) => {
+    if (hasTriggeredRef.current) return;
+    hasTriggeredRef.current = true;
+
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+
+    const finalCmd = textToExecute ? textToExecute.trim() : latestTranscriptRef.current.trim();
+    if (!finalCmd) {
+      hasTriggeredRef.current = false;
+      return;
+    }
+
+    setStatus('PROCESSING');
+    setStatusText('Analyzing voice command automatically...');
+
+    try {
+      if (onCommandExecute) {
+        await onCommandExecute(finalCmd, 'voice');
+      }
+      setStatus('SUCCESS');
+      setStatusText('Voice command processed successfully!');
+      setTimeout(() => {
+        if (onClose) onClose();
+      }, 1000);
+    } catch (err) {
+      console.error('[Voice Execution Error]:', err);
+      setStatus('ERROR');
+      setStatusText(err.message || 'Execution error encountered.');
+      hasTriggeredRef.current = false;
+    }
+  }, [onCommandExecute, onClose]);
+
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
@@ -17,24 +56,56 @@ const VoiceRecorder = ({ onCommandExecute, onTranscriptComplete, selectedLanguag
       rec.lang = selectedLanguage === 'tamil' ? 'ta-IN' : 'en-US';
 
       rec.onresult = (event) => {
-        let currentText = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          currentText += event.results[i][0].transcript;
+        let finalText = '';
+        let interimText = '';
+
+        for (let i = 0; i < event.results.length; i++) {
+          const res = event.results[i];
+          if (res.isFinal) {
+            finalText += res[0].transcript + ' ';
+          } else {
+            interimText += res[0].transcript;
+          }
         }
-        setTranscript(currentText);
+
+        const combined = (finalText + interimText).trim();
+        setTranscript(combined);
+        latestTranscriptRef.current = combined;
+
+        // Auto-silence timer: when user finishes speaking (1.8s silence)
+        if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+        if (combined.length > 5 && !hasTriggeredRef.current) {
+          silenceTimerRef.current = setTimeout(() => {
+            try {
+              rec.stop();
+            } catch (e) {}
+            executeVoiceCommand(combined);
+          }, 1800);
+        }
+      };
+
+      rec.onend = () => {
+        if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+        if (!hasTriggeredRef.current && latestTranscriptRef.current.trim().length > 3) {
+          executeVoiceCommand(latestTranscriptRef.current);
+        }
       };
 
       rec.onerror = (event) => {
         console.warn('[Speech Rec Error]:', event.error);
-        setStatus('ERROR');
-        setStatusText(`Speech Recognition error (${event.error}). You can type your command.`);
+        if (event.error !== 'no-speech') {
+          setStatus('ERROR');
+          setStatusText(`Speech Recognition issue (${event.error}). You can edit or type command.`);
+        }
       };
 
       setRecognition(rec);
     }
-  }, [selectedLanguage]);
+  }, [selectedLanguage, executeVoiceCommand]);
 
   const startListening = () => {
+    hasTriggeredRef.current = false;
+    latestTranscriptRef.current = '';
     setStatus('LISTENING');
     setTranscript('');
     setStatusText('Listening... Speak your command naturally');
@@ -48,6 +119,7 @@ const VoiceRecorder = ({ onCommandExecute, onTranscriptComplete, selectedLanguag
   };
 
   const stopListening = () => {
+    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     if (recognition) {
       try {
         recognition.stop();
@@ -55,12 +127,16 @@ const VoiceRecorder = ({ onCommandExecute, onTranscriptComplete, selectedLanguag
         console.warn('Recognition stop error:', err);
       }
     }
-    setStatus('IDLE');
-    setStatusText('Speech captured. Review or execute below.');
+    if (!hasTriggeredRef.current && latestTranscriptRef.current.trim()) {
+      executeVoiceCommand(latestTranscriptRef.current);
+    } else if (!latestTranscriptRef.current.trim()) {
+      setStatus('IDLE');
+      setStatusText('Speech captured. Review or execute below.');
+    }
   };
 
   const handleUseTranscript = () => {
-    const textToUse = transcript.trim() || "Send a leave letter to my class advisor through Gmail. I need leave tomorrow because of a family function.";
+    const textToUse = transcript.trim() || latestTranscriptRef.current.trim();
     if (onTranscriptComplete) {
       onTranscriptComplete(textToUse);
     }
@@ -68,19 +144,8 @@ const VoiceRecorder = ({ onCommandExecute, onTranscriptComplete, selectedLanguag
   };
 
   const handleDirectExecute = async () => {
-    const textToUse = transcript.trim() || "Send a leave letter to my class advisor through Gmail. I need leave tomorrow because of a family function.";
-    setStatus('PROCESSING');
-    setStatusText('Analyzing voice command...');
-
-    if (onCommandExecute) {
-      await onCommandExecute(textToUse, 'voice');
-    }
-
-    setStatus('SUCCESS');
-    setStatusText('Voice command processed successfully!');
-    setTimeout(() => {
-      if (onClose) onClose();
-    }, 1000);
+    const textToUse = transcript.trim() || latestTranscriptRef.current.trim();
+    executeVoiceCommand(textToUse);
   };
 
   return (

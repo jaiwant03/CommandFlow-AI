@@ -16,9 +16,11 @@
       "parameters": {
         "resource": "message",
         "operation": "send",
-        "subject": "={{$json.body.content.subject}}",
-        "toEmail": "={{$json.body.recipient.email}}",
-        "body": "={{$json.body.content.body}}"
+        "subject": "={{$json.body.subject || $json.body.content?.subject}}",
+        "toEmail": "={{ $json.body.toEmail || (Array.isArray($json.body.recipients) && $json.body.recipients.length > 0 ? $json.body.recipients.join(', ') : ($json.body.recipient?.email || $json.body.recipient)) }}",
+        "emailType": "html",
+        "htmlBody": "={{$json.body.htmlContent || $json.body.content?.htmlBody || $json.body.content?.body || $json.body.content}}",
+        "attachments": "={{$json.body.attachments || []}}"
       },
       "name": "Gmail Node",
       "type": "n8n-nodes-base.gmail",

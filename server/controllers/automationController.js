@@ -16,7 +16,7 @@ const generateAutomationId = () => {
  */
 const createAutomationFromCommand = async (req, res) => {
   try {
-    const { command, inputType = 'text' } = req.body;
+    const { command, inputType = 'text', attachments = [] } = req.body;
     if (!command || !command.trim()) {
       return res.status(400).json({ success: false, message: 'Please provide a valid command.' });
     }
@@ -24,36 +24,23 @@ const createAutomationFromCommand = async (req, res) => {
     const userId = req.user ? req.user._id : '65b820a1c1d4a90012345678';
 
     // 1. Process Command via Groq AI
-    const aiParsed = await groqService.processCommand(command);
+    const aiParsed = await groqService.processCommand(command, attachments);
     const aiTokenUsage = Number(aiParsed?.tokenUsage?.total_tokens || aiParsed?.tokenUsage || 0) || 0;
 
-    const automationId = generateAutomationId();
-    const isScheduled = aiParsed.schedule && aiParsed.schedule.isScheduled;
+    const channel = aiParsed.channel || 'gmail';
+    const recipientsList = aiParsed.recipients || (aiParsed.recipient?.email ? [aiParsed.recipient.email] : []);
 
-    // 2. Parse Scheduled Execution Time if applicable
-    let calculatedExecutionTime = null;
-    if (isScheduled) {
-      const now = new Date();
-      calculatedExecutionTime = new Date(now);
-      const lowerDate = (aiParsed.schedule.date || '').toLowerCase();
-      const lowerTime = (aiParsed.schedule.time || '').toLowerCase();
-
-      if (lowerDate.includes('tomorrow') || lowerDate.includes('naalaikku')) {
-        calculatedExecutionTime.setDate(calculatedExecutionTime.getDate() + 1);
-      }
-      let hours = 9;
-      if (lowerTime.includes('pm') || lowerTime.includes('night') || lowerTime.includes('evening')) {
-        const match = lowerTime.match(/(\d+)/);
-        if (match) hours = (parseInt(match[1], 10) % 12) + 12;
-      } else if (lowerTime.match(/(\d+)/)) {
-        const match = lowerTime.match(/(\d+)/);
-        if (match) hours = parseInt(match[1], 10);
-      }
-      calculatedExecutionTime.setHours(hours, 0, 0, 0);
-      if (calculatedExecutionTime <= now) {
-        calculatedExecutionTime.setDate(calculatedExecutionTime.getDate() + 1);
-      }
+    // Validation: Gmail recipient check
+    if (channel === 'gmail' && recipientsList.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide at least one valid email address.'
+      });
     }
+
+    const automationId = generateAutomationId();
+    const isScheduled = !!(aiParsed.schedule && aiParsed.schedule.isScheduled);
+    const calculatedExecutionTime = aiParsed.schedule?.nextExecution ? new Date(aiParsed.schedule.nextExecution) : null;
 
     const initialStatus = isScheduled ? 'SCHEDULED' : 'PROCESSING';
 
@@ -64,17 +51,20 @@ const createAutomationFromCommand = async (req, res) => {
       originalCommand: command,
       language: aiParsed.language || 'english',
       inputType,
-      intent: aiParsed.intent || (aiParsed.channel === 'gmail' ? 'send_email' : 'send_message'),
-      channel: aiParsed.channel || 'gmail',
+      intent: aiParsed.intent || (channel === 'gmail' ? 'send_email' : 'send_message'),
+      channel,
       recipient: {
         name: aiParsed.recipient?.name || 'Recipient',
-        email: aiParsed.recipient?.email || '',
+        email: recipientsList[0] || aiParsed.recipient?.email || '',
+        recipients: recipientsList,
         telegramId: aiParsed.recipient?.chatId || ''
       },
       generatedContent: {
         subject: aiParsed.subject || '',
-        body: aiParsed.content || ''
+        body: aiParsed.content || '',
+        htmlBody: aiParsed.htmlBody || ''
       },
+      attachments,
       schedule: {
         date: aiParsed.schedule?.date || null,
         time: aiParsed.schedule?.time || null,
@@ -104,9 +94,9 @@ const createAutomationFromCommand = async (req, res) => {
         userId,
         automationId,
         action: 'SCHEDULE_AUTOMATION',
-        channel: aiParsed.channel,
+        channel,
         status: 'SCHEDULED',
-        message: `Scheduled automation set for ${calculatedExecutionTime.toLocaleString()}`
+        message: `Scheduled automation set for ${calculatedExecutionTime ? calculatedExecutionTime.toLocaleString('en-IN') : 'future execution'}`
       });
 
       return res.status(201).json({
@@ -120,8 +110,8 @@ const createAutomationFromCommand = async (req, res) => {
     await ActivityLog.create({
       userId,
       automationId,
-      action: `TRIGGER_WORKFLOW_${aiParsed.channel.toUpperCase()}`,
-      channel: aiParsed.channel,
+      action: `TRIGGER_WORKFLOW_${channel.toUpperCase()}`,
+      channel,
       status: 'PROCESSING',
       message: `Dispatching ${aiParsed.intent} request to n8n webhook`
     });
@@ -130,10 +120,13 @@ const createAutomationFromCommand = async (req, res) => {
       automationId,
       userId: userId.toString(),
       intent: aiParsed.intent,
-      channel: aiParsed.channel,
+      channel,
       recipient: aiParsed.recipient,
+      recipients: recipientsList,
       subject: aiParsed.subject,
       content: aiParsed.content,
+      htmlContent: aiParsed.htmlBody,
+      attachments,
       language: aiParsed.language
     });
 

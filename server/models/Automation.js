@@ -37,13 +37,20 @@ const automationSchema = new mongoose.Schema({
   recipient: {
     name: { type: String, default: '' },
     email: { type: String, default: '' },
+    recipients: [{ type: String }],
     phone: { type: String, default: '' },
     telegramId: { type: String, default: '' }
   },
   generatedContent: {
     subject: { type: String, default: '' },
-    body: { type: String, default: '' }
+    body: { type: String, default: '' },
+    htmlBody: { type: String, default: '' }
   },
+  attachments: [{
+    filename: { type: String },
+    contentType: { type: String },
+    data: { type: String }
+  }],
   documentType: {
     type: String,
     default: null

@@ -15,8 +15,14 @@ class N8nService {
    * Dispatch payload to published n8n webhook (/webhook/commandflow)
    */
   async triggerWorkflow(payload) {
-    const { automationId, userId, channel, intent, recipient, subject, content, language } = payload;
+    const { automationId, userId, channel, intent, recipient, subject, content, language, recipients, htmlContent, attachments } = payload;
     const webhookUrl = `${this.baseUrl}/webhook/commandflow`;
+
+    const recipientsList = recipients && recipients.length > 0
+      ? recipients
+      : (recipient?.email ? [recipient.email] : []);
+
+    const recipientsString = recipientsList.join(', ');
 
     // Construct n8n payload according to specification
     let n8nPayload = {};
@@ -27,10 +33,16 @@ class N8nService {
         channel: 'gmail',
         recipient: {
           name: recipient?.name || 'Recipient',
-          email: recipient?.email || 'admin@example.com'
+          email: recipientsString || recipient?.email || '',
+          recipients: recipientsList
         },
+        recipients: recipientsList,
+        toEmail: recipientsString,
+        to: recipientsString,
         subject: subject || 'CommandFlow Message',
-        content: content || 'Hello from CommandFlow AI',
+        content: htmlContent || content || 'Hello from CommandFlow AI',
+        htmlContent: htmlContent || content,
+        attachments: attachments || [],
         language: language || 'english'
       };
     } else {

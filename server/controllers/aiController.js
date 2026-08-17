@@ -6,21 +6,22 @@ const groqService = require('../services/groqService');
  */
 const parseAICommand = async (req, res) => {
   try {
-    const { command } = req.body;
+    const { command, attachments = [] } = req.body;
     if (!command || !command.trim()) {
       return res.status(400).json({ success: false, message: 'Command text is required.' });
     }
 
-    const parsed = await groqService.processCommand(command);
+    const parsed = await groqService.processCommand(command, attachments);
 
     // Check missing recipient details
     let clarificationNeeded = false;
     let clarificationQuestion = null;
 
-    if (parsed.channel === 'gmail' && !parsed.recipient.email) {
+    const recipients = parsed.recipients || (parsed.recipient?.email ? [parsed.recipient.email] : []);
+    if (parsed.channel === 'gmail' && recipients.length === 0) {
       clarificationNeeded = true;
-      clarificationQuestion = `Recipient email address is missing for Gmail execution. Please provide an email address.`;
-    } else if (parsed.channel === 'telegram' && !parsed.recipient.chatId) {
+      clarificationQuestion = `Please provide at least one valid email address.`;
+    } else if (parsed.channel === 'telegram' && !parsed.recipient?.chatId) {
       clarificationNeeded = true;
       clarificationQuestion = `Telegram Chat ID is missing. Please provide Telegram Chat ID.`;
     }

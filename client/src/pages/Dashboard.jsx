@@ -95,7 +95,8 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
 
   const handleStartAnalysisAndRun = async (
     textToAnalyze,
-    inputType = 'text'
+    inputType = 'text',
+    attachments = []
   ) => {
 
     if (
@@ -148,6 +149,9 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
         recipient:
           parsedData.recipient,
 
+        recipients:
+          parsedData.recipients || (parsedData.recipient?.email ? [parsedData.recipient.email] : []),
+
         subject:
           parsedData.subject,
 
@@ -176,9 +180,10 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
 
         setExecutionStep(4);
 
-        await executeCommand(
+        const execRes = await executeCommand(
           textToAnalyze,
-          inputType
+          inputType,
+          attachments
         );
 
         setExecutionResult({
@@ -192,6 +197,9 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
 
           recipient:
             parsedData.recipient,
+
+          recipients:
+            parsedData.recipients,
 
           scheduledDate:
             parsedData.schedule?.date,
@@ -220,7 +228,8 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
         const execRes =
           await executeCommand(
             textToAnalyze,
-            inputType
+            inputType,
+            attachments
           );
 
         setExecutionStep(7);
@@ -1050,12 +1059,14 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
                   </div>
 
                   <div>
-                    <span>Recipient</span>
+                    <span>Recipient(s)</span>
                     <strong>
-                      {aiPreview.recipient?.name ||
-                        aiPreview.recipient?.email ||
-                        aiPreview.recipient?.chatId ||
-                        'N/A'}
+                      {(aiPreview.recipients && aiPreview.recipients.length > 0)
+                        ? aiPreview.recipients.join(', ')
+                        : (aiPreview.recipient?.email ||
+                          aiPreview.recipient?.name ||
+                          aiPreview.recipient?.chatId ||
+                          'N/A')}
                     </strong>
                   </div>
 

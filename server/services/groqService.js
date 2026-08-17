@@ -13,7 +13,7 @@ class GroqService {
   /**
    * Parse user command into structured JSON according to CommandFlow specifications
    */
-  async processCommand(command) {
+  async processCommand(command, attachments = []) {
     if (!command || !command.trim()) {
       throw new Error('Command text cannot be empty.');
     }
@@ -103,7 +103,7 @@ For Telegram:
         const resultText = response.data.choices[0].message.content;
         const parsed = JSON.parse(resultText);
         const tokenUsage = response.data.usage || null;
-        const normalized = this.normalizeParsedCommand(parsed, command);
+        const normalized = this.normalizeParsedCommand(parsed, command, attachments);
         normalized.tokenUsage = tokenUsage || this.estimateTokenUsage(command, normalized.content || '', normalized.subject || '');
         return normalized;
       } catch (err) {
@@ -111,7 +111,7 @@ For Telegram:
       }
     }
 
-    const fallback = this.fallbackHeuristicParser(command);
+    const fallback = this.fallbackHeuristicParser(command, attachments);
     fallback.tokenUsage = this.estimateTokenUsage(command, fallback.content || '', fallback.subject || '');
     return fallback;
   }
@@ -122,9 +122,241 @@ For Telegram:
   }
 
   /**
+   * Convert spoken email patterns in text into valid email addresses
+   * E.g., "john dot smith at gmail dot com" -> "john.smith@gmail.com"
+   */
+  normalizeSpokenEmailText(text) {
+    if (!text) return '';
+    let result = text;
+
+    result = result.replace(/\b([a-zA-Z0-9._%+-]+(?:\s+(?:dot|period|_|underscore|-|hyphen|dash)\s+[a-zA-Z0-9._%+-]+)*)\s+(?:at|@)\s+([a-zA-Z0-9-]+(?:\s+(?:dot|period)\s+[a-zA-Z0-9-]+)*)\s+(?:dot|period|\.)\s+([a-zA-Z]{2,})\b/gi, (match, username, domain, tld) => {
+      let cleanUser = username
+        .replace(/\s+(?:dot|period)\s+/gi, '.')
+        .replace(/\s+(?:underscore)\s+/gi, '_')
+        .replace(/\s+(?:hyphen|dash)\s+/gi, '-')
+        .replace(/\s+/g, '');
+      let cleanDomain = domain
+        .replace(/\s+(?:dot|period)\s+/gi, '.')
+        .replace(/\s+/g, '');
+      return `${cleanUser}@${cleanDomain}.${tld.toLowerCase()}`;
+    });
+
+    return result;
+  }
+
+  /**
+   * Extract clean, validated array of email recipients from text command and parsed AI output
+   */
+  extractAllRecipients(command, parsedRecipients = []) {
+    const normalizedText = this.normalizeSpokenEmailText(command);
+    
+    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/gi;
+    const matches = normalizedText.match(emailRegex) || [];
+
+    const rawList = [...matches];
+
+    if (Array.isArray(parsedRecipients)) {
+      rawList.push(...parsedRecipients);
+    } else if (typeof parsedRecipients === 'string' && parsedRecipients) {
+      rawList.push(parsedRecipients);
+    } else if (parsedRecipients && parsedRecipients.email) {
+      rawList.push(parsedRecipients.email);
+    }
+
+    const cleanList = [];
+    const seen = new Set();
+
+    for (let raw of rawList) {
+      if (!raw || typeof raw !== 'string') continue;
+      
+      let clean = raw.trim().toLowerCase();
+      clean = clean.replace(/[.,;:!()\]\[>]+$/, '');
+      clean = clean.replace(/^[<(\[]+/, '');
+
+      const isValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(clean);
+      if (isValid && !seen.has(clean)) {
+        seen.add(clean);
+        cleanList.push(clean);
+      }
+    }
+
+    return cleanList;
+  }
+
+  /**
+   * Calculate exact scheduled execution timestamp (relative or explicit)
+   */
+  calculateScheduledExecutionTime(command, aiSchedule = {}) {
+    const lowerCmd = (command || '').toLowerCase();
+    const now = new Date();
+
+    // 1. Strict Relative Delay: "after 10 minutes", "in 30 mins", "after 2 hours", "after 1 day"
+    // MUST match explicit time unit: minute, mins, hour, hrs, day, days
+    const relativeMatch = lowerCmd.match(/\b(?:after|in)\s+(\d+)\s*(minutes?|mins?|hours?|hrs?|days?)\b/i);
+
+    if (relativeMatch) {
+      const amount = parseInt(relativeMatch[1], 10);
+      const unit = relativeMatch[2].toLowerCase();
+      const scheduledDate = new Date(now.getTime());
+
+      if (unit.startsWith('min')) {
+        scheduledDate.setMinutes(scheduledDate.getMinutes() + amount);
+      } else if (unit.startsWith('hour') || unit.startsWith('hr')) {
+        scheduledDate.setHours(scheduledDate.getHours() + amount);
+      } else if (unit.startsWith('day')) {
+        scheduledDate.setDate(scheduledDate.getDate() + amount);
+      }
+
+      return {
+        isScheduled: true,
+        nextExecution: scheduledDate,
+        date: scheduledDate.toLocaleDateString('en-IN'),
+        time: scheduledDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+      };
+    }
+
+    // 2. Strict Explicit Clock Time: "at 5 PM", "at 5:30 PM", "5:30 PM", "9 AM", "at 17:30"
+    const explicitClockMatch = lowerCmd.match(/\b(?:at\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?|(\d{1,2}):(\d{2})\s*(am|pm)?|(\d{1,2})\s*(am|pm))\b/i);
+    
+    let targetHours = null;
+    let targetMinutes = 0;
+    let hasExplicitClockTime = false;
+
+    if (explicitClockMatch) {
+      const fullMatch = explicitClockMatch[0].toLowerCase();
+      const matchDetails = fullMatch.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+      if (matchDetails) {
+        let h = parseInt(matchDetails[1], 10);
+        let m = matchDetails[2] ? parseInt(matchDetails[2], 10) : 0;
+        let ampm = matchDetails[3] ? matchDetails[3].toLowerCase() : null;
+
+        if (ampm === 'pm' && h < 12) h += 12;
+        if (ampm === 'am' && h === 12) h = 0;
+
+        if (h >= 0 && h <= 23 && m >= 0 && m <= 59) {
+          targetHours = h;
+          targetMinutes = m;
+          hasExplicitClockTime = true;
+        }
+      }
+    }
+
+    // 3. Strict Date Keywords
+    const isTomorrow = lowerCmd.includes('tomorrow') ||
+                       lowerCmd.includes('naalaikku') ||
+                       /\b(?:next\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday))\b/i.test(lowerCmd) ||
+                       /\b(?:on\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday))\b/i.test(lowerCmd);
+
+    const hasExplicitScheduleKeyword = lowerCmd.includes('schedule') || lowerCmd.includes('scheduled for');
+
+    // ONLY mark as scheduled if user explicitly provided a relative delay, clock time, tomorrow/date keyword, or explicit schedule instruction!
+    const isScheduled = !!(hasExplicitClockTime || isTomorrow || (aiSchedule.isScheduled && (hasExplicitScheduleKeyword || aiSchedule.time || aiSchedule.date)));
+
+    if (isScheduled) {
+      const scheduledDate = new Date(now.getTime());
+
+      if (isTomorrow) {
+        scheduledDate.setDate(scheduledDate.getDate() + 1);
+      }
+
+      if (hasExplicitClockTime) {
+        scheduledDate.setHours(targetHours, targetMinutes, 0, 0);
+        if (!isTomorrow && scheduledDate <= now) {
+          scheduledDate.setDate(scheduledDate.getDate() + 1);
+        }
+      }
+
+      return {
+        isScheduled: true,
+        nextExecution: scheduledDate,
+        date: scheduledDate.toLocaleDateString('en-IN'),
+        time: scheduledDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+      };
+    }
+
+    return {
+      isScheduled: false,
+      nextExecution: null,
+      date: null,
+      time: null
+    };
+  }
+
+  /**
+   * Generate clean, professional HTML email body
+   */
+  generateHtmlEmailBody({ subject, content, attachments = [], recipientName = '' }) {
+    const safeContent = content || '';
+    const paragraphs = safeContent
+      .split(/\n\n+/)
+      .map(p => p.trim())
+      .filter(p => p.length > 0)
+      .map(p => `<p style="margin: 0 0 16px 0; line-height: 1.6; color: #334155; font-size: 15px;">${p.replace(/\n/g, '<br/>')}</p>`)
+      .join('');
+
+    let attachmentHtml = '';
+    if (attachments && attachments.length > 0) {
+      const imageItems = attachments.map((att, idx) => {
+        const src = att.data || att.url || '';
+        if (!src) return '';
+        return `
+          <div style="margin-top: 16px; text-align: center;">
+            <img src="${src}" alt="${att.filename || 'Attached Image ' + (idx + 1)}" style="max-width: 100%; max-height: 500px; height: auto; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: inline-block;" />
+            <p style="font-size: 12px; color: #64748b; margin-top: 6px; font-weight: 600;">📎 ${att.filename || 'Attachment ' + (idx + 1)}</p>
+          </div>
+        `;
+      }).filter(Boolean).join('');
+
+      if (imageItems) {
+        attachmentHtml = `
+          <div style="margin-top: 24px; padding-top: 20px; border-top: 1px dashed #cbd5e1;">
+            <p style="font-size: 13px; font-weight: 700; color: #475569; margin: 0 0 12px 0;">Attached Image(s):</p>
+            ${imageItems}
+          </div>
+        `;
+      }
+    }
+
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject || 'CommandFlow AI Notification'}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; padding: 30px 15px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); overflow: hidden;">
+          <tr>
+            <td style="background-color: #2563eb; padding: 24px 32px; text-align: left;">
+              <span style="color: #ffffff; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; font-family: 'Segoe UI', Arial, sans-serif;">CommandFlow AI</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 32px; text-align: left; color: #334155;">
+              ${paragraphs}
+              ${attachmentHtml}
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #f1f5f9; padding: 16px 32px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b;">
+              Sent automatically via <strong style="color: #2563eb;">CommandFlow AI Automation Platform</strong>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+  }
+
+  /**
    * Normalize and validate parsed JSON structure
    */
-  normalizeParsedCommand(parsed, originalCommand) {
+  normalizeParsedCommand(parsed, originalCommand, attachments = []) {
     const lowerCmd = originalCommand.toLowerCase();
     
     // Detect channel
@@ -137,55 +369,41 @@ For Telegram:
     if (/[\u0B80-\u0BFF]/.test(originalCommand)) language = 'tamil';
     else if (/(naalaikku|irukku|panni|pannu|sollu|sir-ku|advisor-ku|anuppu|varuven|varuvennu)/i.test(originalCommand)) language = 'tanglish';
 
-    // Email extraction regex
-    const emailMatch = originalCommand.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    // Extract recipients
+    const recipientsList = this.extractAllRecipients(originalCommand, parsed.recipient || parsed.recipients);
     // Telegram chat ID extraction regex
     const chatIdMatch = originalCommand.match(/\b\d{7,12}\b/);
 
-    const isScheduled = !!(
-      parsed.schedule?.isScheduled ||
-      lowerCmd.includes('tomorrow') ||
-      lowerCmd.includes('naalaikku') ||
-      lowerCmd.includes(' at ') ||
-      lowerCmd.includes('pm') ||
-      lowerCmd.includes('am')
-    );
-
-    let scheduleDate = parsed.schedule?.date || null;
-    let scheduleTime = parsed.schedule?.time || null;
-
-    if (isScheduled) {
-      if (!scheduleDate && (lowerCmd.includes('tomorrow') || lowerCmd.includes('naalaikku'))) {
-        scheduleDate = 'tomorrow';
-      }
-      if (!scheduleTime) {
-        const timeMatch = lowerCmd.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm|mani|manikku))/i);
-        if (timeMatch) scheduleTime = timeMatch[0];
-      }
-    }
+    // Schedule calculation
+    const scheduleInfo = this.calculateScheduledExecutionTime(originalCommand, parsed.schedule || {});
 
     // Ensure content is generated and NOT raw user command
     const generatedContent = this.ensureGeneratedContent(parsed.content, parsed.subject, originalCommand, channel, language);
     const generatedSubject = this.ensureGeneratedSubject(parsed.subject, originalCommand, channel);
+    const htmlBody = channel === 'gmail' ? this.generateHtmlEmailBody({ subject: generatedSubject, content: generatedContent, attachments }) : '';
 
     if (channel === 'gmail') {
-      const recipientEmail = emailMatch ? emailMatch[0] : (parsed.recipient?.email || '');
-      const recipientName = parsed.recipient?.name || (emailMatch ? emailMatch[0].split('@')[0] : 'Recipient');
+      const primaryEmail = recipientsList.length > 0 ? recipientsList[0] : '';
+      const recipientName = parsed.recipient?.name || (primaryEmail ? primaryEmail.split('@')[0] : 'Recipient');
       
       return {
         intent: parsed.intent || 'send_email',
         channel: 'gmail',
         recipient: {
           name: recipientName,
-          email: recipientEmail
+          email: primaryEmail,
+          recipients: recipientsList
         },
+        recipients: recipientsList,
         subject: generatedSubject,
         content: generatedContent,
+        htmlBody,
         language,
         schedule: {
-          isScheduled,
-          date: scheduleDate,
-          time: scheduleTime,
+          isScheduled: scheduleInfo.isScheduled,
+          nextExecution: scheduleInfo.nextExecution,
+          date: scheduleInfo.date,
+          time: scheduleInfo.time,
           timezone: 'Asia/Kolkata'
         }
       };
@@ -198,12 +416,14 @@ For Telegram:
         recipient: {
           chatId: recipientChatId
         },
+        recipients: [],
         content: generatedContent,
         language,
         schedule: {
-          isScheduled,
-          date: scheduleDate,
-          time: scheduleTime,
+          isScheduled: scheduleInfo.isScheduled,
+          nextExecution: scheduleInfo.nextExecution,
+          date: scheduleInfo.date,
+          time: scheduleInfo.time,
           timezone: 'Asia/Kolkata'
         }
       };
@@ -307,8 +527,8 @@ For Telegram:
   /**
    * Fallback heuristic parser when Groq API key is not active
    */
-  fallbackHeuristicParser(command) {
-    return this.normalizeParsedCommand({}, command);
+  fallbackHeuristicParser(command, attachments = []) {
+    return this.normalizeParsedCommand({}, command, attachments);
   }
 
   /**
