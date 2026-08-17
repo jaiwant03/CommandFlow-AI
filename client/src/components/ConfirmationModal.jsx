@@ -88,13 +88,13 @@ const ConfirmationModal = ({ parsedData, originalCommand, onConfirm, onCancel, i
             Generated Content Preview
           </div>
           <div style={{ background: '#FFFFFF', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem', maxHeight: '160px', overflowY: 'auto' }}>
-            {parsedData.generatedSubject && (
+            {(parsedData.subject || parsedData.generatedSubject) && (
               <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)', marginBottom: '0.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.35rem' }}>
-                Subject: {parsedData.generatedSubject}
+                Subject: {parsedData.subject || parsedData.generatedSubject}
               </div>
             )}
             <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', lineHeight: 1.45 }}>
-              {parsedData.generatedBody || 'Content generated based on command intent.'}
+              {parsedData.message || parsedData.generatedBody || parsedData.content || 'Content generated based on command intent.'}
             </div>
           </div>
         </div>

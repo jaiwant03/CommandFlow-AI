@@ -1,51 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Mic, MicOff, Loader, CheckCircle, AlertCircle, X, ArrowRight, Sparkles } from 'lucide-react';
+import { Mic, MicOff, CheckCircle, AlertCircle, X, ArrowRight, Sparkles } from 'lucide-react';
 import '../styles/voice.css';
 
-const VoiceRecorder = ({ onCommandExecute, onTranscriptComplete, selectedLanguage = 'auto', onClose }) => {
-  const [status, setStatus] = useState('IDLE'); // IDLE, LISTENING, PROCESSING, SUCCESS, ERROR
+const VoiceRecorder = ({ onTranscriptComplete, selectedLanguage = 'auto', onClose }) => {
+  const [status, setStatus] = useState('IDLE'); // IDLE, LISTENING, ERROR
   const [transcript, setTranscript] = useState('');
   const [statusText, setStatusText] = useState('Click start to speak...');
   const [recognition, setRecognition] = useState(null);
 
   const silenceTimerRef = React.useRef(null);
-  const hasTriggeredRef = React.useRef(false);
   const latestTranscriptRef = React.useRef('');
-
-  const executeVoiceCommand = React.useCallback(async (textToExecute) => {
-    if (hasTriggeredRef.current) return;
-    hasTriggeredRef.current = true;
-
-    if (silenceTimerRef.current) {
-      clearTimeout(silenceTimerRef.current);
-      silenceTimerRef.current = null;
-    }
-
-    const finalCmd = textToExecute ? textToExecute.trim() : latestTranscriptRef.current.trim();
-    if (!finalCmd) {
-      hasTriggeredRef.current = false;
-      return;
-    }
-
-    setStatus('PROCESSING');
-    setStatusText('Analyzing voice command automatically...');
-
-    try {
-      if (onCommandExecute) {
-        await onCommandExecute(finalCmd, 'voice');
-      }
-      setStatus('SUCCESS');
-      setStatusText('Voice command processed successfully!');
-      setTimeout(() => {
-        if (onClose) onClose();
-      }, 1000);
-    } catch (err) {
-      console.error('[Voice Execution Error]:', err);
-      setStatus('ERROR');
-      setStatusText(err.message || 'Execution error encountered.');
-      hasTriggeredRef.current = false;
-    }
-  }, [onCommandExecute, onClose]);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -72,39 +36,55 @@ const VoiceRecorder = ({ onCommandExecute, onTranscriptComplete, selectedLanguag
         setTranscript(combined);
         latestTranscriptRef.current = combined;
 
-        // Auto-silence timer: when user finishes speaking (1.8s silence)
+        // Stream live text to command input box
+        if (onTranscriptComplete && combined) {
+          onTranscriptComplete(combined);
+        }
+
+        // When user pauses speaking (1.8s silence), stop recording without executing
         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-        if (combined.length > 5 && !hasTriggeredRef.current) {
+        if (combined.length > 2) {
           silenceTimerRef.current = setTimeout(() => {
             try {
               rec.stop();
             } catch (e) {}
-            executeVoiceCommand(combined);
+            setStatus('IDLE');
+            setStatusText('✓ Speech converted to text in command input!');
           }, 1800);
         }
       };
 
       rec.onend = () => {
         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-        if (!hasTriggeredRef.current && latestTranscriptRef.current.trim().length > 3) {
-          executeVoiceCommand(latestTranscriptRef.current);
+        setStatus('IDLE');
+        if (latestTranscriptRef.current.trim()) {
+          setStatusText('✓ Speech converted to text in command input!');
+          if (onTranscriptComplete) {
+            onTranscriptComplete(latestTranscriptRef.current.trim());
+          }
+        } else {
+          setStatusText('Click start to speak...');
         }
       };
 
       rec.onerror = (event) => {
-        console.warn('[Speech Rec Error]:', event.error);
-        if (event.error !== 'no-speech') {
-          setStatus('ERROR');
-          setStatusText(`Speech Recognition issue (${event.error}). You can edit or type command.`);
+        console.warn('[Speech Rec Event]:', event.error);
+        if (event.error !== 'no-speech' && event.error !== 'aborted') {
+          if (event.error === 'not-allowed') {
+            setStatus('ERROR');
+            setStatusText('Microphone permission denied. Please allow mic access.');
+          } else {
+            setStatus('ERROR');
+            setStatusText(`Speech Recognition issue (${event.error}). You can edit or type command.`);
+          }
         }
       };
 
       setRecognition(rec);
     }
-  }, [selectedLanguage, executeVoiceCommand]);
+  }, [selectedLanguage, onTranscriptComplete]);
 
   const startListening = () => {
-    hasTriggeredRef.current = false;
     latestTranscriptRef.current = '';
     setStatus('LISTENING');
     setTranscript('');
@@ -127,25 +107,21 @@ const VoiceRecorder = ({ onCommandExecute, onTranscriptComplete, selectedLanguag
         console.warn('Recognition stop error:', err);
       }
     }
-    if (!hasTriggeredRef.current && latestTranscriptRef.current.trim()) {
-      executeVoiceCommand(latestTranscriptRef.current);
-    } else if (!latestTranscriptRef.current.trim()) {
-      setStatus('IDLE');
-      setStatusText('Speech captured. Review or execute below.');
+    setStatus('IDLE');
+    if (latestTranscriptRef.current.trim()) {
+      setStatusText('✓ Speech converted to text in command input!');
+      if (onTranscriptComplete) {
+        onTranscriptComplete(latestTranscriptRef.current.trim());
+      }
     }
   };
 
   const handleUseTranscript = () => {
     const textToUse = transcript.trim() || latestTranscriptRef.current.trim();
-    if (onTranscriptComplete) {
+    if (onTranscriptComplete && textToUse) {
       onTranscriptComplete(textToUse);
     }
     if (onClose) onClose();
-  };
-
-  const handleDirectExecute = async () => {
-    const textToUse = transcript.trim() || latestTranscriptRef.current.trim();
-    executeVoiceCommand(textToUse);
   };
 
   return (
@@ -172,11 +148,8 @@ const VoiceRecorder = ({ onCommandExecute, onTranscriptComplete, selectedLanguag
           <button
             className={`mic-hero-btn ${status === 'LISTENING' ? 'listening' : ''}`}
             onClick={status === 'LISTENING' ? stopListening : startListening}
-            disabled={status === 'PROCESSING'}
           >
-            {status === 'PROCESSING' ? (
-              <Loader className="spin" size={32} />
-            ) : status === 'LISTENING' ? (
+            {status === 'LISTENING' ? (
               <MicOff size={32} />
             ) : (
               <Mic size={32} />
@@ -185,9 +158,11 @@ const VoiceRecorder = ({ onCommandExecute, onTranscriptComplete, selectedLanguag
         </div>
 
         <div className="voice-status-text">
-          {status === 'PROCESSING' && <Loader size={16} className="spin" />}
-          {status === 'SUCCESS' && <CheckCircle size={16} color="var(--success)" />}
-          {status === 'ERROR' && <AlertCircle size={16} color="var(--danger)" />}
+          {status === 'ERROR' ? (
+            <AlertCircle size={16} color="var(--danger)" />
+          ) : transcript ? (
+            <CheckCircle size={16} color="var(--success)" />
+          ) : null}
           <span>{statusText}</span>
         </div>
 
@@ -200,28 +175,19 @@ const VoiceRecorder = ({ onCommandExecute, onTranscriptComplete, selectedLanguag
         </div>
 
         <div className="voice-modal-actions">
-          {status !== 'LISTENING' && status !== 'PROCESSING' && (
+          {status !== 'LISTENING' ? (
             <>
               <button className="btn btn-secondary" onClick={startListening}>
                 <Mic size={16} />
                 <span>{transcript ? 'Re-record' : 'Start Speaking'}</span>
               </button>
 
-              {transcript && (
-                <button className="btn btn-secondary" onClick={handleUseTranscript}>
-                  <ArrowRight size={16} />
-                  <span>Transfer to Input Box</span>
-                </button>
-              )}
-
-              <button className="btn btn-primary" onClick={handleDirectExecute}>
-                <Sparkles size={16} />
-                <span>Analyze & Execute</span>
+              <button className="btn btn-primary" onClick={handleUseTranscript}>
+                <ArrowRight size={16} />
+                <span>Use Converted Text</span>
               </button>
             </>
-          )}
-
-          {status === 'LISTENING' && (
+          ) : (
             <button className="btn btn-primary" onClick={stopListening}>
               <MicOff size={16} />
               <span>Stop Recording</span>

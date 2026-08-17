@@ -1,0 +1,189 @@
+----------------------------------------
+NODE NAME: Webhook
+PARAMETERS:
+{
+  "httpMethod": "POST",
+  "path": "commandflow",
+  "options": {}
+}
+----------------------------------------
+NODE NAME: Validate Recipient
+PARAMETERS:
+{
+  "jsCode": "const item = $input.item;\nconst body = item.json.body || item.json;\n\nlet rawRecipient = body.recipientEmail || body.toEmail || body.to || (typeof body.recipient === 'object' ? body.recipient?.email : body.recipient);\n\nif (typeof rawRecipient === 'string' && rawRecipient.startsWith('{')) {\n  try {\n    const parsed = JSON.parse(rawRecipient);\n    rawRecipient = parsed.email || parsed.to || rawRecipient;\n  } catch (e) {}\n}\n\nlet cleanRecipient = String(rawRecipient || '').trim().toLowerCase();\ncleanRecipient = cleanRecipient.replace(/\\s+/g, '');\n\nconst isValid = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(cleanRecipient);\n\nif (!isValid) {\n  throw new Error(`[n8n Validation Error] Invalid recipient email address: '${rawRecipient}'. Evaluated recipient: '${cleanRecipient}'`);\n}\n\nconst hasBinary = !!(item.binary && Object.keys(item.binary).length > 0);\n\nreturn {\n  json: {\n    ...item.json,\n    resolvedToEmail: cleanRecipient,\n    toEmail: cleanRecipient,\n    hasAttachment: hasBinary\n  },\n  binary: item.binary || {}\n};"
+}
+----------------------------------------
+NODE NAME: Switch
+PARAMETERS:
+{
+  "rules": {
+    "values": [
+      {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{$json.body.channel || 'gmail'}}",
+              "rightValue": "gmail",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "e8511f1c-2c93-4120-abef-bf9856219983"
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a7987421-40fb-4aea-a2ed-2ec2dc9016b4",
+              "leftValue": "={{$json.body.channel}}",
+              "rightValue": "telegram",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    ]
+  },
+  "options": {}
+}
+----------------------------------------
+NODE NAME: Has Attachment?
+PARAMETERS:
+{
+  "conditions": {
+    "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "strict",
+      "version": 2
+    },
+    "conditions": [
+      {
+        "id": "has-att-cond-1",
+        "leftValue": "={{ $json.hasAttachment }}",
+        "rightValue": true,
+        "operator": {
+          "type": "boolean",
+          "operation": "true"
+        }
+      }
+    ],
+    "combinator": "and"
+  },
+  "options": {}
+}
+----------------------------------------
+NODE NAME: Send a message (With Attachment)
+PARAMETERS:
+{
+  "sendTo": "={{ $json.resolvedToEmail || $json.toEmail || $json.body?.recipientEmail || $json.body?.toEmail || $json.body?.to || $json.body?.recipient?.email }}",
+  "subject": "={{$json.body.subject || 'CommandFlow AI Notification'}}",
+  "message": "={{$json.body.htmlContent || $json.body.content}}",
+  "options": {
+    "attachmentsUi": {
+      "attachmentsBinary": [
+        {}
+      ]
+    }
+  }
+}
+----------------------------------------
+NODE NAME: Send a message (Text Only)
+PARAMETERS:
+{
+  "sendTo": "={{ $json.resolvedToEmail || $json.toEmail || $json.body?.recipientEmail || $json.body?.toEmail || $json.body?.to || $json.body?.recipient?.email }}",
+  "subject": "={{$json.body.subject || 'CommandFlow AI Notification'}}",
+  "message": "={{$json.body.htmlContent || $json.body.content}}",
+  "options": {}
+}
+----------------------------------------
+NODE NAME: Send a text message
+PARAMETERS:
+{
+  "chatId": "7793673257",
+  "text": "={{$json.body.content || 'Hello from CommandFlow AI \ud83d\ude80'}}",
+  "additionalFields": {}
+}
+----------------------------------------
+CONNECTIONS:
+{
+  "Webhook": {
+    "main": [
+      [
+        {
+          "node": "Validate Recipient",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    ]
+  },
+  "Validate Recipient": {
+    "main": [
+      [
+        {
+          "node": "Switch",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    ]
+  },
+  "Switch": {
+    "main": [
+      [
+        {
+          "node": "Has Attachment?",
+          "type": "main",
+          "index": 0
+        }
+      ],
+      [
+        {
+          "node": "Send a text message",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    ]
+  },
+  "Has Attachment?": {
+    "main": [
+      [
+        {
+          "node": "Send a message (With Attachment)",
+          "type": "main",
+          "index": 0
+        }
+      ],
+      [
+        {
+          "node": "Send a message (Text Only)",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    ]
+  }
+}

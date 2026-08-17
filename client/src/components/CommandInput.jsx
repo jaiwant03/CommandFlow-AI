@@ -1,11 +1,91 @@
 import React, { useState, useRef } from 'react';
-import { Sparkles, Loader, Image as ImageIcon, X } from 'lucide-react';
+import { Sparkles, Loader, Image as ImageIcon, X, Mic, MicOff } from 'lucide-react';
 import '../styles/automation.css';
 
 const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
   const [attachments, setAttachments] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [speechStatus, setSpeechStatus] = useState('');
   const fileInputRef = useRef(null);
+  const recognitionRef = useRef(null);
+
+  const toggleSpeechToText = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setErrorMsg('Speech recognition is not supported in your browser. Please type your command.');
+      return;
+    }
+
+    if (isListening) {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop(); } catch (e) {}
+      }
+      setIsListening(false);
+      setSpeechStatus('');
+      return;
+    }
+
+    setErrorMsg('');
+    try {
+      const rec = new SpeechRecognition();
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.lang = navigator.language || 'en-US';
+
+      rec.onstart = () => {
+        setIsListening(true);
+        setSpeechStatus('🔴 Listening... Speak now and text will appear live in the box below!');
+      };
+
+      rec.onresult = (event) => {
+        let finalText = '';
+        let interimText = '';
+
+        for (let i = 0; i < event.results.length; i++) {
+          const result = event.results[i];
+          if (result.isFinal) {
+            finalText += result[0].transcript + ' ';
+          } else {
+            interimText += result[0].transcript;
+          }
+        }
+
+        const combined = (finalText + interimText).trim();
+        if (combined) {
+          onChange(combined);
+          setSpeechStatus('✨ Speech converted to text live in input box!');
+        }
+      };
+
+      rec.onerror = (event) => {
+        console.warn('Speech recognition event:', event.error);
+        if (event.error !== 'no-speech' && event.error !== 'aborted') {
+          if (event.error === 'not-allowed') {
+            setErrorMsg('Microphone access denied. Please allow microphone permissions in your browser settings.');
+          } else if (event.error === 'audio-capture') {
+            setErrorMsg('No microphone detected. Please connect a microphone and try again.');
+          } else {
+            setErrorMsg(`Voice input notice (${event.error}). You can type or try speaking again.`);
+          }
+        }
+        setIsListening(false);
+        setSpeechStatus('');
+      };
+
+      rec.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = rec;
+      rec.start();
+    } catch (err) {
+      console.error('Speech recognition error:', err);
+      setErrorMsg('Could not access microphone.');
+      setIsListening(false);
+      setSpeechStatus('');
+    }
+  };
 
   const handleFileChange = (e) => {
     setErrorMsg('');
@@ -26,6 +106,7 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
         const reader = new FileReader();
         reader.onload = () => {
           resolve({
+            file, // Preserve raw JavaScript File object for FormData upload
             filename: file.name,
             contentType: file.type || 'image/png',
             data: reader.result
@@ -80,14 +161,52 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
                 padding: '1rem 1.25rem',
                 fontSize: '1rem',
                 borderRadius: 'var(--radius-lg)',
-                border: '2px solid var(--border-color)',
+                border: isListening ? '2px solid #10B981' : '2px solid var(--border-color)',
                 outline: 'none',
                 fontFamily: 'var(--font-body)',
                 backgroundColor: '#FFFFFF',
-                boxShadow: 'var(--shadow-sm)'
+                boxShadow: isListening ? '0 0 0 4px rgba(16, 185, 129, 0.15)' : 'var(--shadow-sm)',
+                transition: 'all 0.2s ease'
               }}
             />
           </div>
+
+          <button
+            type="button"
+            onClick={toggleSpeechToText}
+            disabled={isLoading}
+            title={isListening ? "Stop Listening" : "Speak Command (Voice to Text)"}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.45rem',
+              padding: '0.95rem 1.25rem',
+              fontSize: '0.9rem',
+              fontWeight: 700,
+              borderRadius: 'var(--radius-lg)',
+              backgroundColor: isListening ? '#FEF2F2' : '#F8FAFC',
+              color: isListening ? '#EF4444' : '#0F172A',
+              border: isListening ? '2px solid #EF4444' : '2px solid #CBD5E1',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.15s ease',
+              boxShadow: 'var(--shadow-sm)',
+              height: '50px'
+            }}
+          >
+            {isListening ? (
+              <>
+                <MicOff size={19} color="#EF4444" />
+                <span>Stop Listening</span>
+              </>
+            ) : (
+              <>
+                <Mic size={19} color="#10B981" />
+                <span>Speak</span>
+              </>
+            )}
+          </button>
 
           <input
             type="file"
@@ -165,6 +284,21 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
           </button>
         </div>
       </form>
+
+      {speechStatus && (
+        <div style={{
+          marginTop: '0.5rem',
+          fontSize: '0.85rem',
+          color: isListening ? '#10B981' : '#2563EB',
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.35rem'
+        }}>
+          <span>🎤</span>
+          <span>{speechStatus}</span>
+        </div>
+      )}
 
       {errorMsg && (
         <div style={{

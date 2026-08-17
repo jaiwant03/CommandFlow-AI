@@ -7,113 +7,147 @@ class GroqService {
   constructor() {
     this.apiKey = process.env.GROQ_API_KEY || '';
     this.apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
-    this.model = 'llama-3.3-70b-versatile';
+    this.model = 'qwen/qwen3.6-27b';
+    this.fallbackModels = [
+      'qwen/qwen3.6-27b',
+      'openai/gpt-oss-120b',
+      'openai/gpt-oss-20b',
+      'groq/compound-mini',
+      'groq/compound',
+      'llama-3.3-70b-versatile',
+      'llama-3.1-8b-instant'
+    ];
   }
 
   /**
    * Parse user command into structured JSON according to CommandFlow specifications
    */
-  async processCommand(command, attachments = []) {
+  async processCommand(commandInput, attachments = []) {
+    let command = '';
+    let channelHint = '';
+    let recipientHint = '';
+
+    if (typeof commandInput === 'object' && commandInput !== null) {
+      command = commandInput.userCommand || commandInput.command || '';
+      channelHint = commandInput.channel || '';
+      recipientHint = commandInput.recipient || '';
+    } else {
+      command = String(commandInput || '');
+    }
+
     if (!command || !command.trim()) {
       throw new Error('Command text cannot be empty.');
     }
 
-    const systemPrompt = `You are CommandFlow AI, an intelligent personal automation assistant.
+    const normalizedCommandText = this.normalizeSpokenEmailText(command);
 
-The user will provide natural-language instructions for sending emails or messages.
+    const systemPrompt = `You are the content-generation engine for CommandFlow AI. The user's original natural-language command is the source of truth. Understand exactly what the user is asking for and generate the requested email content. Never replace the requested purpose with a generic email template. Preserve all relevant details from the command. Return structured JSON containing intent, channel, recipients, subject, and message.
 
-Your job is to:
-1. Understand the user's intent (send_email for Gmail, send_message for Telegram).
-2. Identify the communication channel (gmail or telegram).
-3. Extract recipient information (name, email address for Gmail; chatId for Telegram). Never invent fake email addresses or Telegram chat IDs if not provided.
-4. Extract scheduling information (date, time, timezone).
-5. Understand the purpose and important details from the command.
-6. GENERATE THE ACTUAL MESSAGE / EMAIL CONTENT. Never use the user's command itself as the final message unless the user explicitly asks to send that exact text (e.g. "Send exactly this message: ...").
-7. GENERATE A SUITABLE SUBJECT for emails (e.g., "Leave Request", "Request for Bonafide Certificate", "Absence Notification", "Permission Request", "Meeting Request"). Never use generic subjects like "CommandFlow AI Test" or raw command text.
-8. Preserve the user's requested meaning and reason (e.g., if user mentions attending uncle's function, include that in the letter).
-9. Write professionally when the user requests letters, applications, requests, or formal communication. Include formal salutations (e.g., "Dear Sir/Madam,"), clear body paragraphs, and proper sign-offs (e.g., "Regards,\nJaiwant Karrun").
-10. Respect the requested language (English, Tamil, Tanglish). If Tanglish (e.g., "Naalaikku class ku vara mudiyadhu, leave letter ah sir ku anuppu"), interpret the meaning and generate an appropriate leave request.
-
-DISTINCTION BETWEEN COMMAND vs CONTENT:
-- If user says: "Send a message to John saying I will reach at 6 PM." -> content: "I will reach at 6 PM."
-- If user says: "Send a leave letter to admin@example.com through Gmail because I went to my uncle's function." -> subject: "Leave Request", content: "Dear Sir/Madam,\n\nI am writing to request leave as I had to attend my uncle's function. Due to this personal commitment, I was unable to attend class.\n\nI kindly request you to consider my absence and grant me leave.\n\nThank you for your understanding.\n\nRegards,\nJaiwant Karrun"
-- If user says: "Send a bonafide certificate request to admin@example.com through Gmail." -> subject: "Request for Bonafide Certificate", content: "Dear Sir/Madam,\n\nI am writing to kindly request a bonafide certificate for official purposes. I would be grateful if you could process my request and provide the certificate at your earliest convenience.\n\nThank you for your assistance.\n\nRegards,\nJaiwant Karrun"
-
-Return ONLY valid JSON matching this exact structure:
-
-For Gmail:
+DETAILED RULES:
+1. SOURCE OF TRUTH: The user's original command defines the topic, reason, tone, timing, attachments, and recipient. You must analyze the exact command.
+2. CHANNEL DETECTION:
+   - "gmail" for email requests (Gmail, email, mail, request letter, leave request, application, etc.).
+   - "telegram" for messaging requests (Telegram, message, chat, text).
+3. RECIPIENTS EXTRACTION:
+   - For Gmail: Extract all target email addresses as an array in "recipients".
+   - For Telegram: Extract Telegram chat ID into "recipients" array (default to ["7793673257"] if unspecified).
+4. SUBJECT GENERATION (For Emails):
+   - Generate a clear, professional, and specific email subject matching the user's request purpose.
+   - Examples:
+     * "send a bona fide request letter to official.jaiwantkarrunworks@gmail.com through gmail" -> subject: "Request for Bona Fide Certificate"
+     * "send an apology email to abc@gmail.com" -> subject: "Apology Regarding Recent Inconvenience"
+     * "send a leave request to abc@gmail.com because I am sick" -> subject: "Leave Request Due to Illness"
+     * "send my project submission email to abc@gmail.com saying I have attached my project" -> subject: "Project Submission"
+     * "send a meeting request to abc@gmail.com for tomorrow" -> subject: "Meeting Request for Tomorrow"
+5. MESSAGE GENERATION (Email / Telegram Body):
+   - Generate full, well-structured, professional email content.
+   - Include formal salutation (e.g. "Dear Sir/Madam,"), comprehensive body paragraphs directly addressing the user's command (preserving all specific details, reasons like sickness or uncle's function, attachment mentions, or timing), and a formal sign-off ("Regards,\nJaiwant Karrun").
+   - NEVER use generic placeholders like "Official Communication" or "I am writing regarding the matter requested".
+6. OUTPUT SCHEMA:
+Return ONLY a valid JSON object with the following schema:
 {
   "intent": "send_email",
   "channel": "gmail",
-  "recipient": {
-    "name": string,
-    "email": string
-  },
-  "subject": string (Generated professional email subject),
-  "content": string (Generated full professional email body),
-  "language": "english" | "tamil" | "tanglish",
-  "schedule": {
-    "isScheduled": boolean,
-    "date": string or null,
-    "time": string or null,
-    "timezone": "Asia/Kolkata"
-  }
-}
+  "recipients": ["recipient@example.com"],
+  "subject": "Specific Generated Subject",
+  "message": "Dear Sir/Madam,\n\nGenerated message body...\n\nRegards,\nJaiwant Karrun"
+}`;
 
-For Telegram:
-{
-  "intent": "send_message",
-  "channel": "telegram",
-  "recipient": {
-    "chatId": string
-  },
-  "content": string (Generated natural Telegram message),
-  "language": "english" | "tamil" | "tanglish",
-  "schedule": {
-    "isScheduled": boolean,
-    "date": string or null,
-    "time": string or null,
-    "timezone": "Asia/Kolkata"
-  }
-}
-`;
+    const extractedEmails = this.extractAllRecipients(command);
+    const userPayload = {
+      userCommand: normalizedCommandText,
+      channel: channelHint || (command.toLowerCase().includes('telegram') ? 'telegram' : 'gmail'),
+      recipient: recipientHint || (extractedEmails.length > 0 ? extractedEmails[0] : undefined)
+    };
 
     if (this.apiKey && !this.apiKey.includes('placeholder')) {
-      try {
-        const response = await axios.post(
-          this.apiUrl,
-          {
-            model: this.model,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: `User Command: "${command}"` }
-            ],
-            response_format: { type: 'json_object' },
-            temperature: 0.2
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${this.apiKey}`,
-              'Content-Type': 'application/json'
+      for (const modelName of this.fallbackModels) {
+        try {
+          const response = await axios.post(
+            this.apiUrl,
+            {
+              model: modelName,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: JSON.stringify(userPayload) }
+              ],
+              response_format: { type: 'json_object' },
+              temperature: 0.1,
+              max_tokens: 1024
             },
-            timeout: 12000
-          }
-        );
+            {
+              headers: {
+                'Authorization': `Bearer ${this.apiKey}`,
+                'Content-Type': 'application/json'
+              },
+              timeout: 10000
+            }
+          );
 
-        const resultText = response.data.choices[0].message.content;
-        const parsed = JSON.parse(resultText);
-        const tokenUsage = response.data.usage || null;
-        const normalized = this.normalizeParsedCommand(parsed, command, attachments);
-        normalized.tokenUsage = tokenUsage || this.estimateTokenUsage(command, normalized.content || '', normalized.subject || '');
-        return normalized;
-      } catch (err) {
-        console.warn(`[Groq AI] API call error (${err.message}). Using smart fallback generator.`);
+          const resultText = response.data.choices[0].message.content;
+          const parsed = this.safeParseGroqJson(resultText);
+
+          if (parsed && (parsed.message || parsed.content)) {
+            const tokenUsage = response.data.usage || null;
+            const normalized = this.normalizeParsedCommand(parsed, command, attachments);
+            normalized.tokenUsage = tokenUsage || this.estimateTokenUsage(command, normalized.message || '', normalized.subject || '');
+            return normalized;
+          }
+        } catch (err) {
+          console.warn(`[Groq AI] Model ${modelName} error (${err.message}). Trying next model...`);
+        }
       }
     }
 
-    const fallback = this.fallbackHeuristicParser(command, attachments);
-    fallback.tokenUsage = this.estimateTokenUsage(command, fallback.content || '', fallback.subject || '');
-    return fallback;
+    throw new Error(`[Groq AI Engine Error] Unable to generate structured JSON response for command: "${command}". Please verify your Groq API key and network connection.`);
+  }
+
+  /**
+   * Safely parse JSON from Groq output with error repair
+   */
+  safeParseGroqJson(text) {
+    if (!text || typeof text !== 'string') return null;
+
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      try {
+        return JSON.parse(cleaned);
+      } catch (e2) {
+        const firstBrace = text.indexOf('{');
+        const lastBrace = text.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace > firstBrace) {
+          const jsonSub = text.substring(firstBrace, lastBrace + 1);
+          try {
+            return JSON.parse(jsonSub);
+          } catch (e3) {
+            console.error('[Groq AI] JSON parse repair failed:', e3.message);
+          }
+        }
+      }
+    }
+    return null;
   }
 
   estimateTokenUsage(command, content = '', subject = '') {
@@ -123,23 +157,59 @@ For Telegram:
 
   /**
    * Convert spoken email patterns in text into valid email addresses
-   * E.g., "john dot smith at gmail dot com" -> "john.smith@gmail.com"
    */
   normalizeSpokenEmailText(text) {
-    if (!text) return '';
+    if (!text || typeof text !== 'string') return '';
     let result = text;
 
-    result = result.replace(/\b([a-zA-Z0-9._%+-]+(?:\s+(?:dot|period|_|underscore|-|hyphen|dash)\s+[a-zA-Z0-9._%+-]+)*)\s+(?:at|@)\s+([a-zA-Z0-9-]+(?:\s+(?:dot|period)\s+[a-zA-Z0-9-]+)*)\s+(?:dot|period|\.)\s+([a-zA-Z]{2,})\b/gi, (match, username, domain, tld) => {
-      let cleanUser = username
+    result = result.replace(/\b(?:at|@)\s+([a-zA-Z0-9-]+(?:\s+(?:dot|period|\.)\s+[a-zA-Z0-9-]+)+)\b/gi, (match, domainGroup) => {
+      const cleanDomain = domainGroup.replace(/\s+(?:dot|period)\s+/gi, '.').replace(/\s+/g, '');
+      return `@${cleanDomain}`;
+    });
+
+    result = result.replace(/\b([a-zA-Z0-9._%+-]+(?:\s+(?:dot|period|underscore|dash|hyphen)\s+[a-zA-Z0-9._%+-]+)+)\s*(?:at|@)\s*([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/gi, (match, userPart, domainPart) => {
+      let cleanUser = userPart
         .replace(/\s+(?:dot|period)\s+/gi, '.')
         .replace(/\s+(?:underscore)\s+/gi, '_')
-        .replace(/\s+(?:hyphen|dash)\s+/gi, '-')
+        .replace(/\s+(?:dash|hyphen)\s+/gi, '-')
         .replace(/\s+/g, '');
-      let cleanDomain = domain
-        .replace(/\s+(?:dot|period)\s+/gi, '.')
-        .replace(/\s+/g, '');
-      return `${cleanUser}@${cleanDomain}.${tld.toLowerCase()}`;
+      return `${cleanUser}@${domainPart.replace(/\s+/g, '')}`;
     });
+
+    const domainRegex = /\b([a-zA-Z0-9._%+-]+(?:\s+[a-zA-Z0-9._%+-]+)*)\s*@\s*([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/gi;
+
+    result = result.replace(domainRegex, (match, userPart, domainPart) => {
+      const tokens = userPart.trim().split(/\s+/);
+      const stopWords = new Set([
+        'to', 'for', 'send', 'sending', 'email', 'mail', 'sent', 'letter',
+        'message', 'address', 'unto', 'towards', 'via', 'with', 'through'
+      ]);
+      
+      let emailTokens = [];
+      for (let i = tokens.length - 1; i >= 0; i--) {
+        const token = tokens[i];
+        const lower = token.toLowerCase();
+        
+        if (stopWords.has(lower) && emailTokens.length > 0) {
+          break;
+        }
+        
+        emailTokens.unshift(token);
+      }
+      
+      const prefixCount = tokens.length - emailTokens.length;
+      const prefix = prefixCount > 0 ? tokens.slice(0, prefixCount).join(' ') + ' ' : '';
+      
+      let cleanUser = emailTokens.join('')
+        .replace(/(?:dot|period)/gi, '.')
+        .replace(/(?:underscore)/gi, '_')
+        .replace(/(?:dash|hyphen)/gi, '-');
+
+      const cleanDomain = domainPart.trim().toLowerCase();
+      return `${prefix}${cleanUser.toLowerCase()}@${cleanDomain}`;
+    });
+
+    result = result.replace(/\b([a-zA-Z0-9._%+-]+)\s*@\s*([a-zA-Z0-9.-]+)\s*\.\s*([a-zA-Z]{2,})\b/gi, '$1@$2.$3');
 
     return result;
   }
@@ -149,18 +219,35 @@ For Telegram:
    */
   extractAllRecipients(command, parsedRecipients = []) {
     const normalizedText = this.normalizeSpokenEmailText(command);
-    
     const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/gi;
     const matches = normalizedText.match(emailRegex) || [];
 
     const rawList = [...matches];
 
     if (Array.isArray(parsedRecipients)) {
-      rawList.push(...parsedRecipients);
+      for (let p of parsedRecipients) {
+        if (typeof p === 'string') {
+          const normP = this.normalizeSpokenEmailText(p);
+          const pMatches = normP.match(emailRegex) || [];
+          if (pMatches.length > 0) rawList.push(...pMatches);
+          else rawList.push(p);
+        } else if (p && p.email) {
+          const normE = this.normalizeSpokenEmailText(p.email);
+          const eMatches = normE.match(emailRegex) || [];
+          if (eMatches.length > 0) rawList.push(...eMatches);
+          else rawList.push(p.email);
+        }
+      }
     } else if (typeof parsedRecipients === 'string' && parsedRecipients) {
-      rawList.push(parsedRecipients);
+      const normP = this.normalizeSpokenEmailText(parsedRecipients);
+      const pMatches = normP.match(emailRegex) || [];
+      if (pMatches.length > 0) rawList.push(...pMatches);
+      else rawList.push(parsedRecipients);
     } else if (parsedRecipients && parsedRecipients.email) {
-      rawList.push(parsedRecipients.email);
+      const normE = this.normalizeSpokenEmailText(parsedRecipients.email);
+      const eMatches = normE.match(emailRegex) || [];
+      if (eMatches.length > 0) rawList.push(...eMatches);
+      else rawList.push(parsedRecipients.email);
     }
 
     const cleanList = [];
@@ -172,6 +259,7 @@ For Telegram:
       let clean = raw.trim().toLowerCase();
       clean = clean.replace(/[.,;:!()\]\[>]+$/, '');
       clean = clean.replace(/^[<(\[]+/, '');
+      clean = clean.replace(/\s+/g, '');
 
       const isValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(clean);
       if (isValid && !seen.has(clean)) {
@@ -184,14 +272,12 @@ For Telegram:
   }
 
   /**
-   * Calculate exact scheduled execution timestamp (relative or explicit)
+   * Calculate exact scheduled execution timestamp
    */
   calculateScheduledExecutionTime(command, aiSchedule = {}) {
     const lowerCmd = (command || '').toLowerCase();
     const now = new Date();
 
-    // 1. Strict Relative Delay: "after 10 minutes", "in 30 mins", "after 2 hours", "after 1 day"
-    // MUST match explicit time unit: minute, mins, hour, hrs, day, days
     const relativeMatch = lowerCmd.match(/\b(?:after|in)\s+(\d+)\s*(minutes?|mins?|hours?|hrs?|days?)\b/i);
 
     if (relativeMatch) {
@@ -215,7 +301,6 @@ For Telegram:
       };
     }
 
-    // 2. Strict Explicit Clock Time: "at 5 PM", "at 5:30 PM", "5:30 PM", "9 AM", "at 17:30"
     const explicitClockMatch = lowerCmd.match(/\b(?:at\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?|(\d{1,2}):(\d{2})\s*(am|pm)?|(\d{1,2})\s*(am|pm))\b/i);
     
     let targetHours = null;
@@ -241,15 +326,12 @@ For Telegram:
       }
     }
 
-    // 3. Strict Date Keywords
     const isTomorrow = lowerCmd.includes('tomorrow') ||
                        lowerCmd.includes('naalaikku') ||
                        /\b(?:next\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday))\b/i.test(lowerCmd) ||
                        /\b(?:on\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday))\b/i.test(lowerCmd);
 
     const hasExplicitScheduleKeyword = lowerCmd.includes('schedule') || lowerCmd.includes('scheduled for');
-
-    // ONLY mark as scheduled if user explicitly provided a relative delay, clock time, tomorrow/date keyword, or explicit schedule instruction!
     const isScheduled = !!(hasExplicitClockTime || isTomorrow || (aiSchedule.isScheduled && (hasExplicitScheduleKeyword || aiSchedule.time || aiSchedule.date)));
 
     if (isScheduled) {
@@ -285,37 +367,21 @@ For Telegram:
   /**
    * Generate clean, professional HTML email body
    */
-  generateHtmlEmailBody({ subject, content, attachments = [], recipientName = '' }) {
+  generateHtmlEmailBody({ subject, content, attachments = [] }) {
     const safeContent = content || '';
-    const paragraphs = safeContent
+
+    // Strip any raw <img> tags or broken cid placeholders to prevent broken image boxes in Gmail
+    const cleanTextContent = safeContent
+      .replace(/<img[^>]*>/gi, '')
+      .replace(/\[broken image[^\]]*\]/gi, '')
+      .trim();
+
+    const paragraphs = cleanTextContent
       .split(/\n\n+/)
       .map(p => p.trim())
       .filter(p => p.length > 0)
       .map(p => `<p style="margin: 0 0 16px 0; line-height: 1.6; color: #334155; font-size: 15px;">${p.replace(/\n/g, '<br/>')}</p>`)
       .join('');
-
-    let attachmentHtml = '';
-    if (attachments && attachments.length > 0) {
-      const imageItems = attachments.map((att, idx) => {
-        const src = att.data || att.url || '';
-        if (!src) return '';
-        return `
-          <div style="margin-top: 16px; text-align: center;">
-            <img src="${src}" alt="${att.filename || 'Attached Image ' + (idx + 1)}" style="max-width: 100%; max-height: 500px; height: auto; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: inline-block;" />
-            <p style="font-size: 12px; color: #64748b; margin-top: 6px; font-weight: 600;">📎 ${att.filename || 'Attachment ' + (idx + 1)}</p>
-          </div>
-        `;
-      }).filter(Boolean).join('');
-
-      if (imageItems) {
-        attachmentHtml = `
-          <div style="margin-top: 24px; padding-top: 20px; border-top: 1px dashed #cbd5e1;">
-            <p style="font-size: 13px; font-weight: 700; color: #475569; margin: 0 0 12px 0;">Attached Image(s):</p>
-            ${imageItems}
-          </div>
-        `;
-      }
-    }
 
     return `<!DOCTYPE html>
 <html>
@@ -337,7 +403,6 @@ For Telegram:
           <tr>
             <td style="padding: 32px; text-align: left; color: #334155;">
               ${paragraphs}
-              ${attachmentHtml}
             </td>
           </tr>
           <tr>
@@ -354,49 +419,58 @@ For Telegram:
   }
 
   /**
-   * Normalize and validate parsed JSON structure
+   * Normalize and validate parsed JSON structure from Groq AI
    */
   normalizeParsedCommand(parsed, originalCommand, attachments = []) {
     const lowerCmd = originalCommand.toLowerCase();
     
-    // Detect channel
     let channel = parsed.channel || 'gmail';
     if (lowerCmd.includes('telegram')) channel = 'telegram';
     else if (lowerCmd.includes('gmail') || lowerCmd.includes('email') || lowerCmd.includes('mail')) channel = 'gmail';
 
-    // Detect language
     let language = parsed.language || 'english';
     if (/[\u0B80-\u0BFF]/.test(originalCommand)) language = 'tamil';
     else if (/(naalaikku|irukku|panni|pannu|sollu|sir-ku|advisor-ku|anuppu|varuven|varuvennu)/i.test(originalCommand)) language = 'tanglish';
 
-    // Extract recipients
-    const recipientsList = this.extractAllRecipients(originalCommand, parsed.recipient || parsed.recipients);
-    // Telegram chat ID extraction regex
+    const recipientsList = this.extractAllRecipients(originalCommand, parsed.recipients || parsed.recipient);
     const chatIdMatch = originalCommand.match(/\b\d{7,12}\b/);
-
-    // Schedule calculation
     const scheduleInfo = this.calculateScheduledExecutionTime(originalCommand, parsed.schedule || {});
 
-    // Ensure content is generated and NOT raw user command
-    const generatedContent = this.ensureGeneratedContent(parsed.content, parsed.subject, originalCommand, channel, language);
-    const generatedSubject = this.ensureGeneratedSubject(parsed.subject, originalCommand, channel);
-    const htmlBody = channel === 'gmail' ? this.generateHtmlEmailBody({ subject: generatedSubject, content: generatedContent, attachments }) : '';
+    const generatedSubject = parsed.subject ? String(parsed.subject).trim() : '';
+    const generatedMessage = (parsed.message || parsed.content || '').trim();
+
+    // Strict validation (Rule 14)
+    if (channel === 'gmail') {
+      if (!generatedSubject) {
+        throw new Error(`[Groq AI Error] Subject returned by Groq AI is empty for command: "${originalCommand}".`);
+      }
+      if (!generatedMessage) {
+        throw new Error(`[Groq AI Error] Message content returned by Groq AI is empty for command: "${originalCommand}".`);
+      }
+    }
+
+    const htmlBody = channel === 'gmail' ? this.generateHtmlEmailBody({ subject: generatedSubject, content: generatedMessage, attachments }) : '';
 
     if (channel === 'gmail') {
-      const primaryEmail = recipientsList.length > 0 ? recipientsList[0] : '';
-      const recipientName = parsed.recipient?.name || (primaryEmail ? primaryEmail.split('@')[0] : 'Recipient');
-      
+      const effectiveRecipients = recipientsList;
+      const primaryEmail = effectiveRecipients[0] || '';
+      const recipientName = (parsed.recipient?.name && parsed.recipient?.name !== 'Recipient') 
+        ? parsed.recipient.name 
+        : (primaryEmail ? primaryEmail.split('@')[0] : 'Recipient');
+
       return {
         intent: parsed.intent || 'send_email',
         channel: 'gmail',
+        userCommand: originalCommand,
         recipient: {
           name: recipientName,
           email: primaryEmail,
-          recipients: recipientsList
+          recipients: effectiveRecipients
         },
-        recipients: recipientsList,
+        recipients: effectiveRecipients,
         subject: generatedSubject,
-        content: generatedContent,
+        message: generatedMessage,
+        content: generatedMessage, // backwards compatibility
         htmlBody,
         language,
         schedule: {
@@ -413,11 +487,14 @@ For Telegram:
       return {
         intent: parsed.intent || 'send_message',
         channel: 'telegram',
+        userCommand: originalCommand,
         recipient: {
           chatId: recipientChatId
         },
-        recipients: [],
-        content: generatedContent,
+        recipients: [recipientChatId],
+        subject: '',
+        message: generatedMessage,
+        content: generatedMessage, // backwards compatibility
         language,
         schedule: {
           isScheduled: scheduleInfo.isScheduled,
@@ -430,110 +507,6 @@ For Telegram:
     }
   }
 
-  /**
-   * Helper to ensure content is an actual generated message and NOT the raw command string
-   */
-  ensureGeneratedContent(content, subject, command, channel, language) {
-    const trimmedCmd = command.trim();
-    // If content is missing, or is identical to the raw command, or contains raw command wrapper, generate smart content
-    if (!content || content.trim() === trimmedCmd || content.includes(`Command: "${trimmedCmd}"`)) {
-      return this.generateSmartContentFromCommand(command, channel, language);
-    }
-    return content;
-  }
-
-  /**
-   * Helper to ensure subject is a professional subject and NOT raw command
-   */
-  ensureGeneratedSubject(subject, command, channel) {
-    if (channel !== 'gmail') return '';
-    const trimmedCmd = command.trim();
-    if (!subject || subject.trim() === trimmedCmd || subject.includes('CommandFlow Message')) {
-      return this.generateSubjectFromCommand(command);
-    }
-    return subject;
-  }
-
-  /**
-   * Smart subject generator based on command intent
-   */
-  generateSubjectFromCommand(command) {
-    const lower = command.toLowerCase();
-    if (lower.includes('leave')) return 'Leave Request';
-    if (lower.includes('bonafide')) return 'Request for Bonafide Certificate';
-    if (lower.includes('absent') || lower.includes('not feeling well')) return 'Absence Notification';
-    if (lower.includes('permission')) return 'Request for Permission';
-    if (lower.includes('meeting')) return 'Meeting Request';
-    if (lower.includes('late')) return 'Late Arrival Notice';
-    return 'Official Communication';
-  }
-
-  /**
-   * Smart fallback content generator based on natural language command
-   */
-  generateSmartContentFromCommand(command, channel, language) {
-    const lower = command.toLowerCase();
-
-    // Check if exact message was provided using "saying ...", "say ...", "message: ..."
-    const sayingMatch = command.match(/(?:saying|say|message:)\s+["']?([^"']+)["']?/i);
-    if (sayingMatch && sayingMatch[1]) {
-      const explicitMsg = sayingMatch[1].trim();
-      // Remove trailing schedule/channel words if caught
-      return explicitMsg.replace(/\s+(through|via|by|tomorrow|at)\s+.*/i, '');
-    }
-
-    const exactMatch = command.match(/(?:exactly this message:?)\s+["']?([^"']+)["']?/i);
-    if (exactMatch && exactMatch[1]) {
-      return exactMatch[1].trim();
-    }
-
-    if (channel === 'telegram') {
-      if (lower.includes('late')) return 'I will be arriving a bit late today.';
-      if (lower.includes('reach')) {
-        const timeMatch = command.match(/\b\d{1,2}(?::\d{2})?\s*(?:am|pm)?\b/i);
-        return `I will reach ${timeMatch ? `by ${timeMatch[0]}` : 'soon'}.`;
-      }
-      return command;
-    }
-
-    // Gmail letter / formal request generation
-    if (lower.includes('leave')) {
-      let reason = 'personal commitments';
-      if (lower.includes("uncle's function") || lower.includes('uncle function')) {
-        reason = "my uncle's function";
-      } else if (lower.includes('sick') || lower.includes('fever') || lower.includes('not feeling well')) {
-        reason = 'health reasons as I am not feeling well';
-      }
-
-      return `Dear Sir/Madam,\n\nI am writing to formally request leave of absence due to ${reason}. Due to this commitment, I will be unable to attend class.\n\nI kindly request you to consider my absence and grant me leave for the concerned day.\n\nThank you for your understanding.\n\nRegards,\nJaiwant Karrun`;
-    }
-
-    if (lower.includes('bonafide')) {
-      return `Dear Sir/Madam,\n\nI am writing to kindly request the issuance of a Bonafide Certificate for official documentation purposes. I would be grateful if you could process my request and provide the certificate at your earliest convenience.\n\nThank you for your assistance.\n\nRegards,\nJaiwant Karrun`;
-    }
-
-    if (lower.includes('absent') || lower.includes('not feeling well')) {
-      return `Dear Sir/Madam,\n\nI would like to inform you that I will be absent tomorrow as I am not feeling well. Kindly consider my absence.\n\nThank you for your understanding.\n\nRegards,\nJaiwant Karrun`;
-    }
-
-    if (lower.includes('permission')) {
-      return `Dear Sir/Madam,\n\nI am writing to request permission regarding the upcoming academic event. I request you to kindly grant approval for the same.\n\nThank you for your support.\n\nRegards,\nJaiwant Karrun`;
-    }
-
-    // Default professional formal email generator
-    return `Dear Sir/Madam,\n\nI am writing regarding the matter requested. Please find this official communication for your reference.\n\nThank you for your time and assistance.\n\nRegards,\nJaiwant Karrun`;
-  }
-
-  /**
-   * Fallback heuristic parser when Groq API key is not active
-   */
-  fallbackHeuristicParser(command, attachments = []) {
-    return this.normalizeParsedCommand({}, command, attachments);
-  }
-
-  /**
-   * Helper for dynamic content generation
-   */
   async generateContent(prompt) {
     if (this.apiKey && !this.apiKey.includes('placeholder')) {
       try {
@@ -561,3 +534,4 @@ For Telegram:
 }
 
 module.exports = new GroqService();
+

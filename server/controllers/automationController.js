@@ -16,25 +16,86 @@ const generateAutomationId = () => {
  */
 const createAutomationFromCommand = async (req, res) => {
   try {
-    const { command, inputType = 'text', attachments = [] } = req.body;
+    let { command, inputType = 'text', attachments: rawAttachments } = req.body;
     if (!command || !command.trim()) {
       return res.status(400).json({ success: false, message: 'Please provide a valid command.' });
     }
 
+    let parsedAttachments = [];
+    if (typeof rawAttachments === 'string') {
+      try {
+        parsedAttachments = JSON.parse(rawAttachments);
+      } catch (e) {
+        parsedAttachments = [];
+      }
+    } else if (Array.isArray(rawAttachments)) {
+      parsedAttachments = rawAttachments;
+    }
+
+    const combinedAttachments = [...parsedAttachments];
+
+    if (req.files) {
+      let uploadedFileList = [];
+      if (Array.isArray(req.files)) {
+        uploadedFileList = req.files;
+      } else if (typeof req.files === 'object') {
+        uploadedFileList = [
+          ...(req.files.image || []),
+          ...(req.files.file || []),
+          ...(req.files.attachments || []),
+          ...(req.files.data || [])
+        ];
+      }
+
+      for (const file of uploadedFileList) {
+        console.log(`[Attachment] File received: ${file.originalname || file.name}`);
+        console.log(`[Attachment] MIME type: ${file.mimetype}`);
+        console.log(`[Attachment] Size: ${file.size} bytes`);
+
+        const base64Data = file.buffer ? `data:${file.mimetype};base64,${file.buffer.toString('base64')}` : '';
+        combinedAttachments.push({
+          filename: file.originalname || file.name || 'attachment.png',
+          contentType: file.mimetype || 'image/png',
+          data: base64Data,
+          buffer: file.buffer,
+          size: file.size || 0
+        });
+      }
+    }
+
+    const attachments = combinedAttachments;
     const userId = req.user ? req.user._id : '65b820a1c1d4a90012345678';
 
-    // 1. Process Command via Groq AI
-    const aiParsed = await groqService.processCommand(command, attachments);
+    // 1. Process Command via Groq AI using complete original natural-language command
+    const aiParsed = await groqService.processCommand({ userCommand: command }, attachments);
     const aiTokenUsage = Number(aiParsed?.tokenUsage?.total_tokens || aiParsed?.tokenUsage || 0) || 0;
 
     const channel = aiParsed.channel || 'gmail';
-    const recipientsList = aiParsed.recipients || (aiParsed.recipient?.email ? [aiParsed.recipient.email] : []);
+    let recipientsList = aiParsed.recipients && aiParsed.recipients.length > 0 
+      ? aiParsed.recipients 
+      : (aiParsed.recipient?.email ? [aiParsed.recipient.email] : []);
 
-    // Validation: Gmail recipient check
-    if (channel === 'gmail' && recipientsList.length === 0) {
+    const isValidRecipientEmail = recipientsList.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipientsList[0]);
+
+    if (channel === 'gmail' && !isValidRecipientEmail) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide at least one valid email address.'
+        message: "I couldn't clearly identify the recipient email address. Please check it before running."
+      });
+    }
+
+    if (channel === 'gmail' && (!aiParsed.subject || !aiParsed.subject.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "AI failed to generate a valid email subject."
+      });
+    }
+
+    const generatedBody = aiParsed.message || aiParsed.content;
+    if (!generatedBody || !generatedBody.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "AI failed to generate email message content."
       });
     }
 
@@ -61,7 +122,7 @@ const createAutomationFromCommand = async (req, res) => {
       },
       generatedContent: {
         subject: aiParsed.subject || '',
-        body: aiParsed.content || '',
+        body: generatedBody,
         htmlBody: aiParsed.htmlBody || ''
       },
       attachments,
@@ -118,13 +179,15 @@ const createAutomationFromCommand = async (req, res) => {
 
     const n8nResult = await n8nService.triggerWorkflow({
       automationId,
+      userCommand: command,
       userId: userId.toString(),
       intent: aiParsed.intent,
       channel,
       recipient: aiParsed.recipient,
       recipients: recipientsList,
       subject: aiParsed.subject,
-      content: aiParsed.content,
+      message: generatedBody,
+      content: generatedBody,
       htmlContent: aiParsed.htmlBody,
       attachments,
       language: aiParsed.language
@@ -137,18 +200,19 @@ const createAutomationFromCommand = async (req, res) => {
       automation.responseTimeMs = Math.max(0, automation.completedAt.getTime() - new Date(automation.executedAt).getTime());
       await automation.save();
 
+      const executionVia = n8nResult.via === 'direct_email' ? 'Gmail Direct Engine' : (n8nResult.via === 'direct_telegram' ? 'Telegram Direct Engine' : 'n8n Workflow');
       await ActivityLog.create({
         userId,
         automationId,
         action: `WORKFLOW_COMPLETED_${aiParsed.channel.toUpperCase()}`,
         channel: aiParsed.channel,
         status: 'SUCCESS',
-        message: `n8n execution successful (${n8nResult.n8nExecutionId})`
+        message: `Execution successful via ${executionVia} (${n8nResult.n8nExecutionId})`
       });
 
       return res.status(201).json({
         success: true,
-        message: 'Automation executed successfully via n8n.',
+        message: `Automation executed successfully via ${executionVia}.`,
         data: automation
       });
     } else {

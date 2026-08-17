@@ -304,16 +304,19 @@
 
 /* Recent Automations Row — Clean List View */
 .cf-recent-row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto 20px;
-  gap: 14px;
-  align-items: center;
-  padding: 12px 16px;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 120px 160px !important;
+  gap: 16px !important;
+  align-items: center !important;
+  padding: 12px 16px !important;
   background: #FFFFFF;
   border: 1px solid #DCE6F0;
   border-radius: 11px;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 72px;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .cf-recent-row:hover {
@@ -323,23 +326,26 @@
 }
 
 .cf-recent-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  flex: 1 1 0% !important;
+  overflow: hidden !important;
 }
 
 .cf-recent-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 42px !important;
+  height: 42px !important;
   border-radius: 10px;
   background: #F7FAFD;
   border: 1px solid #E8EEF5;
   color: #10B981;
-  flex-shrink: 0;
+  flex: 0 0 42px !important;
 }
 
 .cf-recent-icon.gmail {
@@ -361,43 +367,67 @@
 }
 
 .cf-recent-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.25rem !important;
+  min-width: 0 !important;
+  width: 0 !important;
+  flex: 1 1 0% !important;
+  overflow: hidden !important;
 }
 
 .cf-recent-title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #0F172A;
-  line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #0F172A !important;
+  line-height: 1.4 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .cf-recent-meta {
-  font-size: 0.8rem;
-  color: #64748B;
+  font-size: 0.8rem !important;
+  color: #64748B !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .cf-recent-middle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 90px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  justify-self: center !important;
+  flex-shrink: 0 !important;
 }
 
 .cf-status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.9rem;
-  border-radius: 1rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  white-space: nowrap;
+  width: 96px !important;
+  min-width: 96px !important;
+  max-width: 96px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.4rem !important;
+  padding: 0.4rem 0.6rem !important;
+  border-radius: 1rem !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
 }
 
 .cf-status-dot {
@@ -442,22 +472,29 @@
 }
 
 .cf-recent-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
+  justify-self: end !important;
+  gap: 12px !important;
+  flex-shrink: 0 !important;
 }
 
 .cf-recent-time {
-  font-size: 0.8rem;
-  color: #94A3B8;
-  min-width: 60px;
-  text-align: right;
+  font-size: 0.8rem !important;
+  color: #94A3B8 !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+  flex: 1 !important;
 }
 
 .cf-recent-chevron {
   color: #DCE6F0;
   flex-shrink: 0;
+  width: 18px;
 }
 
 .cf-recent-row:hover .cf-recent-chevron {

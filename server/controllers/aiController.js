@@ -11,7 +11,7 @@ const parseAICommand = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Command text is required.' });
     }
 
-    const parsed = await groqService.processCommand(command, attachments);
+    const parsed = await groqService.processCommand({ userCommand: command }, attachments);
 
     // Check missing recipient details
     let clarificationNeeded = false;

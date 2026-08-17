@@ -1375,28 +1375,17 @@ path:not(.chart-fill) {
 }
 
 .cf-recent-row {
-
   min-height: 68px;
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    auto
-    auto;
-
-  align-items: center;
-
-  column-gap: 16px;
-
-  padding: 10px 14px;
-
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 120px 160px !important;
+  align-items: center !important;
+  column-gap: 16px !important;
+  padding: 10px 14px !important;
   border-bottom: 1px solid #edf2f7;
-
   cursor: pointer;
-
-  transition:
-    background 0.18s ease;
+  transition: background 0.18s ease;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .cf-recent-row:last-child {
@@ -1408,104 +1397,86 @@ path:not(.chart-fill) {
 }
 
 .cf-recent-left {
-
-  min-width: 0;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 11px;
+  min-width: 0 !important;
+  width: 100% !important;
+  flex: 1 1 0% !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 11px !important;
 }
 
 .cf-recent-icon {
-
-  width: 40px;
-  height: 40px;
-
-  flex: 0 0 40px;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
+  width: 40px !important;
+  height: 40px !important;
+  flex: 0 0 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   border-radius: 11px;
-
   background: #f1f7ff;
-
   color: var(--cf-blue);
 }
 
 .cf-recent-icon.gmail {
-
   background: #fff4f4;
-
   color: #ef4444;
 }
 
 .cf-recent-icon.telegram {
-
   background: #eff8ff;
-
   color: #229ed9;
 }
 
 .cf-recent-icon.calendar {
-
   background: #eff6ff;
-
   color: var(--cf-blue);
 }
 
 .cf-recent-icon.n8n {
-
   background: #fff4f4;
-
   color: #ef4444;
 }
 
 .cf-recent-icon.slack {
-
   background: #faf5ff;
-
   color: #9333ea;
 }
 
 .cf-recent-info {
-  min-width: 0;
+  min-width: 0 !important;
+  width: 0 !important;
+  flex: 1 1 0% !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
 }
 
 .cf-recent-title {
-
-  overflow: hidden;
-
-  color: #111827;
-
-  font-size: 12px;
-
-  font-weight: 750;
-
-  white-space: nowrap;
-
-  text-overflow: ellipsis;
+  overflow: hidden !important;
+  color: #111827 !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  min-width: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .cf-recent-meta {
-
-  margin-top: 4px;
-
-  overflow: hidden;
-
-  color: #7a8797;
-
-  font-size: 10px;
-
-  font-weight: 500;
-
-  white-space: nowrap;
-
-  text-overflow: ellipsis;
+  overflow: hidden !important;
+  color: #7a8797 !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  min-width: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 
@@ -1514,108 +1485,94 @@ path:not(.chart-fill) {
    ============================================================ */
 
 .cf-recent-middle {
-
-  display: flex;
-
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  justify-self: center !important;
+  flex-shrink: 0 !important;
 }
 
 .cf-status-pill {
-
-  min-width: 82px;
-
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 6px;
-
-  padding: 5px 9px;
-
-  border-radius: 999px;
-
-  font-size: 9px;
-
-  font-weight: 800;
+  width: 96px !important;
+  min-width: 96px !important;
+  max-width: 96px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 5px 8px !important;
+  border-radius: 999px !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
 }
 
 .cf-status-dot {
-
   width: 5px;
   height: 5px;
-
   border-radius: 50%;
-
   background: currentColor;
 }
 
 .cf-status-pill.success {
-
   color: var(--cf-green-dark);
-
   background: #ecfdf5;
-
   border: 1px solid #a7ead5;
 }
 
 .cf-status-pill.scheduled {
-
   color: var(--cf-blue);
-
   background: #eff6ff;
-
   border: 1px solid #bfdbfe;
 }
 
 .cf-status-pill.failed {
-
   color: var(--cf-red);
-
   background: #fff1f2;
-
   border: 1px solid #fecdd3;
 }
 
 .cf-status-pill.cancelled {
-
   color: #d97706;
-
   background: #fffbeb;
-
   border: 1px solid #fde68a;
 }
 
 .cf-status-pill.running {
-
   color: #64748b;
-
   background: #f8fafc;
-
   border: 1px solid #e2e8f0;
 }
 
 .cf-recent-right {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 7px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
+  justify-self: end !important;
+  gap: 10px !important;
+  flex-shrink: 0 !important;
 }
 
 .cf-recent-time {
-
   color: #94a3b8;
-
-  font-size: 9px;
-
+  font-size: 11px;
   white-space: nowrap;
+  text-align: right;
+  flex: 1;
 }
 
 .cf-recent-chevron {
   color: #94a3b8;
+  width: 18px;
+  flex-shrink: 0;
 }
 
 

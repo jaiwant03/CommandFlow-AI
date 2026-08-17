@@ -4,28 +4,90 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "send-gmail",
+        "path": "commandflow",
         "options": {}
       },
       "name": "Webhook Trigger",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [100, 300]
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.item;\nconst body = item.json.body || item.json;\n\nlet rawRecipient = body.recipientEmail || body.toEmail || body.to || (typeof body.recipient === 'object' ? body.recipient?.email : body.recipient);\n\nif (typeof rawRecipient === 'string' && rawRecipient.startsWith('{')) {\n  try {\n    const parsed = JSON.parse(rawRecipient);\n    rawRecipient = parsed.email || parsed.to || rawRecipient;\n  } catch (e) {}\n}\n\nlet cleanRecipient = String(rawRecipient || '').trim().toLowerCase().replace(/\\s+/g, '');\nconst isValid = /^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(cleanRecipient);\n\nif (!isValid) {\n  throw new Error(`[n8n Validation Error] Invalid recipient email address: '${rawRecipient}'`);\n}\n\nlet binary = item.binary || {};\nconst binaryKeys = Object.keys(binary);\nif (binaryKeys.length > 0 && !binary.data) {\n  binary.data = binary[binaryKeys[0]];\n}\n\nconst cleanBinary = {};\nif (binary.data) {\n  cleanBinary.data = binary.data;\n}\nitem.binary = cleanBinary;\n\nconst rawHasAtt = body.hasAttachment;\nconst hasBinary = Boolean(item.binary?.data);\nconst bodyHasAtt = rawHasAtt === true || rawHasAtt === 'true' || (Array.isArray(body.attachments) && body.attachments.length > 0);\nconst isAttachment = Boolean(hasBinary || bodyHasAtt);\n\nconst subject = String(body.subject || item.json.subject || '').trim();\nconst message = String(body.message || body.content || body.htmlContent || item.json.message || item.json.content || '').trim();\nconst htmlBody = String(body.htmlBody || body.htmlContent || item.json.htmlBody || item.json.htmlContent || '').trim();\n\nitem.json = {\n  ...item.json,\n  hasAttachment: isAttachment,\n  recipient: cleanRecipient,\n  resolvedToEmail: cleanRecipient,\n  toEmail: cleanRecipient,\n  subject: subject,\n  message: message,\n  htmlContent: htmlBody || message,\n  htmlBody: htmlBody || message\n};\n\nreturn item;"
+      },
+      "name": "Validate Recipient",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.hasAttachment }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Has Attachment?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ]
     },
     {
       "parameters": {
         "resource": "message",
         "operation": "send",
-        "subject": "={{$json.body.subject || $json.body.content?.subject}}",
-        "toEmail": "={{ $json.body.toEmail || (Array.isArray($json.body.recipients) && $json.body.recipients.length > 0 ? $json.body.recipients.join(', ') : ($json.body.recipient?.email || $json.body.recipient)) }}",
+        "subject": "={{ $json.subject || $json.body?.subject }}",
+        "toEmail": "={{ $json.resolvedToEmail || $json.toEmail || $json.recipient || $json.body?.recipients[0] || $json.body?.recipientEmail }}",
+        "sendTo": "={{ $json.resolvedToEmail || $json.toEmail || $json.recipient || $json.body?.recipients[0] || $json.body?.recipientEmail }}",
         "emailType": "html",
-        "htmlBody": "={{$json.body.htmlContent || $json.body.content?.htmlBody || $json.body.content?.body || $json.body.content}}",
-        "attachments": "={{$json.body.attachments || []}}"
+        "htmlBody": "={{ $json.htmlBody || $json.htmlContent || $json.message }}",
+        "attachmentsUi": {
+          "attachment": [
+            {
+              "binaryPropertyName": "data"
+            }
+          ]
+        }
       },
-      "name": "Gmail Node",
+      "name": "Gmail (With Attachment)",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [350, 300]
+      "position": [
+        720,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "subject": "={{ $json.subject || $json.body?.subject }}",
+        "toEmail": "={{ $json.resolvedToEmail || $json.toEmail || $json.recipient || $json.body?.recipients[0] || $json.body?.recipientEmail }}",
+        "sendTo": "={{ $json.resolvedToEmail || $json.toEmail || $json.recipient || $json.body?.recipients[0] || $json.body?.recipientEmail }}",
+        "emailType": "html",
+        "htmlBody": "={{ $json.htmlBody || $json.htmlContent || $json.message }}"
+      },
+      "name": "Gmail (Text Only)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        720,
+        400
+      ]
     }
   ],
   "connections": {
@@ -33,7 +95,36 @@
       "main": [
         [
           {
-            "node": "Gmail Node",
+            "node": "Validate Recipient",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Recipient": {
+      "main": [
+        [
+          {
+            "node": "Has Attachment?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Attachment?": {
+      "main": [
+        [
+          {
+            "node": "Gmail (With Attachment)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail (Text Only)",
             "type": "main",
             "index": 0
           }
