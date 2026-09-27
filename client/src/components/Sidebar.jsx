@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
   Zap,
+  Users,
   Calendar,
   History,
   Layers,
@@ -15,6 +16,7 @@ const Sidebar = ({ isOpen }) => {
   const navItems = [
     { label: 'Command Center', icon: <LayoutDashboard size={18} />, path: '/dashboard' },
     { label: 'Automations', icon: <Zap size={18} />, path: '/automations' },
+    { label: 'Contacts', icon: <Users size={18} />, path: '/contacts' },
     { label: 'Schedules', icon: <Calendar size={18} />, path: '/schedules' },
     { label: 'History', icon: <History size={18} />, path: '/history' },
     { label: 'Integrations', icon: <Layers size={18} />, path: '/integrations' },
@@ -48,7 +50,7 @@ const Sidebar = ({ isOpen }) => {
       <div className="sidebar-footer" style={{ padding: '1rem', borderTop: '1px solid var(--border-color)' }}>
         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.4 }}>
           <strong>CommandFlow AI Engine</strong><br />
-          Groq AI + n8n Automation
+          Groq AI + BullMQ + n8n
         </div>
       </div>
 
