@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchDocuments, generateDocument } from '../services/automationService';
 import DocumentPreview from '../components/DocumentPreview';
+import HandwrittenHeading from '../components/HandwrittenHeading';
 import { FileText, Plus, Download, Eye, Sparkles } from 'lucide-react';
 import '../styles/documents.css';
 
@@ -54,7 +55,7 @@ const Documents = () => {
     <div className="page-container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <h1 className="page-title">PDF Document Center</h1>
+          <HandwrittenHeading text="PDF Document Center" size="normal" withFlourish={true} />
           <p className="page-subtitle">AI-generated leave letters, bonafide requests, and official PDFs.</p>
         </div>
 

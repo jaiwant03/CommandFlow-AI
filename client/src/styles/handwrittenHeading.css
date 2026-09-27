@@ -101,19 +101,19 @@
 
 /* Special font overrides for tall ascenders and capitals */
 .font-pinyon-d {
-  font-family: 'Pinyon Script', 'Allura', cursive;
+  font-family: 'Pinyon Script', 'Allura', cursive !important;
   font-size: 1.05em;
   margin-left: -2px;
 }
 
 .font-capital-a {
-  font-family: 'Dancing Script', 'Alex Brush', cursive;
+  font-family: 'Dancing Script', 'Alex Brush', cursive !important;
   font-weight: 700;
   font-size: 0.94em;
 }
 
 .font-capital-i {
-  font-family: 'Dancing Script', 'Alex Brush', cursive;
+  font-family: 'Dancing Script', 'Alex Brush', cursive !important;
   font-weight: 700;
   font-size: 0.94em;
   margin-left: 1px;

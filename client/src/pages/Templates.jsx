@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import HandwrittenHeading from '../components/HandwrittenHeading';
 import { FileCode, Sparkles, Copy, Check } from 'lucide-react';
 import '../styles/global.css';
 
@@ -37,7 +38,7 @@ const Templates = () => {
   return (
     <div className="page-container">
       <div style={{ marginBottom: '1.5rem' }}>
-        <h1 className="page-title">AI Template Library</h1>
+        <HandwrittenHeading text="AI Template Library" size="normal" withFlourish={true} />
         <p className="page-subtitle">Reusable templates intelligently populated by Groq AI engine.</p>
       </div>
 

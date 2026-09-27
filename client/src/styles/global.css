@@ -141,24 +141,18 @@
 
 
   /* ----------------------------------------------------------
-     FONTS (Modern Stylish Typography Stack)
+     FONTS (Times New Roman & Serif Stack)
      ---------------------------------------------------------- */
 
   --font-heading:
-    'Outfit',
-    'Plus Jakarta Sans',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+    'Times New Roman',
+    Times,
+    serif;
 
   --font-body:
-    'Plus Jakarta Sans',
-    'Inter',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+    'Times New Roman',
+    Times,
+    serif;
 
   --font-mono:
     'JetBrains Mono',
@@ -274,11 +268,16 @@ a {
    GLOBAL TYPOGRAPHY RULES
    ============================================================ */
 
-h1, h2, h3, h4, h5, h6 {
+h1:not(.handwritten-heading-title),
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   color: var(--text-primary);
   font-weight: 700;
-  letter-spacing: -0.028em;
+  letter-spacing: -0.015em;
   line-height: 1.25;
 }
 
