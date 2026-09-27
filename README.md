@@ -6,17 +6,17 @@ Voice-to-Action Multi-Channel Automation Platform built with React (Vite), Node.
 
 ## 🌟 Features
 
-* **Voice & Text Command Input**: Hands-free voice automation supporting English, Tamil, and Tanglish (Tamil written in Latin script).
-* **Multi-Language AI Engine**: Natural language understanding powered by Groq Llama 3.3 70B for intent parsing, recipient resolution, and document content generation.
-* **Supported Communication Channels**:
-  * 📧 **Gmail**: Formal emails, leave letters, bonafide requests, and PDF document attachments.
-  * ✈️ **Telegram**: Automated instant messages, group alerts, and notifications.
-* **Automatic PDF Generation**: Generates official formal letters (leave letters, bonafide requests, permission notes) dynamically into downloadable PDF files.
-* **No-Approval Automatic Execution**: Pure natural voice-to-action flow without manual confirmation blocks.
-* **n8n Workflow Engine Integration**: Webhook-driven orchestration pipeline.
-* **Scheduling & Follow-Up Automation**: Delay execution for future times/dates and schedule automatic follow-up reminders.
-* **Contact Directory**: Manage saved contacts with preferred communication channels.
-* **Activity & History Logs**: End-to-end execution traces stored in MongoDB.
+- **Voice & Text Command Input**: Hands-free voice automation supporting English, Tamil, and Tanglish (Tamil written in Latin script).
+- **Multi-Language AI Engine**: Natural language understanding powered by Groq Llama 3.3 70B for intent parsing, recipient resolution, and document content generation.
+- **Supported Communication Channels**:
+  - 📧 **Gmail**: Formal emails, leave letters, bonafide requests, and PDF document attachments.
+  - ✈️ **Telegram**: Automated instant messages, group alerts, and notifications.
+- **Automatic PDF Generation**: Generates official formal letters (leave letters, bonafide requests, permission notes) dynamically into downloadable PDF files.
+- **No-Approval Automatic Execution**: Pure natural voice-to-action flow without manual confirmation blocks.
+- **n8n Workflow Engine Integration**: Webhook-driven orchestration pipeline.
+- **Scheduling & Follow-Up Automation**: Delay execution for future times/dates and schedule automatic follow-up reminders.
+- **Contact Directory**: Manage saved contacts with preferred communication channels.
+- **Activity & History Logs**: End-to-end execution traces stored in MongoDB.
 
 ---
 
@@ -111,9 +111,9 @@ n8n start
 
 ## 📄 API Documentation
 
-* `POST /api/ai/parse`: Parse command text into structured JSON payload.
-* `POST /api/automations`: Create and execute voice/text automation.
-* `GET /api/automations`: List all user automations.
-* `GET /api/contacts`: Retrieve contact list.
-* `POST /api/contacts`: Add new contact recipient.
-* `GET /api/integrations`: Service connectivity status.
+- `POST /api/ai/parse`: Parse command text into structured JSON payload.
+- `POST /api/automations`: Create and execute voice/text automation.
+- `GET /api/automations`: List all user automations.
+- `GET /api/contacts`: Retrieve contact list.
+- `POST /api/contacts`: Add new contact recipient.
+- `GET /api/integrations`: Service connectivity status.
