@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchAutomations, fetchAutomationDetails } from '../services/automationService';
 import AutomationCard from '../components/AutomationCard';
+import HandwrittenHeading from '../components/HandwrittenHeading';
 import { Layers, Bot, Mail, Send, Database, Zap, Sparkles, RefreshCw, GitCommit, Search, X, ChevronRight, CheckCircle, Clock, AlertTriangle, Eye, Workflow, Calendar } from 'lucide-react';
 import '../styles/global.css';
 import '../styles/voice.css';

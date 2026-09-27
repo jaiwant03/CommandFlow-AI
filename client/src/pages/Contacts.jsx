@@ -66,7 +66,7 @@ const Contacts = () => {
     <div className="page-container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <h1 className="page-title">Saved Contacts</h1>
+          <HandwrittenHeading text="Saved Contacts" size="normal" withFlourish={true} />
           <p className="page-subtitle">Manage recipients for natural language AI recipient resolution.</p>
         </div>
 
