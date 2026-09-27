@@ -409,8 +409,8 @@ Return ONLY a valid JSON object with the following schema:
     const chatIdMatch = originalCommand.match(/\b\d{7,12}\b/);
     const scheduleInfo = this.calculateScheduledExecutionTime(originalCommand, parsed.schedule || {});
 
-    const generatedSubject = parsed.subject ? String(parsed.subject).trim() : '';
-    const generatedMessage = (parsed.message || parsed.content || '').trim();
+    let generatedSubject = parsed.subject ? String(parsed.subject).trim() : '';
+    let generatedMessage = (parsed.message || parsed.content || '').trim();
 
     // Ensure subject and message are never empty
     if (channel === 'gmail') {
