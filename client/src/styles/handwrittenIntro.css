@@ -744,14 +744,14 @@
 
 .gv-flourish-stroke {
   opacity: 0;
-  stroke-dasharray: 1000;
-  stroke-dashoffset: 1000;
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
   animation: drawGvFlourish 0.84s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   animation-delay: 2.76s;
 }
 
 @keyframes drawGvFlourish {
-  0% { stroke-dashoffset: 1000; opacity: 0; }
+  0% { stroke-dashoffset: 1400; opacity: 0; }
   5% { opacity: 1; }
   100% { stroke-dashoffset: 0; opacity: 1; }
 }

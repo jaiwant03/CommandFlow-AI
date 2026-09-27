@@ -412,10 +412,10 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
             </linearGradient>
           </defs>
           <path
-            d="M 50,26 C 230,46 470,44 680,28 C 820,16 910,14 945,22 C 970,28 980,36 960,42 C 935,48 905,38 930,26 C 948,16 978,22 995,26"
+            d="M 60,30 C 240,48 480,46 680,30 C 820,18 910,16 945,24 C 970,30 980,38 960,44 C 935,50 905,40 930,28 C 948,18 978,24 995,28"
             fill="none"
             stroke="url(#flourishMultiGrad)"
-            strokeWidth="3.6"
+            strokeWidth="4.6"
             strokeLinecap="round"
             strokeLinejoin="round"
             className="gv-flourish-stroke"
