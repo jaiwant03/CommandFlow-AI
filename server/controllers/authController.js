@@ -1,104 +1,179 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 const User = require('../models/User');
+const config = require('../config/env');
+const { sendSuccess, sendError } = require('../utils/responseFormatter');
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'commandflow_ai_super_secret_jwt_key_2026', {
-    expiresIn: '30d'
+  return jwt.sign({ id }, config.jwtSecret, {
+    expiresIn: config.jwtExpiresIn || '30d'
   });
 };
 
-const registerUser = async (req, res) => {
+const registerUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide all fields.' });
+      return sendError(res, 'Please provide name, email, and password.', 400, 'MISSING_FIELDS');
     }
 
     let userExists = await User.findOne({ email: email.toLowerCase() });
     if (userExists) {
-      return res.status(400).json({ success: false, message: 'User already exists with this email.' });
+      return sendError(res, 'User already exists with this email address.', 400, 'USER_ALREADY_EXISTS');
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({
-      name,
-      email: email.toLowerCase(),
+      name: name.trim(),
+      email: email.toLowerCase().trim(),
       password: hashedPassword
     });
 
-    res.status(201).json({
-      success: true,
-      message: 'Account created successfully.',
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        token: generateToken(user._id)
-      }
-    });
+    const token = generateToken(user._id);
+
+    return sendSuccess(res, 'Account created successfully.', {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token
+    }, 201);
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide email and password.' });
+      return sendError(res, 'Please provide email and password.', 400, 'MISSING_CREDENTIALS');
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() });
-    if (user && (await bcrypt.compare(password, user.password))) {
-      return res.json({
-        success: true,
-        message: 'Logged in successfully.',
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          token: generateToken(user._id)
-        }
+    const cleanEmail = email.toLowerCase().trim();
+
+    // 1. Check in database
+    const user = await User.findOne({ email: cleanEmail });
+    if (user && user.password && (await bcrypt.compare(password, user.password))) {
+      const token = generateToken(user._id);
+      return sendSuccess(res, 'Logged in successfully.', {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        token
       });
     }
 
-    // Fallback demo account for easy testing
-    if (email === 'demo@commandflow.ai' && password === 'demo1234') {
-      return res.json({
-        success: true,
-        message: 'Logged in as Demo User.',
-        user: {
-          _id: '65b820a1c1d4a90012345678',
+    // 2. Fallback demo account for testing & local development
+    if (cleanEmail === 'demo@commandflow.ai' && password === 'demo1234') {
+      const demoId = '65b820a1c1d4a90012345678';
+      let demoUser = await User.findById(demoId);
+      if (!demoUser) {
+        demoUser = await User.create({
+          _id: demoId,
           name: 'Demo User',
           email: 'demo@commandflow.ai',
-          token: generateToken('65b820a1c1d4a90012345678')
-        }
+          password: await bcrypt.hash('demo1234', 10)
+        });
+      }
+
+      return sendSuccess(res, 'Logged in as Demo User.', {
+        _id: demoUser._id,
+        name: demoUser.name,
+        email: demoUser.email,
+        token: generateToken(demoUser._id)
       });
     }
 
-    return res.status(401).json({ success: false, message: 'Invalid email or password.' });
+    return sendError(res, 'Invalid email or password.', 401, 'INVALID_CREDENTIALS');
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };
 
-const getMe = async (req, res) => {
+/**
+ * Google Sign-In verification and token generation
+ * POST /api/auth/google
+ */
+const googleAuth = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id).select('-password');
-    res.json({
-      success: true,
-      user: user || req.user
+    const { credential, idToken, googleId, email, name, avatar } = req.body;
+
+    let verifiedEmail = email;
+    let verifiedName = name;
+    let verifiedGoogleId = googleId;
+    let verifiedAvatar = avatar;
+
+    const tokenToVerify = credential || idToken;
+
+    // Verify token with Google if token provided
+    if (tokenToVerify) {
+      try {
+        const verifyRes = await axios.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${tokenToVerify}`);
+        if (verifyRes.data?.email) {
+          verifiedEmail = verifyRes.data.email;
+          verifiedName = verifyRes.data.name || verifiedName;
+          verifiedGoogleId = verifyRes.data.sub || verifiedGoogleId;
+          verifiedAvatar = verifyRes.data.picture || verifiedAvatar;
+        }
+      } catch (verifyErr) {
+        console.warn(`[Auth] Google token verification error (${verifyErr.message}).`);
+      }
+    }
+
+    if (!verifiedEmail) {
+      return sendError(res, 'Google authentication failed: Email address could not be verified.', 400, 'GOOGLE_AUTH_FAILED');
+    }
+
+    let user = await User.findOne({
+      $or: [
+        { email: verifiedEmail.toLowerCase() },
+        ...(verifiedGoogleId ? [{ googleId: verifiedGoogleId }] : [])
+      ]
+    });
+
+    if (!user) {
+      user = await User.create({
+        name: verifiedName || verifiedEmail.split('@')[0],
+        email: verifiedEmail.toLowerCase(),
+        googleId: verifiedGoogleId,
+        avatar: verifiedAvatar || ''
+      });
+    } else {
+      if (verifiedGoogleId && !user.googleId) {
+        user.googleId = verifiedGoogleId;
+        await user.save();
+      }
+    }
+
+    const token = generateToken(user._id);
+
+    return sendSuccess(res, 'Logged in with Google successfully.', {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      token
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
+  }
+};
+
+const getMe = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    return sendSuccess(res, 'Current user profile.', user || req.user);
+  } catch (err) {
+    next(err);
   }
 };
 
 module.exports = {
   registerUser,
   loginUser,
+  googleAuth,
   getMe
 };
