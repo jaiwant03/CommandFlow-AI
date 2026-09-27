@@ -1,7 +1,7 @@
 /* ============================================================
    HANDWRITTEN INTRO SPLASH SCREEN STYLES
    CommandFlow AI — Pure White Model Shining Palette
-   Authentic Real Human Handwriting Format
+   Great Vibes Cursive Theme with Exact Handwriting Motion
    Multicolor: Rama Green + Peacock Blue + Bright Violet Purple
    ============================================================ */
 
@@ -146,103 +146,124 @@
 
 /* ============================================================
    CENTER STAGE: ONLY the word "CommandFlow AI"
+   Great Vibes Cursive Penmanship Stage
    ============================================================ */
 .handwritten-center-box {
   position: relative;
   width: 95vw;
-  max-width: 1160px;
+  max-width: 1100px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 10;
 }
 
-/* SVG Stage */
-.real-handwriting-svg {
-  width: 100%;
-  height: auto;
-  max-height: 380px;
-  overflow: visible;
-  filter: drop-shadow(0 6px 16px rgba(0, 200, 150, 0.16))
-          drop-shadow(0 10px 24px rgba(124, 58, 237, 0.14));
+.great-vibes-stage {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(4.2rem, 8.5vw, 7.4rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 1px;
+  filter: drop-shadow(0 6px 18px rgba(0, 200, 150, 0.16))
+          drop-shadow(0 10px 26px rgba(124, 58, 237, 0.14));
 }
 
-/* Authentic Luxury Script Typography */
-.hw-svg-text {
-  font-family: 'Dancing Script', 'Caveat', cursive;
-  font-size: 112px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+/* Spacers between words with natural handwriting distance */
+.gv-word-spacer {
+  display: inline-block;
+  width: clamp(14px, 2.2vw, 24px);
+}
+
+/* Word Segments: Each word carries its multicolor gradient */
+.gv-word {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+/* Word 1: Command -> Rama Green (#00D29E -> #00B894 -> #009E7E) */
+.gv-word-command .gv-char {
+  background: linear-gradient(135deg, #00D29E 0%, #00B894 55%, #009E7E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Word 2: Flow -> Peacock Blue (#00A3E0 -> #0088CC -> #0284C7) */
+.gv-word-flow .gv-char {
+  background: linear-gradient(135deg, #00A3E0 0%, #0088CC 50%, #0284C7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Word 3: AI -> Bright Violet Purple (#8B5CF6 -> #7C3AED -> #6D28D9) */
+.gv-word-ai .gv-char {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 55%, #6D28D9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* ============================================================
-   STROKE MASK ANIMATIONS: Real Human Handwriting Motion
-   Draws along the continuous cursive path like a fountain pen
+   AUTHENTIC CURSIVE WRITE-IN MOTION: SLANTED INK FLOW
+   Simulates a fountain pen flowing ink along the 18° cursive slant
    ============================================================ */
-
-/* 1. Command Stroke Mask (0.2s - 1.45s) */
-.stroke-mask-command {
-  stroke-dasharray: 2600;
-  stroke-dashoffset: 2600;
-  animation: drawCommandStroke 1.25s cubic-bezier(0.42, 0.0, 0.58, 1.0) forwards;
-  animation-delay: 0.2s;
-}
-
-@keyframes drawCommandStroke {
-  0% {
-    stroke-dashoffset: 2600;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* 2. Flow Stroke Mask (1.55s - 2.25s) */
-.stroke-mask-flow {
-  stroke-dasharray: 1800;
-  stroke-dashoffset: 1800;
-  animation: drawFlowStroke 0.70s cubic-bezier(0.42, 0.0, 0.58, 1.0) forwards;
-  animation-delay: 1.55s;
-}
-
-@keyframes drawFlowStroke {
-  0% {
-    stroke-dashoffset: 1800;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* 3. AI Stroke Mask (2.35s - 2.85s) */
-.stroke-mask-ai {
-  stroke-dasharray: 1200;
-  stroke-dashoffset: 1200;
-  animation: drawAIStroke 0.50s cubic-bezier(0.42, 0.0, 0.58, 1.0) forwards;
-  animation-delay: 2.35s;
-}
-
-@keyframes drawAIStroke {
-  0% {
-    stroke-dashoffset: 1200;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* 4. Signature Flourish Underline (2.95s - 3.75s) */
-.hw-flourish-path {
-  stroke-dasharray: 1400;
-  stroke-dashoffset: 1400;
+.gv-char {
+  display: inline-block;
   opacity: 0;
-  animation: drawFlourish 0.80s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  clip-path: polygon(0 -20%, 0 -20%, 0 120%, 0 120%);
+  transform: translateY(3px) scale(0.96) skewX(-14deg);
+  animation-name: writeCursiveChar;
+  animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  animation-fill-mode: forwards;
+  will-change: clip-path, opacity, transform;
+}
+
+@keyframes writeCursiveChar {
+  0% {
+    opacity: 0;
+    clip-path: polygon(0 -20%, 0 -20%, 0 120%, 0 120%);
+    transform: translateY(3px) scale(0.96) skewX(-14deg);
+    filter: blur(1.5px);
+  }
+  30% {
+    opacity: 1;
+    filter: blur(0.6px);
+  }
+  100% {
+    opacity: 1;
+    clip-path: polygon(0 -20%, 130% -20%, 130% 120%, 0 120%);
+    transform: translateY(0) scale(1) skewX(0deg);
+    filter: blur(0);
+  }
+}
+
+/* ============================================================
+   CALLIGRAPHIC SIGNATURE FLOURISH UNDERLINE
+   ============================================================ */
+.gv-flourish-svg {
+  width: 95%;
+  max-width: 960px;
+  height: 52px;
+  margin-top: -12px;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 12px rgba(0, 200, 150, 0.22));
+}
+
+.gv-flourish-stroke {
+  opacity: 0;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawGvFlourish 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   animation-delay: 2.95s;
 }
 
-@keyframes drawFlourish {
+@keyframes drawGvFlourish {
   0% {
-    stroke-dashoffset: 1400;
+    stroke-dashoffset: 1000;
     opacity: 0;
   }
   5% {
@@ -254,27 +275,108 @@
   }
 }
 
-/* Active Luminous Ink Tip */
-.hw-ink-tip-group {
+/* ============================================================
+   TRAVELING LIQUID INK BEAD (ACTIVE PEN TIP)
+   Locked precisely to the active writing stroke
+   ============================================================ */
+.gv-traveling-ink-bead {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
   pointer-events: none;
-  transition: transform 0.016s linear;
-  will-change: transform;
+  z-index: 20;
+  transition: transform 0.04s linear;
 }
 
-/* Specular Gloss Sheen Sweep */
-.hw-sheen-sweep-rect {
+.ink-bead-halo {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  opacity: 0.28;
+  filter: blur(4px);
+  animation: beadPulse 0.4s ease-in-out infinite alternate;
+}
+
+.ink-bead-core {
+  position: absolute;
+  top: -3.5px;
+  left: -3.5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 0 8px currentColor, 0 0 14px currentColor;
+}
+
+@keyframes beadPulse {
+  0% { transform: scale(0.85); opacity: 0.22; }
+  100% { transform: scale(1.15); opacity: 0.34; }
+}
+
+/* ============================================================
+   MODEL SHINING PALETTE: Specular Gloss Sheen Sweep
+   ============================================================ */
+.gv-specular-gloss-sheen {
+  position: absolute;
+  inset: -15% -10%;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.7) 48%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.7) 52%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
   opacity: 0;
+  mix-blend-mode: overlay;
+  animation: gvSheenSweep 1.5s cubic-bezier(0.35, 0, 0.25, 1) forwards;
+  animation-delay: 3.4s;
 }
 
-/* Responsive scaling */
+@keyframes gvSheenSweep {
+  0% {
+    opacity: 0;
+    background-position: -120% 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  75% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    background-position: 120% 0;
+  }
+}
+
+/* Responsive Font Scaling */
 @media (max-width: 768px) {
-  .real-handwriting-svg {
-    max-height: 280px;
+  .great-vibes-stage {
+    font-size: clamp(3.4rem, 9.5vw, 5.4rem);
+  }
+  .gv-flourish-svg {
+    height: 42px;
+    margin-top: -10px;
   }
 }
 
 @media (max-width: 480px) {
-  .real-handwriting-svg {
-    max-height: 220px;
+  .great-vibes-stage {
+    font-size: clamp(2.6rem, 10vw, 4.0rem);
+  }
+  .gv-word-spacer {
+    width: 12px;
+  }
+  .gv-flourish-svg {
+    height: 32px;
+    margin-top: -8px;
   }
 }
