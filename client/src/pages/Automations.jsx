@@ -166,9 +166,7 @@ const Automations = () => {
       ======================================================== */}
       <div className="cf-page-header" style={{ marginBottom: '1.25rem' }}>
         <div>
-          <h1 style={{ fontSize: '31px', fontWeight: 700, color: '#0F172A', margin: '0 0 0.35rem 0', letterSpacing: '-0.5px' }}>
-            Automations
-          </h1>
+          <HandwrittenHeading text="Automations" size="normal" withFlourish={true} />
           <p style={{ fontSize: '0.875rem', color: '#64748B', margin: 0, fontWeight: 500 }}>
             Manage automation pipelines and active execution flows
           </p>

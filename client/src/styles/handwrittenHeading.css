@@ -1,0 +1,170 @@
+/* ============================================================
+   HANDWRITTEN HEADING DESIGN SYSTEM
+   Multi-color Handwriting Motion (Rama Green + Peacock Blue + Violet Purple)
+   Inspired by HandwrittenIntro Great Vibes cursive penmanship
+   ============================================================ */
+
+.handwritten-heading-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  position: relative;
+  margin-bottom: 0.35rem;
+  overflow: visible;
+  user-select: none;
+}
+
+.handwritten-heading-title {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  row-gap: 0.15rem;
+  column-gap: 0.45rem;
+  font-family: 'Great Vibes', cursive;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: 0.5px;
+  overflow: visible;
+  margin: 0;
+  padding: 0;
+  filter: drop-shadow(0 3px 10px rgba(0, 200, 150, 0.15))
+          drop-shadow(0 5px 16px rgba(124, 58, 237, 0.12));
+}
+
+/* Sizing Variants */
+.handwritten-heading-title.size-hero {
+  font-size: clamp(2.35rem, 4.2vw, 3.4rem);
+}
+
+.handwritten-heading-title.size-normal {
+  font-size: clamp(2.1rem, 3.4vw, 2.75rem);
+}
+
+.handwritten-heading-title.size-compact {
+  font-size: clamp(1.85rem, 2.8vw, 2.35rem);
+}
+
+/* Words group wrapper */
+.hw-word {
+  display: inline-flex;
+  align-items: baseline;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+/* Color Zones (Inspired by HandwrittenIntro model shining palette) */
+.hw-color-green .hw-char {
+  background: linear-gradient(135deg, #00D29E 0%, #00B894 55%, #009E7E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hw-color-blue .hw-char {
+  background: linear-gradient(135deg, #00A3E0 0%, #0088CC 50%, #0284C7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hw-color-purple .hw-char {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 55%, #6D28D9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Continuous Multicolor for single-word headings */
+.hw-color-rainbow .hw-char {
+  background: linear-gradient(115deg, #00D29E 0%, #00A3E0 45%, #8B5CF6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Individual cursive character with handwriting ink write-in motion */
+.hw-char {
+  display: inline-block;
+  overflow: visible;
+  opacity: 0;
+  clip-path: inset(-150% 100% -150% -30%);
+  transform: translateY(2px) scale(0.96) skewX(-12deg);
+  animation-name: writeHwCursiveChar;
+  animation-duration: 0.28s;
+  animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  animation-fill-mode: forwards;
+  will-change: clip-path, opacity, transform;
+}
+
+/* Special font overrides for tall ascenders and capitals */
+.font-pinyon-d {
+  font-family: 'Pinyon Script', 'Allura', cursive;
+  font-size: 1.05em;
+  margin-left: -2px;
+}
+
+.font-capital-a {
+  font-family: 'Dancing Script', 'Alex Brush', cursive;
+  font-weight: 700;
+  font-size: 0.94em;
+}
+
+.font-capital-i {
+  font-family: 'Dancing Script', 'Alex Brush', cursive;
+  font-weight: 700;
+  font-size: 0.94em;
+  margin-left: 1px;
+}
+
+@keyframes writeHwCursiveChar {
+  0% {
+    opacity: 0;
+    clip-path: inset(-150% 100% -150% -30%);
+    transform: translateY(2px) scale(0.96) skewX(-12deg);
+    filter: blur(1.2px);
+  }
+  35% {
+    opacity: 1;
+    filter: blur(0.5px);
+  }
+  99% {
+    opacity: 1;
+    clip-path: inset(-150% 0% -150% -30%);
+    transform: translateY(0) scale(1) skewX(0deg);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    clip-path: none;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Calligraphic Flourish Underline */
+.hw-flourish-svg {
+  width: 100%;
+  max-width: 380px;
+  height: 22px;
+  margin-top: -6px;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 8px rgba(0, 200, 150, 0.25));
+}
+
+.hw-flourish-stroke {
+  opacity: 0;
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  animation: drawHwFlourish 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes drawHwFlourish {
+  0% {
+    stroke-dashoffset: 600;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.95;
+  }
+}

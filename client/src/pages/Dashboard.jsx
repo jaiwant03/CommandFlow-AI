@@ -11,6 +11,7 @@ import socketService from '../services/socketService';
 
 import CommandInput from '../components/CommandInput';
 import VoiceRecorder from '../components/VoiceRecorder';
+import HandwrittenHeading from '../components/HandwrittenHeading';
 
 import {
   Zap,
@@ -883,17 +884,13 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
 
           <div>
 
-            <div className="cf-title-row">
-
-              <h1 className="cf-page-title">
-                Command Center
-              </h1>
-
+            <div className="cf-title-row" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.2rem' }}>
+              <HandwrittenHeading text="CommandFlow" size="hero" withFlourish={true} />
               <Sparkles
-                size={20}
+                size={22}
                 className="cf-title-sparkle"
+                style={{ color: '#00D29E', marginTop: '-0.5rem' }}
               />
-
             </div>
 
             <p className="cf-page-subtitle">
