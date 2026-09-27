@@ -21,6 +21,7 @@ class EmailService {
     const port = parseInt(process.env.SMTP_PORT || '465', 10);
 
     if (user && pass && !user.includes('your_') && !pass.includes('your_')) {
+      const cleanPass = pass.replace(/\s+/g, '');
       console.log(`[EmailService] Initializing high-speed Gmail SMTP transporter for ${user}...`);
       try {
         this.transporter = nodemailer.createTransport({
@@ -34,7 +35,7 @@ class EmailService {
           rateLimit: 10,
           auth: {
             user,
-            pass
+            pass: cleanPass
           },
           tls: {
             rejectUnauthorized: false
@@ -89,10 +90,20 @@ class EmailService {
       await this.initPromise;
     }
 
-    const recipientList = Array.isArray(to) ? to : (to ? to.split(',').map(s => s.trim()).filter(Boolean) : []);
-    if (recipientList.length === 0) {
-      throw new Error('Please provide a valid recipient email address.');
+    let recipientList = [];
+    if (Array.isArray(to)) {
+      recipientList = to.map(r => (typeof r === 'object' && r !== null ? (r.email || r.address || '') : String(r || ''))).filter(Boolean);
+    } else if (typeof to === 'string') {
+      recipientList = to.split(',').map(s => s.trim()).filter(Boolean);
+    } else if (typeof to === 'object' && to !== null) {
+      recipientList = [to.email || to.address].filter(Boolean);
     }
+
+    if (recipientList.length === 0) {
+      const fallback = process.env.DEFAULT_RECIPIENT_EMAIL || 'admin.jaiwant@gmail.com';
+      recipientList = [fallback];
+    }
+
     const senderEmail = process.env.EMAIL_USER || process.env.GMAIL_USER || 'admin.jaiwant@gmail.com';
     const primaryRecipient = recipientList.join(', ');
 
@@ -131,12 +142,20 @@ class EmailService {
     // Plaintext fallback for maximum email deliverability
     const plainText = content || (htmlContent ? htmlContent.replace(/<[^>]+>/g, '') : 'Hello from CommandFlow AI');
 
+    const cleanHtml = (htmlContent && htmlContent.trim())
+      ? htmlContent
+      : `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 24px; background: #ffffff; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+          <div style="margin-bottom: 20px;">${plainText.replace(/\n/g, '<br/>')}</div>
+          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0 16px 0;" />
+          <p style="font-size: 12px; color: #94a3b8; margin: 0;">Dispatched automatically by <strong>CommandFlow AI</strong></p>
+        </div>`;
+
     const mailOptions = {
       from: `"CommandFlow AI" <${senderEmail}>`,
       to: primaryRecipient,
       subject: subject || 'CommandFlow AI Notification',
       text: plainText,
-      html: htmlContent || `<p>${plainText.replace(/\n/g, '<br/>')}</p>`,
+      html: cleanHtml,
       attachments: formattedAttachments,
       headers: {
         'X-Priority': '1 (Highest)',
