@@ -48,10 +48,10 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
     let animId;
     const startTime = performance.now();
 
-    // Word 1: Command (0.2s - 1.4s) -> Rama Green
-    // Word 2: Flow (1.5s - 2.2s) -> Peacock Blue
-    // Word 3: AI (2.3s - 2.8s) -> Bright Violet Purple
-    // Flourish: (2.9s - 3.7s) -> Multicolor gradient sweep
+    // Word 1: Command (0.2s - 1.45s) -> Rama Green
+    // Word 2: Flow (1.55s - 2.25s) -> Peacock Blue
+    // Word 3: AI (2.35s - 2.85s) -> Bright Violet Purple
+    // Flourish: (2.95s - 3.75s) -> Multicolor gradient sweep
     const updateTip = (now) => {
       const elapsed = (now - startTime) / 1000;
 
@@ -68,7 +68,6 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
         if (path) {
           const total = path.getTotalLength();
           const progress = Math.min(Math.max((elapsed - 0.2) / 1.25, 0), 1);
-          // Ease in-out cubic
           const eased = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
           const pt = path.getPointAtLength(eased * total);
           setInkTipPos({ x: pt.x, y: pt.y, visible: true, color: '#00C896' });
@@ -110,12 +109,10 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
           const progress = Math.min(Math.max((elapsed - 2.95) / 0.80, 0), 1);
           const eased = 1 - Math.pow(1 - progress, 3);
           const pt = path.getPointAtLength(eased * total);
-          // Color shifts from Peacock Blue to Violet
           const tipColor = progress < 0.5 ? '#0284C7' : '#8B5CF6';
           setInkTipPos({ x: pt.x, y: pt.y, visible: true, color: tipColor });
         }
       } else {
-        // Writing finished, fade out ink tip
         setInkTipPos(prev => ({ ...prev, visible: false }));
       }
 
@@ -154,21 +151,21 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
             {/* Word 1: Rama Green */}
             <linearGradient id="ramaGreenGrad" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#00C896" />
-              <stop offset="50%" stopColor="#00B894" />
+              <stop offset="60%" stopColor="#00B894" />
               <stop offset="100%" stopColor="#00A884" />
             </linearGradient>
 
             {/* Word 2: Peacock Blue */}
             <linearGradient id="peacockBlueGrad" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#0088CC" />
-              <stop offset="50%" stopColor="#0284C7" />
+              <stop offset="60%" stopColor="#0284C7" />
               <stop offset="100%" stopColor="#0369A1" />
             </linearGradient>
 
             {/* Word 3: Bright Violet Purple */}
             <linearGradient id="violetPurpleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#8B5CF6" />
-              <stop offset="50%" stopColor="#7C3AED" />
+              <stop offset="60%" stopColor="#7C3AED" />
               <stop offset="100%" stopColor="#6D28D9" />
             </linearGradient>
 
@@ -182,8 +179,8 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
 
             {/* Specular Gloss Sheen Filter */}
             <filter id="softGlow" x="-10%" y="-10%" width="120%" height="120%">
-              <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#00C896" floodOpacity="0.18" />
-              <feDropShadow dx="0" dy="8" stdDeviation="14" floodColor="#8B5CF6" floodOpacity="0.14" />
+              <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#00C896" floodOpacity="0.16" />
+              <feDropShadow dx="0" dy="8" stdDeviation="14" floodColor="#8B5CF6" floodOpacity="0.12" />
             </filter>
 
             {/* =======================================================
@@ -195,14 +192,13 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
             <mask id="maskCommand" maskUnits="userSpaceOnUse" x="0" y="0" width="1160" height="300">
               <rect x="0" y="0" width="1160" height="300" fill="black" />
               <path
-                d="M 175,122 C 158,102 135,118 126,145 C 118,172 132,194 158,194 C 178,194 192,176 195,158
-                   C 198,140 216,140 224,152 C 234,166 230,192 245,192 C 255,192 258,162 268,154
-                   C 278,146 288,176 295,192 C 304,192 308,162 318,154 C 328,146 338,176 345,192
-                   C 354,192 358,162 368,154 C 378,146 388,176 395,192 C 404,192 408,162 418,154
-                   C 426,148 436,152 440,165 C 445,180 435,192 450,192 C 460,192 468,162 478,154
-                   C 488,146 498,176 505,192 C 514,192 518,162 528,154 C 538,146 545,155 548,165
-                   C 552,180 540,192 555,192 C 565,192 570,165 572,120 C 573,95 570,192 585,192
-                   C 595,192 605,178 615,165"
+                d="M 260,115 C 235,105 220,135 224,168 C 228,185 248,185 265,165
+                   C 275,145 268,160 276,175 C 284,185 296,175 298,155 C 295,140 305,146 308,175
+                   C 318,142 326,175 336,142 C 344,175 354,142 362,175 C 370,160 376,175 386,142
+                   C 394,175 404,142 412,175 C 422,142 430,175 438,160 C 448,144 438,158 446,175
+                   C 456,185 464,170 466,150 C 466,175 475,162 482,175 C 492,142 500,175 510,142
+                   C 518,175 528,160 538,144 C 528,158 536,175 550,175 C 554,150 556,95 556,175
+                   C 565,185 580,175 595,165"
                 fill="none"
                 stroke="white"
                 strokeWidth="48"
@@ -216,12 +212,12 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
             <mask id="maskFlow" maskUnits="userSpaceOnUse" x="0" y="0" width="1160" height="300">
               <rect x="0" y="0" width="1160" height="300" fill="black" />
               <path
-                d="M 645,108 C 665,96 705,94 725,106
-                   M 685,100 C 675,130 668,165 660,192 C 655,200 648,198 654,185 C 662,170 690,162 708,162
-                   M 698,172 C 715,120 725,95 732,95 C 738,95 732,145 734,192
-                   C 736,192 748,165 758,154 C 768,144 785,152 788,168 C 792,185 782,192 798,192
-                   C 808,192 815,168 825,160 C 835,152 842,185 850,192 C 858,192 865,165 875,158
-                   C 885,150 895,162 902,170"
+                d="M 615,102 C 640,95 660,95 675,104
+                   M 648,100 C 640,135 634,168 626,178 C 620,182 630,176 648,165
+                   M 628,138 L 656,136
+                   M 658,168 C 670,115 678,96 680,96 C 682,96 676,145 676,175 C 684,180 688,165 694,155
+                   C 686,160 692,175 706,175 C 716,170 714,148 718,145 C 722,175 732,148 742,175
+                   C 750,180 756,155 765,142 C 772,138 780,148 788,155"
                 fill="none"
                 stroke="white"
                 strokeWidth="48"
@@ -235,11 +231,11 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
             <mask id="maskAI" maskUnits="userSpaceOnUse" x="0" y="0" width="1160" height="300">
               <rect x="0" y="0" width="1160" height="300" fill="black" />
               <path
-                d="M 915,192 C 932,150 948,110 960,95 C 970,110 985,155 998,192
-                   M 932,152 C 955,148 975,148 990,152
-                   M 1008,102 C 1025,100 1045,100 1058,102
-                   M 1033,104 L 1033,190
-                   M 1012,190 C 1025,192 1045,192 1058,190"
+                d="M 816,175 C 830,135 842,95 846,92 C 850,95 862,145 870,175
+                   M 826,145 L 862,142
+                   M 885,100 L 920,100
+                   M 902,102 L 902,175
+                   M 885,175 L 922,175"
                 fill="none"
                 stroke="white"
                 strokeWidth="48"
@@ -259,8 +255,8 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
             {/* Word 1: Command (Rama Green) */}
             <g mask="url(#maskCommand)">
               <text
-                x="120"
-                y="184"
+                x="220"
+                y="175"
                 className="hw-svg-text hw-text-command"
                 fill="url(#ramaGreenGrad)"
               >
@@ -271,8 +267,8 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
             {/* Word 2: Flow (Peacock Blue) */}
             <g mask="url(#maskFlow)">
               <text
-                x="650"
-                y="184"
+                x="620"
+                y="175"
                 className="hw-svg-text hw-text-flow"
                 fill="url(#peacockBlueGrad)"
               >
@@ -283,8 +279,8 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
             {/* Word 3: AI (Bright Violet Purple) */}
             <g mask="url(#maskAI)">
               <text
-                x="925"
-                y="184"
+                x="818"
+                y="175"
                 className="hw-svg-text hw-text-ai"
                 fill="url(#violetPurpleGrad)"
               >
@@ -298,7 +294,7 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
               Gracefully sweeps underneath the entire handwritten logo
               ======================================================= */}
           <path
-            d="M 105,224 C 280,248 520,242 760,222 C 890,210 990,206 1035,214 C 1060,218 1075,228 1055,234 C 1030,240 995,230 1020,218 C 1038,208 1068,214 1090,220"
+            d="M 180,222 C 340,244 560,240 760,222 C 880,212 940,208 970,214 C 990,218 1000,226 985,232 C 965,236 935,228 955,218 C 970,210 995,214 1015,220"
             fill="none"
             stroke="url(#flourishMultiGrad)"
             strokeWidth="3.6"
@@ -318,17 +314,6 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
               <circle r="3.5" fill="#FFFFFF" />
             </g>
           )}
-
-          {/* Model Shining Specular Sheen Sweep */}
-          <rect
-            x="0"
-            y="50"
-            width="1160"
-            height="210"
-            fill="url(#sheenGrad)"
-            className="hw-sheen-sweep-rect"
-            pointerEvents="none"
-          />
         </svg>
       </div>
     </div>
