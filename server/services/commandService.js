@@ -45,11 +45,21 @@ class CommandService {
     const aiParsed = await groqService.processCommand({ userCommand: command }, attachments);
     const aiTokenUsage = Number(aiParsed?.tokenUsage?.total_tokens || aiParsed?.tokenUsage || 0) || 0;
 
-    // 3. Intelligent Contact Resolution (Resolve names like "Arun" or "J K Sam" from MongoDB)
+    // 3. Intelligent Contact Resolution (Resolve names like "Arun" or "Jaswant" from MongoDB)
     let resolvedContact = null;
     const currentRecipients = aiParsed.recipients || (aiParsed.recipient?.email ? [aiParsed.recipient.email] : []);
+    const isPlaceholderEmail = currentRecipients.length === 0 || currentRecipients.some(r => 
+      !r || 
+      !r.includes('@') || 
+      r.includes('@example.com') || 
+      r.includes('@test.com') || 
+      r.includes('@sample.com') || 
+      r.includes('placeholder')
+    );
 
-    if (currentRecipients.length === 0 || (aiParsed.channel === 'gmail' && !currentRecipients.some(r => r.includes('@')))) {
+    const shouldResolveFromContacts = isPlaceholderEmail || (aiParsed.recipient?.name && aiParsed.recipient.name.toLowerCase() !== 'recipient');
+
+    if (shouldResolveFromContacts) {
       resolvedContact = await contactService.resolveRecipient(userId, {
         nameHint: aiParsed.recipient?.name,
         commandText: command,
@@ -63,14 +73,19 @@ class CommandService {
           aiParsed.recipient = {
             ...aiParsed.recipient,
             name: resolvedContact.name,
-            email: resolvedContact.email
+            email: resolvedContact.email,
+            recipients: [resolvedContact.email],
+            contactId: resolvedContact.contactId || resolvedContact._id
           };
-        } else if (aiParsed.channel === 'telegram' && resolvedContact.telegramId) {
-          aiParsed.recipients = [resolvedContact.telegramId];
+        } else if (aiParsed.channel === 'telegram' && (resolvedContact.telegramId || resolvedContact.chatId)) {
+          const tid = resolvedContact.telegramId || resolvedContact.chatId;
+          aiParsed.recipients = [tid];
           aiParsed.recipient = {
             ...aiParsed.recipient,
             name: resolvedContact.name,
-            chatId: resolvedContact.telegramId
+            chatId: tid,
+            telegramId: tid,
+            contactId: resolvedContact.contactId || resolvedContact._id
           };
         }
       }
