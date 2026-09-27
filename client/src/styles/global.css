@@ -422,8 +422,6 @@ code, pre, kbd, samp {
 
   rotate: 0deg !important;
 
-  skew: 0deg !important;
-
   transform-style: flat;
 
   overflow: hidden;
@@ -437,9 +435,6 @@ code, pre, kbd, samp {
     none !important;
 
   rotate:
-    0deg !important;
-
-  skew:
     0deg !important;
 
   box-shadow:

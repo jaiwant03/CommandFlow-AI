@@ -79,7 +79,6 @@ const Landing = () => {
             background: 'rgba(255, 255, 255, 0.95)',
             transform: 'none',
             rotate: '0deg',
-            skew: '0deg',
             boxShadow: '0 30px 60px -12px rgba(0, 200, 150, 0.25), 0 18px 36px -18px rgba(15, 23, 42, 0.12)',
             border: '1px solid var(--border-glow)',
             position: 'relative'
