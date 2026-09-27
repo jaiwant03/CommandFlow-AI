@@ -40,26 +40,26 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
     };
   }, [duration, onComplete]);
 
-  // Letter sequence for authentic human handwriting timing
-  // Word 1: Command (Rama Green -> Peacock Blue)
-  // Word 2: Flow (Peacock Blue -> Violet)
-  // Word 3: AI (Bright Violet Purple)
+  // Confident, fluid human handwriting cadence
+  // Word 1: Command (0.2s - 1.3s)
+  // Word 2: Flow (1.4s - 2.1s)
+  // Word 3: AI (2.2s - 2.7s)
   const letters = useMemo(() => [
-    { char: 'C', word: 1, delay: 0.20, dur: 0.32 },
-    { char: 'o', word: 1, delay: 0.48, dur: 0.20 },
-    { char: 'm', word: 1, delay: 0.65, dur: 0.26 },
-    { char: 'm', word: 1, delay: 0.88, dur: 0.26 },
-    { char: 'a', word: 1, delay: 1.11, dur: 0.20 },
-    { char: 'n', word: 1, delay: 1.28, dur: 0.20 },
-    { char: 'd', word: 1, delay: 1.45, dur: 0.28 },
-    // Natural pen lift between words (120ms pause)
-    { char: 'F', word: 2, delay: 1.82, dur: 0.32 },
-    { char: 'l', word: 2, delay: 2.11, dur: 0.22 },
-    { char: 'o', word: 2, delay: 2.30, dur: 0.20 },
-    { char: 'w', word: 2, delay: 2.47, dur: 0.25 },
-    // Natural pen lift before AI (130ms pause)
-    { char: 'A', word: 3, delay: 2.82, dur: 0.32 },
-    { char: 'I', word: 3, delay: 3.12, dur: 0.30 },
+    { char: 'C', word: 1, delay: 0.20, dur: 0.26 },
+    { char: 'o', word: 1, delay: 0.40, dur: 0.16 },
+    { char: 'm', word: 1, delay: 0.54, dur: 0.20 },
+    { char: 'm', word: 1, delay: 0.72, dur: 0.20 },
+    { char: 'a', word: 1, delay: 0.90, dur: 0.16 },
+    { char: 'n', word: 1, delay: 1.04, dur: 0.16 },
+    { char: 'd', word: 1, delay: 1.18, dur: 0.22 },
+    // Natural pen lift between words (100ms pause)
+    { char: 'F', word: 2, delay: 1.48, dur: 0.26 },
+    { char: 'l', word: 2, delay: 1.70, dur: 0.18 },
+    { char: 'o', word: 2, delay: 1.86, dur: 0.16 },
+    { char: 'w', word: 2, delay: 2.00, dur: 0.20 },
+    // Natural pen lift before AI (100ms pause)
+    { char: 'A', word: 3, delay: 2.28, dur: 0.26 },
+    { char: 'I', word: 3, delay: 2.52, dur: 0.24 },
   ], []);
 
   return (

@@ -258,7 +258,7 @@
   opacity: 0;
   mix-blend-mode: overlay;
   animation: modelSheenSweep 1.5s cubic-bezier(0.35, 0, 0.25, 1) forwards;
-  animation-delay: 3.35s;
+  animation-delay: 3.1s;
 }
 
 @keyframes modelSheenSweep {
@@ -282,20 +282,21 @@
    CALLIGRAPHIC SIGNATURE FLOURISH UNDERLINE
    ============================================================ */
 .hw-flourish-svg {
-  width: 90%;
-  max-width: 820px;
+  width: 95%;
+  max-width: 920px;
   height: 48px;
-  margin-top: -12px;
+  margin-top: -10px;
   overflow: visible;
   pointer-events: none;
   filter: drop-shadow(0 4px 10px rgba(0, 200, 150, 0.2));
 }
 
 .hw-flourish-stroke {
+  opacity: 0;
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
-  animation: drawFlourish 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: 3.3s;
+  animation: drawFlourish 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 2.8s;
 }
 
 @keyframes drawFlourish {
@@ -327,7 +328,7 @@
   opacity: 0;
   box-shadow: 0 0 12px currentColor,
               0 0 20px currentColor;
-  animation: inkTipCadence 3.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  animation: inkTipCadence 2.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
   animation-delay: 0.2s;
 }
 
@@ -348,18 +349,18 @@
     transform: scale(1);
   }
   /* o-m-m-a-n-d */
-  12% { left: 16%; top: 46%; color: #00C896; }
-  24% { left: 26%; top: 48%; color: #00B894; }
-  35% { left: 36%; top: 46%; color: #0088CC; }
-  42% { left: 45%; top: 48%; color: #0088CC; }
+  10% { left: 15%; top: 46%; color: #00C896; }
+  22% { left: 25%; top: 48%; color: #00B894; }
+  32% { left: 35%; top: 46%; color: #0088CC; }
+  40% { left: 45%; top: 48%; color: #0088CC; }
   /* Pen lift pause between Command & Flow */
-  46% {
+  44% {
     opacity: 0.3;
     left: 47%;
     top: 36%;
     transform: scale(0.6);
   }
-  49% {
+  48% {
     opacity: 1;
     left: 50%;
     top: 44%;
@@ -367,34 +368,34 @@
     transform: scale(1);
   }
   /* F-l-o-w */
-  58% { left: 58%; top: 46%; color: #0284C7; }
-  68% { left: 69%; top: 48%; color: #8B5CF6; }
+  58% { left: 59%; top: 46%; color: #0284C7; }
+  68% { left: 70%; top: 48%; color: #8B5CF6; }
   /* Pen lift pause between Flow & AI */
   72% {
     opacity: 0.3;
-    left: 71%;
+    left: 72%;
     top: 36%;
     transform: scale(0.6);
   }
   76% {
     opacity: 1;
-    left: 75%;
+    left: 76%;
     top: 44%;
     color: #8B5CF6;
     transform: scale(1);
   }
   /* A-I */
-  86% { left: 83%; top: 46%; color: #7C3AED; }
-  94% { left: 91%; top: 48%; color: #9333EA; }
+  86% { left: 84%; top: 46%; color: #7C3AED; }
+  94% { left: 92%; top: 48%; color: #9333EA; }
   98% {
     opacity: 0.9;
-    left: 93%;
+    left: 94%;
     top: 48%;
     transform: scale(1.3);
   }
   100% {
     opacity: 0;
-    left: 94%;
+    left: 95%;
     top: 48%;
     transform: scale(0);
   }
