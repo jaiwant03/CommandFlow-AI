@@ -213,7 +213,7 @@
 .gv-char {
   display: inline-block;
   opacity: 0;
-  clip-path: polygon(0 -20%, 0 -20%, 0 120%, 0 120%);
+  clip-path: inset(-120% 100% -120% -20%);
   transform: translateY(3px) scale(0.96) skewX(-14deg);
   animation-name: writeCursiveChar;
   animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -224,7 +224,7 @@
 @keyframes writeCursiveChar {
   0% {
     opacity: 0;
-    clip-path: polygon(0 -20%, 0 -20%, 0 120%, 0 120%);
+    clip-path: inset(-120% 100% -120% -20%);
     transform: translateY(3px) scale(0.96) skewX(-14deg);
     filter: blur(1.5px);
   }
@@ -232,11 +232,17 @@
     opacity: 1;
     filter: blur(0.6px);
   }
-  100% {
+  99% {
     opacity: 1;
-    clip-path: polygon(0 -20%, 130% -20%, 130% 120%, 0 120%);
+    clip-path: inset(-120% 0% -120% -20%);
     transform: translateY(0) scale(1) skewX(0deg);
     filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    clip-path: none;
+    transform: none;
+    filter: none;
   }
 }
 
