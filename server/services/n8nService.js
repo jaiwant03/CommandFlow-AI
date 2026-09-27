@@ -209,7 +209,9 @@ class N8nService {
         const status = err.response ? err.response.status : (err.code === 'ECONNABORTED' ? 'TIMEOUT' : err.message);
         console.warn(`[n8n Engine] Webhook at ${webhookUrl} returned ${status}.`);
       }
-    } else if (channel === 'telegram') {
+    }
+
+    if (channel === 'telegram') {
       try {
         const botToken = process.env.TELEGRAM_BOT_TOKEN;
         const chatId = recipient?.chatId || process.env.TELEGRAM_DEFAULT_CHAT_ID || '7793673257';
