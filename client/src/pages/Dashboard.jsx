@@ -251,85 +251,69 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
         });
 
       } else {
-
         setExecutionStep(5);
 
-        await new Promise((resolve) =>
-          setTimeout(resolve, 400)
+        const execRes = await executeCommand(
+          textToAnalyze,
+          inputType,
+          attachments
         );
 
-        setExecutionStep(6);
-
-        const execRes =
-          await executeCommand(
-            textToAnalyze,
-            inputType,
-            attachments
-          );
-
-        setExecutionStep(7);
-
-
-        if (
-          execRes.success &&
-          execRes.data?.status !== 'FAILED'
-        ) {
-
-          setExecutionResult({
-
-            type: 'immediate',
-
-            status: 'SUCCESS',
-
-            channel:
-              parsedData.channel,
-
-            recipient:
-              parsedData.recipient,
-
-            intent:
-              parsedData.intent,
-
-            content:
-              parsedData.message || parsedData.content,
-
-            subject:
-              parsedData.subject,
-
-            message:
-              `Successfully generated content & executed via n8n ${parsedData.channel?.toUpperCase()} node!`
-
-          });
-
-        } else {
-
-          setExecutionResult({
-
-            type: 'immediate',
-
-            status: 'FAILED',
-
-            channel:
-              parsedData.channel,
-
-            recipient:
-              parsedData.recipient,
-
-            intent:
-              parsedData.intent,
-
-            error:
-              execRes.message ||
-              execRes.data?.error ||
-              'n8n execution failed',
-
-            message:
-              'Execution failed.'
-
-          });
-
+        const autoId = execRes.data?.automationId;
+        if (autoId) {
+          setActiveAutomationId(autoId);
+          socketService.joinAutomation(autoId);
         }
 
+        if (execRes.success && execRes.data?.status === 'SUCCESS') {
+          setExecutionStep(7);
+          setExecutionResult({
+            type: 'immediate',
+            status: 'SUCCESS',
+            channel: parsedData.channel,
+            recipient: parsedData.recipient,
+            intent: parsedData.intent,
+            content: parsedData.message || parsedData.content,
+            subject: parsedData.subject,
+            message: `✓ Successfully executed via ${parsedData.channel?.toUpperCase()} engine!`
+          });
+        } else if (execRes.success && (execRes.data?.status === 'QUEUED' || execRes.data?.status === 'PROCESSING')) {
+          // Worker is currently executing in background, Socket.IO will trigger step 6 -> 7
+          setExecutionStep(6);
+          setExecutionResult({
+            type: 'immediate',
+            status: 'PROCESSING',
+            channel: parsedData.channel,
+            recipient: parsedData.recipient,
+            intent: parsedData.intent,
+            content: parsedData.message || parsedData.content,
+            subject: parsedData.subject,
+            message: 'Queued in BullMQ worker. Processing and dispatching...'
+          });
+        } else if (execRes.success && execRes.data?.status !== 'FAILED') {
+          setExecutionStep(7);
+          setExecutionResult({
+            type: 'immediate',
+            status: 'SUCCESS',
+            channel: parsedData.channel,
+            recipient: parsedData.recipient,
+            intent: parsedData.intent,
+            content: parsedData.message || parsedData.content,
+            subject: parsedData.subject,
+            message: `Successfully executed via ${parsedData.channel?.toUpperCase()} engine!`
+          });
+        } else {
+          setExecutionStep(7);
+          setExecutionResult({
+            type: 'immediate',
+            status: 'FAILED',
+            channel: parsedData.channel,
+            recipient: parsedData.recipient,
+            intent: parsedData.intent,
+            error: execRes.message || execRes.error?.message || execRes.data?.error || 'Automation execution failed',
+            message: execRes.message || 'Execution failed.'
+          });
+        }
       }
 
       await loadData();
