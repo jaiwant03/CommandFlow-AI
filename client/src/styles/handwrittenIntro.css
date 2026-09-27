@@ -275,57 +275,6 @@
 }
 
 /* ============================================================
-   SIGNATURE UNDERLINE FLOURISH: Handwritten Ribbon
-   ============================================================ */
-.hw-flourish-ribbon {
-  stroke-dasharray: 1050;
-  stroke-dashoffset: 1050;
-  animation: flourishDraw 0.9s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-  animation-delay: 2.2s;
-}
-
-@keyframes flourishDraw {
-  0% {
-    stroke-dashoffset: 1050;
-    opacity: 0;
-  }
-  5% {
-    opacity: 1;
-  }
-  100% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-}
-
-/* Flourish Completion Sparkle Starburst */
-.hw-flourish-sparkle {
-  opacity: 0;
-  transform: translate(1010px, 250px) scale(0);
-  animation: flourishSparklePop 0.7s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-  animation-delay: 3.0s;
-}
-
-.sparkle-star {
-  filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.7));
-}
-
-@keyframes flourishSparklePop {
-  0% {
-    opacity: 0;
-    transform: translate(1010px, 250px) scale(0) rotate(0deg);
-  }
-  60% {
-    opacity: 1;
-    transform: translate(1010px, 250px) scale(1.25) rotate(45deg);
-  }
-  100% {
-    opacity: 0.9;
-    transform: translate(1010px, 250px) scale(1) rotate(90deg);
-  }
-}
-
-/* ============================================================
    MODEL SHINING PALETTE: Specular Gloss Sheen Sweep
    ============================================================ */
 .hw-gloss-sweep {
@@ -333,8 +282,8 @@
   opacity: 0;
   mix-blend-mode: overlay;
   pointer-events: none;
-  animation: glossSheenSweep 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  animation-delay: 2.7s;
+  animation: glossSheenSweep 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay: 2.3s;
 }
 
 @keyframes glossSheenSweep {

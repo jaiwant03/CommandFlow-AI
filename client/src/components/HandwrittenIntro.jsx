@@ -182,29 +182,6 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
               opacity="0.9"
             />
           </g>
-
-          {/* Group 3: Elegant Signature Underline Flourish Path */}
-          <path
-            d="M 140,248 C 280,272 440,270 600,254 C 740,240 850,234 915,244 C 955,250 975,262 950,270 C 920,278 885,264 910,250 C 935,236 980,244 1010,250"
-            fill="none"
-            stroke="url(#flourishMultiGrad)"
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="hw-flourish-ribbon"
-          />
-
-          {/* Group 4: Delicate Finish Sparkle Starburst at flourish completion */}
-          <g className="hw-flourish-sparkle" transform="translate(1010, 250)">
-            <path
-              d="M 0,-14 L 3,-3 L 14,0 L 3,3 L 0,14 L -3,3 L -14,0 L -3,-3 Z"
-              fill="#8B5CF6"
-              stroke="#FFFFFF"
-              strokeWidth="1.5"
-              className="sparkle-star"
-            />
-            <circle cx="0" cy="0" r="3" fill="#FFFFFF" />
-          </g>
         </svg>
       </div>
     </div>
