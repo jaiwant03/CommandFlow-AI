@@ -186,7 +186,7 @@ class N8nService {
           console.log(`[n8n Engine] Attempting Telegram dispatch to ${webhookUrl}...`);
           const response = await axios.post(webhookUrl, requestPayload, {
             headers: requestHeaders,
-            timeout: 8000
+            timeout: 3000
           });
 
           console.log(`[n8n Engine] Webhook response received from ${webhookUrl}. Status: ${response.status}`);

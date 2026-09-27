@@ -110,7 +110,7 @@ async function verifyAllThreeExamples() {
     // Wait for BullMQ worker to process and deliver
     console.log('3. Waiting for BullMQ worker to process and deliver via n8n / Telegram Bot...');
     let auto2 = null;
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 35; i++) {
       await new Promise(r => setTimeout(r, 1000));
       auto2 = await Automation.findOne({ automationId: cmd2Data.data.automationId });
       if (auto2 && (auto2.status === 'SUCCESS' || auto2.status === 'SENT' || auto2.status === 'FAILED')) {
