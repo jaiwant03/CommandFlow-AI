@@ -151,7 +151,10 @@ class N8nService {
 
         // Asynchronously notify n8n webhook for workflow logging and auditing (non-blocking)
         const n8nWebhookUrl = `${this.baseUrl}/webhook/commandflow`;
-        axios.post(n8nWebhookUrl, requestPayload, { headers: requestHeaders, timeout: 5000 })
+        const auditPayload = typeof requestPayload === 'object' && !hasBinaryAttachments
+          ? { ...requestPayload, channel: 'smtp_direct', deliveredVia: 'gmail_smtp' }
+          : requestPayload;
+        axios.post(n8nWebhookUrl, auditPayload, { headers: requestHeaders, timeout: 5000 })
           .then((res) => console.log(`[n8n Engine] Audit event logged to n8n. Status: ${res.status}`))
           .catch((err) => console.warn(`[n8n Engine] Audit notification note: ${err.message}`));
 
