@@ -37,9 +37,20 @@ const Signup = () => {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '2rem',
-      background: 'radial-gradient(circle at 50% 30%, rgba(129, 140, 248, 0.15) 0%, rgba(9, 13, 22, 0.95) 70%)'
+      background: '#FFFFFF'
     }}>
-      <div className="glass-card" style={{ width: '100%', maxWidth: '440px', padding: '2.5rem' }}>
+      <div
+        className="glass-card"
+        style={{
+          width: '100%',
+          maxWidth: '440px',
+          padding: '2.5rem',
+          position: 'relative',
+          zIndex: 1,
+          background: '#FFFFFF',
+          boxShadow: '0 18px 48px rgba(15, 23, 42, 0.14)',
+        }}
+      >
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div className="brand-logo" style={{ margin: '0 auto 1rem', width: '48px', height: '48px' }}>
             <Bot size={28} />
