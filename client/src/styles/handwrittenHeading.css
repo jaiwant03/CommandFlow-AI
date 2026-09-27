@@ -57,6 +57,7 @@
 .hw-char.hw-color-green {
   background: linear-gradient(135deg, #00D29E 0%, #00B894 55%, #009E7E 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -64,6 +65,7 @@
 .hw-char.hw-color-blue {
   background: linear-gradient(135deg, #00A3E0 0%, #0088CC 50%, #0284C7 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -71,6 +73,7 @@
 .hw-char.hw-color-purple {
   background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 55%, #6D28D9 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -78,6 +81,7 @@
 .hw-color-rainbow .hw-char {
   background: linear-gradient(115deg, #00D29E 0%, #00A3E0 45%, #8B5CF6 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

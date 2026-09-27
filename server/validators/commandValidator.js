@@ -53,8 +53,9 @@ const validateCommandPlan = (plan) => {
   // 1. Schema check
   const parseResult = validatedCommandPlanSchema.safeParse(plan);
   if (!parseResult.success) {
-    const errorMessages = parseResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
-    throw new AppError(`Command validation failed: ${errorMessages}`, 400, 'VALIDATION_ERROR', parseResult.error.errors);
+    const issues = parseResult.error.issues || parseResult.error.errors || [];
+    const errorMessages = issues.map(e => `${(e.path || []).join('.')}: ${e.message}`).join(', ');
+    throw new AppError(`Command validation failed: ${errorMessages}`, 400, 'VALIDATION_ERROR', issues);
   }
 
   const validPlan = parseResult.data;
