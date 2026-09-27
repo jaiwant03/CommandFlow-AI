@@ -131,52 +131,29 @@ class N8nService {
       };
     }
 
-    // List of webhook endpoints to try
-    const webhookUrls = channel === 'gmail'
-      ? [`${this.baseUrl}/webhook/commandflow`, `${this.baseUrl}/webhook/send-gmail`, `${this.baseUrl}/webhook-test/commandflow`]
-      : [`${this.baseUrl}/webhook/commandflow`, `${this.baseUrl}/webhook/send-telegram`, `${this.baseUrl}/webhook-test/commandflow`];
-
-    // Attempt dispatch via n8n first
-    for (const webhookUrl of webhookUrls) {
-      try {
-        console.log(`[n8n Engine] Attempting dispatch to ${webhookUrl}...`);
-        const response = await axios.post(
-          webhookUrl,
-          requestPayload,
-          {
-            headers: requestHeaders,
-            timeout: 10000
-          }
-        );
-
-        console.log(`[n8n Engine] Webhook response received from ${webhookUrl}. Status: ${response.status}`);
-        return {
-          success: true,
-          n8nExecutionId: response.data?.executionId || response.data?.id || `n8n-exec-${Date.now()}`,
-          responseData: response.data,
-          via: 'n8n'
-        };
-      } catch (err) {
-        const status = err.response ? err.response.status : (err.code === 'ECONNABORTED' ? 'TIMEOUT' : err.message);
-        console.warn(`[n8n Engine] Webhook at ${webhookUrl} returned ${status}.`);
-      }
-    }
-
-    // Direct Guaranteed Delivery Fallback (SMTP for Gmail, Bot API for Telegram)
+    // 1. Direct Guaranteed Delivery via Gmail SMTP Engine (Nodemailer - NO Gmail API)
     if (channel === 'gmail') {
       try {
         const targetRecipients = recipientsList.length > 0
           ? recipientsList
-          : [recipient?.email].filter(Boolean);
+          : [recipient?.email, config.defaultRecipientEmail, 'admin.jaiwant@gmail.com'].filter(Boolean);
 
         console.log(`[SMTP Engine] Direct delivery to: ${targetRecipients.join(', ')}...`);
         const emailResult = await emailService.sendEmail({
           to: targetRecipients,
-          subject: subject || 'CommandFlow Message',
+          subject: subject || 'CommandFlow Notification',
           content: message || content || '',
           htmlContent: htmlContent || message || content || '',
           attachments: attachments || []
         });
+
+        console.log(`[SMTP Engine] Successfully sent email to ${targetRecipients.join(', ')}. MessageId: ${emailResult.messageId}`);
+
+        // Asynchronously notify n8n webhook for workflow logging and auditing (non-blocking)
+        const n8nWebhookUrl = `${this.baseUrl}/webhook/commandflow`;
+        axios.post(n8nWebhookUrl, requestPayload, { headers: requestHeaders, timeout: 5000 })
+          .then((res) => console.log(`[n8n Engine] Audit event logged to n8n. Status: ${res.status}`))
+          .catch((err) => console.warn(`[n8n Engine] Audit notification note: ${err.message}`));
 
         return {
           success: true,
@@ -193,7 +170,36 @@ class N8nService {
       }
     }
 
+    // 2. Telegram Delivery Pipeline (n8n Webhook with Bot API Direct Fallback)
     if (channel === 'telegram') {
+      const webhookUrls = [
+        `${this.baseUrl}/webhook/commandflow`,
+        `${this.baseUrl}/webhook/send-telegram`,
+        `${this.baseUrl}/webhook-test/commandflow`
+      ];
+
+      for (const webhookUrl of webhookUrls) {
+        try {
+          console.log(`[n8n Engine] Attempting Telegram dispatch to ${webhookUrl}...`);
+          const response = await axios.post(webhookUrl, requestPayload, {
+            headers: requestHeaders,
+            timeout: 8000
+          });
+
+          console.log(`[n8n Engine] Webhook response received from ${webhookUrl}. Status: ${response.status}`);
+          return {
+            success: true,
+            n8nExecutionId: response.data?.executionId || response.data?.id || `n8n-exec-${Date.now()}`,
+            responseData: response.data,
+            via: 'n8n'
+          };
+        } catch (err) {
+          const status = err.response ? err.response.status : (err.code === 'ECONNABORTED' ? 'TIMEOUT' : err.message);
+          console.warn(`[n8n Engine] Webhook at ${webhookUrl} returned ${status}.`);
+        }
+      }
+
+      // Telegram Direct Bot API Fallback
       try {
         const targetChatId = recipient?.chatId || recipient?.telegramId || config.telegramDefaultChatId;
         console.log(`[Telegram Engine] Direct delivery to chat ID: ${targetChatId}...`);
