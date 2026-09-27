@@ -139,16 +139,19 @@ class EmailService {
       return null;
     }).filter(Boolean);
 
-    // Plaintext fallback for maximum email deliverability
-    const plainText = content || (htmlContent ? htmlContent.replace(/<[^>]+>/g, '') : 'Hello from CommandFlow AI');
+    // Format email content for clean structure, line gaps, and executive presentation in Gmail
+    const { formatEmailContent } = require('../utils/emailFormatter');
+    const formatted = formatEmailContent({
+      subject,
+      content,
+      htmlContent
+    });
 
-    const cleanHtml = (htmlContent && htmlContent.trim())
+    const plainText = formatted.plainText;
+    // If htmlContent is already a full HTML document, preserve it; otherwise use formatted HTML
+    const cleanHtml = (htmlContent && htmlContent.includes('<html') && htmlContent.includes('<body'))
       ? htmlContent
-      : `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 24px; background: #ffffff; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-          <div style="margin-bottom: 20px;">${plainText.replace(/\n/g, '<br/>')}</div>
-          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0 16px 0;" />
-          <p style="font-size: 12px; color: #94a3b8; margin: 0;">Dispatched automatically by <strong>CommandFlow AI</strong></p>
-        </div>`;
+      : formatted.html;
 
     const mailOptions = {
       from: `"CommandFlow AI" <${senderEmail}>`,

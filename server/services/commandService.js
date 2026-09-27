@@ -119,11 +119,26 @@ class CommandService {
         telegramId: validatedPlan.recipient?.chatId || validatedPlan.recipient?.telegramId || '',
         contactId: resolvedContact?.contactId || null
       },
-      generatedContent: {
-        subject: validatedPlan.subject || '',
-        body: validatedPlan.message,
-        htmlBody: validatedPlan.htmlBody || ''
-      },
+      generatedContent: (() => {
+        const { formatEmailContent } = require('../utils/emailFormatter');
+        if (validatedPlan.channel === 'gmail') {
+          const formatted = formatEmailContent({
+            subject: validatedPlan.subject,
+            content: validatedPlan.message,
+            htmlContent: validatedPlan.htmlBody || aiParsed.htmlBody
+          });
+          return {
+            subject: validatedPlan.subject || '',
+            body: formatted.plainText || validatedPlan.message,
+            htmlBody: formatted.html
+          };
+        }
+        return {
+          subject: validatedPlan.subject || '',
+          body: validatedPlan.message,
+          htmlBody: validatedPlan.htmlBody || ''
+        };
+      })(),
       attachments,
       schedule: {
         date: validatedPlan.schedule?.date || null,

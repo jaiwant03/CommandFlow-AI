@@ -37,6 +37,7 @@ const validatedCommandPlanSchema = z.object({
   recipients: z.array(z.string()),
   subject: z.string().default(''),
   message: z.string().min(1, 'Message body cannot be empty.'),
+  htmlBody: z.string().optional(),
   schedule: z.object({
     isScheduled: z.boolean().default(false),
     nextExecution: z.date().nullable().optional(),
@@ -44,7 +45,7 @@ const validatedCommandPlanSchema = z.object({
     time: z.string().nullable().optional(),
     timezone: z.string().default('Asia/Kolkata')
   }).default({})
-});
+}).passthrough();
 
 /**
  * Strict validator for AI-extracted command plan
