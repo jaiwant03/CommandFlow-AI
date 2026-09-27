@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+const { Routes, Route, Navigate } = require ? require('react-router-dom') : {};
+import { Routes as RRoutes, Route as RRoute, Navigate as RNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import { getCurrentUser } from './services/authService';
@@ -10,6 +11,7 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Automations from './pages/Automations';
 import AutomationDetails from './pages/AutomationDetails';
+import Contacts from './pages/Contacts';
 import Schedules from './pages/Schedules';
 import History from './pages/History';
 import Integrations from './pages/Integrations';
@@ -23,7 +25,7 @@ const ProtectedLayout = ({ children, currentLanguage, setLanguage }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <RNavigate to="/login" replace />;
   }
 
   return (
@@ -45,11 +47,11 @@ const App = () => {
   const [currentLanguage, setCurrentLanguage] = useState('auto');
 
   return (
-    <Routes>
+    <RRoutes>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
 
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<RNavigate to="/login" replace />} />
 
       <Route
         path="/dashboard"
@@ -74,6 +76,15 @@ const App = () => {
         element={
           <ProtectedLayout currentLanguage={currentLanguage} setLanguage={setCurrentLanguage}>
             <AutomationDetails />
+          </ProtectedLayout>
+        }
+      />
+
+      <Route
+        path="/contacts"
+        element={
+          <ProtectedLayout currentLanguage={currentLanguage} setLanguage={setCurrentLanguage}>
+            <Contacts />
           </ProtectedLayout>
         }
       />
@@ -114,8 +125,8 @@ const App = () => {
         }
       />
 
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+      <Route path="*" element={<RNavigate to="/dashboard" replace />} />
+    </RRoutes>
   );
 };
 
