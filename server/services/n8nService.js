@@ -127,11 +127,65 @@ class N8nService {
     console.log(`[Gmail] Has image: ${hasImage}`);
     console.log(`[Gmail] Binary field exists: ${binaryFieldExists}`);
 
-    // List of webhook URLs to try (primary registered webhook first, then channel-specific and test endpoints)
+    // List of webhook URLs to try
     const webhookUrls = channel === 'gmail' 
       ? [`${this.baseUrl}/webhook/commandflow`, `${this.baseUrl}/webhook/send-gmail`, `${this.baseUrl}/webhook-test/commandflow`]
       : [`${this.baseUrl}/webhook/commandflow`, `${this.baseUrl}/webhook/send-telegram`, `${this.baseUrl}/webhook-test/commandflow` ];
 
+    // Gmail Channel: Ensure guaranteed delivery using Gmail SMTP engine, with background n8n event logging
+    if (channel === 'gmail') {
+      try {
+        const targetRecipients = recipientsList.length > 0 
+          ? recipientsList 
+          : [recipient?.email || primaryEmail || 'user@gmail.com'].filter(Boolean);
+
+        console.log(`[Gmail Engine] Dispatching email directly via Gmail SMTP to: ${targetRecipients.join(', ')}...`);
+        const emailResult = await emailService.sendEmail({
+          to: targetRecipients,
+          subject: subject || 'CommandFlow Message',
+          content: message || content || '',
+          htmlContent: htmlContent || message || content || '',
+          attachments: attachments || []
+        });
+
+        console.log(`[Gmail Engine] Email dispatched successfully! MessageId: ${emailResult.messageId}`);
+
+        // Also asynchronously notify n8n webhooks in background (fire-and-forget for workflow logging)
+        for (const webhookUrl of webhookUrls) {
+          axios.post(webhookUrl, requestPayload, { headers: requestHeaders, timeout: 5000 }).catch(() => {});
+        }
+
+        return {
+          success: true,
+          n8nExecutionId: emailResult.messageId || `direct-gmail-${Date.now()}`,
+          responseData: emailResult,
+          via: 'direct_email'
+        };
+      } catch (emailErr) {
+        console.error(`[Gmail Engine Error]: ${emailErr.message}. Trying n8n webhooks as backup...`);
+        for (const webhookUrl of webhookUrls) {
+          try {
+            const response = await axios.post(
+              webhookUrl,
+              requestPayload,
+              { headers: requestHeaders, timeout: 10000 }
+            );
+            return {
+              success: true,
+              n8nExecutionId: response.data?.executionId || response.data?.id || `n8n-exec-${Date.now()}`,
+              responseData: response.data,
+              via: 'n8n'
+            };
+          } catch (err) {}
+        }
+        return {
+          success: false,
+          error: `Gmail delivery failed: ${emailErr.message}`
+        };
+      }
+    }
+
+    // Telegram and other channels: Try n8n webhooks first
     for (const webhookUrl of webhookUrls) {
       try {
         console.log(`[n8n Engine] Attempting dispatch to ${webhookUrl}...`);
@@ -140,7 +194,7 @@ class N8nService {
           requestPayload,
           {
             headers: requestHeaders,
-            timeout: 10000 // 10s timeout for n8n execution
+            timeout: 10000
           }
         );
 
@@ -154,34 +208,6 @@ class N8nService {
       } catch (err) {
         const status = err.response ? err.response.status : (err.code === 'ECONNABORTED' ? 'TIMEOUT' : err.message);
         console.warn(`[n8n Engine] Webhook at ${webhookUrl} returned ${status}.`);
-      }
-    }
-
-    // Fallback Execution Path if n8n is offline, unactivated, or returns 404
-    console.log(`[n8n Engine Fallback] n8n Webhook unavailable or returning 404. Executing fallback delivery for channel: ${channel}...`);
-
-    if (channel === 'gmail') {
-      try {
-        const emailResult = await emailService.sendEmail({
-          to: recipientsList.length > 0 ? recipientsList : [recipient?.email || 'user@gmail.com'],
-          subject: subject || 'CommandFlow Message',
-          content: content,
-          htmlContent: htmlContent || content,
-          attachments: attachments || []
-        });
-
-        return {
-          success: true,
-          n8nExecutionId: emailResult.messageId || `direct-gmail-${Date.now()}`,
-          responseData: emailResult,
-          via: 'direct_email'
-        };
-      } catch (emailErr) {
-        console.error(`[n8n Fallback Email Error]: ${emailErr.message}`);
-        return {
-          success: false,
-          error: `Gmail delivery failed: ${emailErr.message}`
-        };
       }
     } else if (channel === 'telegram') {
       try {
