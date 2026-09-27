@@ -17,9 +17,9 @@
   color: #FFFFFF;
   overflow: hidden;
   user-select: none;
-  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-              filter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+              filter 0.55s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: opacity, transform, filter;
 }
 
@@ -189,7 +189,7 @@
   margin-bottom: 1.5rem;
   backdrop-filter: blur(10px);
   box-shadow: 0 0 25px rgba(16, 185, 129, 0.12);
-  animation: badgeSlideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: badgeSlideDown 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes badgeSlideDown {
@@ -246,17 +246,24 @@
 /* SVG Text Styles */
 .svg-handwritten-text {
   font-family: 'Alex Brush', cursive;
-  font-size: 114px;
+  font-size: 116px;
   font-weight: 600;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   dominant-baseline: central;
 }
 
-/* Gradient fill with soft luminous glow */
+/* Gradient fill for "Commandflow" */
 .handwritten-gradient-fill {
   fill: url(#introBrandGrad);
   filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.6))
           drop-shadow(0 0 45px rgba(16, 185, 129, 0.3));
+}
+
+/* Electric Violet/Cyan fill for "AI" */
+.handwritten-ai-fill {
+  fill: url(#introAIGrad);
+  filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.8))
+          drop-shadow(0 0 35px rgba(6, 182, 212, 0.5));
 }
 
 /* Subtle stroke outline for extra crispness */
@@ -264,7 +271,7 @@
   fill: none;
   stroke: url(#introBrandGrad);
   stroke-width: 1.2;
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 /* Calligraphy Underline Ribbon Path */
@@ -276,8 +283,8 @@
   stroke-linejoin: round;
   stroke-dasharray: 1200;
   stroke-dashoffset: 1200;
-  filter: drop-shadow(0 0 14px rgba(6, 182, 212, 0.8));
-  animation: drawRibbon 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 1.6s forwards;
+  filter: drop-shadow(0 0 14px rgba(6, 182, 212, 0.85));
+  animation: drawRibbon 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) 1.4s forwards;
 }
 
 @keyframes drawRibbon {
@@ -296,9 +303,9 @@
 
 /* Sparkling Starburst at the end of flourish */
 .flourish-starburst {
-  animation: starburstPop 0.8s cubic-bezier(0.17, 0.89, 0.32, 1.4) 3.0s forwards;
+  animation: starburstPop 0.7s cubic-bezier(0.17, 0.89, 0.32, 1.4) 2.7s forwards;
   opacity: 0;
-  filter: drop-shadow(0 0 12px #FDE047) drop-shadow(0 0 24px #06B6D4);
+  filter: drop-shadow(0 0 14px #FDE047) drop-shadow(0 0 26px #06B6D4);
 }
 
 @keyframes starburstPop {
@@ -318,8 +325,8 @@
 
 /* In-SVG Pen Nib Assembly Animation */
 .svg-pen-assembly {
-  animation: penSvgTravel 2.7s cubic-bezier(0.25, 0.1, 0.25, 1) 0.3s forwards,
-             penSvgBobbing 0.24s ease-in-out infinite alternate;
+  animation: penSvgTravel 2.4s cubic-bezier(0.25, 0.1, 0.25, 1) 0.25s forwards,
+             penSvgBobbing 0.22s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
 
@@ -331,16 +338,16 @@
   4% {
     opacity: 1;
   }
-  92% {
+  90% {
     transform: translate(910px, 135px);
     opacity: 1;
   }
-  96% {
+  95% {
     transform: translate(920px, 115px) scale(1.15);
     opacity: 0.9;
   }
   100% {
-    transform: translate(930px, 90px) scale(0);
+    transform: translate(930px, 85px) scale(0);
     opacity: 0;
   }
 }
@@ -373,13 +380,13 @@
   gap: 1.25rem;
   margin-top: 1rem;
   opacity: 0;
-  animation: subtitleReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 2.9s forwards;
+  animation: subtitleReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 2.6s forwards;
 }
 
 @keyframes subtitleReveal {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;

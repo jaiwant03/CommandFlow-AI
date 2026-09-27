@@ -125,11 +125,18 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
             preserveAspectRatio="xMidYMid meet"
           >
             <defs>
-              {/* Main Brand Gradient: Emerald -> Cyan -> Blue -> Violet */}
+              {/* Main Brand Gradient: Emerald -> Cyan -> Blue */}
               <linearGradient id="introBrandGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#10B981" />
-                <stop offset="35%" stopColor="#06B6D4" />
-                <stop offset="70%" stopColor="#3B82F6" />
+                <stop offset="40%" stopColor="#06B6D4" />
+                <stop offset="85%" stopColor="#3B82F6" />
+                <stop offset="100%" stopColor="#818CF8" />
+              </linearGradient>
+
+              {/* Electric AI Accent Gradient: Cyan -> Neon Purple */}
+              <linearGradient id="introAIGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#38BDF8" />
+                <stop offset="60%" stopColor="#A855F7" />
                 <stop offset="100%" stopColor="#C084FC" />
               </linearGradient>
 
@@ -157,15 +164,27 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
                 </feMerge>
               </filter>
 
-              {/* Progressive Writing Reveal Mask */}
+              {/* Soft Ink Brush Edge Filter */}
+              <filter id="featherBrushFilter" x="-10%" y="-10%" width="120%" height="120%">
+                <feGaussianBlur stdDeviation="4" />
+              </filter>
+
+              {/* Progressive Writing Reveal Mask with Feathered Brush Edge */}
               <mask id="inkWritingMask">
-                <rect x="0" y="0" width="130" height="260" fill="#FFFFFF">
+                <rect
+                  x="0"
+                  y="0"
+                  width="130"
+                  height="260"
+                  fill="#FFFFFF"
+                  filter="url(#featherBrushFilter)"
+                >
                   <animate
                     attributeName="width"
                     from="130"
                     to="1050"
-                    dur="2.7s"
-                    begin="0.3s"
+                    dur="2.4s"
+                    begin="0.25s"
                     fill="freeze"
                     calcMode="spline"
                     keySplines="0.25 0.1 0.25 1"
@@ -180,9 +199,10 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
                 x="525"
                 y="135"
                 textAnchor="middle"
-                className="svg-handwritten-text handwritten-gradient-fill"
+                className="svg-handwritten-text"
               >
-                Commandflow AI
+                <tspan className="handwritten-gradient-fill">Commandflow </tspan>
+                <tspan className="handwritten-ai-fill">AI</tspan>
               </text>
               <text
                 x="525"
