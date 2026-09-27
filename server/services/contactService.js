@@ -32,7 +32,32 @@ class ContactService {
     });
     if (contact) return contact;
 
-    // 4. Role / Relationship match (e.g., "advisor", "class advisor", "mentor", "hod")
+    // 4. Check if any word in query matches contact name (e.g., query "Jaswant Karun" matches contact "Jaswant")
+    const queryTokens = cleanQuery.split(/\s+/).filter(w => w.length > 2);
+    for (const token of queryTokens) {
+      contact = await Contact.findOne({
+        userId,
+        name: { $regex: new RegExp(`^${this.escapeRegex(token)}$`, 'i') }
+      });
+      if (contact) return contact;
+    }
+
+    // 5. Check if any contact's name is contained in the query
+    try {
+      const allUserContacts = await Contact.find({ userId });
+      for (const c of allUserContacts) {
+        if (!c.name) continue;
+        const cLower = c.name.toLowerCase().trim();
+        const qLower = cleanQuery.toLowerCase().trim();
+        if (qLower.includes(cLower) || cLower.includes(qLower)) {
+          return c;
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    // 6. Role / Relationship match (e.g., "advisor", "class advisor", "mentor", "hod", "friend")
     contact = await Contact.findOne({
       userId,
       $or: [
