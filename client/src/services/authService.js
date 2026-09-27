@@ -2,16 +2,24 @@ import API from './api';
 
 export const loginUser = async (email, password) => {
   const response = await API.post('/auth/login', { email, password });
-  if (response.data.success && response.data.user) {
-    localStorage.setItem('commandflow_user', JSON.stringify(response.data.user));
+  const userData = response.data.data || response.data.user || response.data;
+  if (response.data.success && userData) {
+    if (!userData.token && response.data.token) {
+      userData.token = response.data.token;
+    }
+    localStorage.setItem('commandflow_user', JSON.stringify(userData));
   }
   return response.data;
 };
 
 export const signupUser = async (name, email, password) => {
   const response = await API.post('/auth/register', { name, email, password });
-  if (response.data.success && response.data.user) {
-    localStorage.setItem('commandflow_user', JSON.stringify(response.data.user));
+  const userData = response.data.data || response.data.user || response.data;
+  if (response.data.success && userData) {
+    if (!userData.token && response.data.token) {
+      userData.token = response.data.token;
+    }
+    localStorage.setItem('commandflow_user', JSON.stringify(userData));
   }
   return response.data;
 };

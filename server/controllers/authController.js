@@ -33,13 +33,20 @@ const registerUser = async (req, res, next) => {
     });
 
     const token = generateToken(user._id);
-
-    return sendSuccess(res, 'Account created successfully.', {
+    const userPayload = {
       _id: user._id,
       name: user.name,
       email: user.email,
       token
-    }, 201);
+    };
+
+    return res.status(201).json({
+      success: true,
+      message: 'Account created successfully.',
+      data: userPayload,
+      user: userPayload,
+      token
+    });
   } catch (err) {
     next(err);
   }
@@ -58,10 +65,17 @@ const loginUser = async (req, res, next) => {
     const user = await User.findOne({ email: cleanEmail });
     if (user && user.password && (await bcrypt.compare(password, user.password))) {
       const token = generateToken(user._id);
-      return sendSuccess(res, 'Logged in successfully.', {
+      const userPayload = {
         _id: user._id,
         name: user.name,
         email: user.email,
+        token
+      };
+      return res.status(200).json({
+        success: true,
+        message: 'Logged in successfully.',
+        data: userPayload,
+        user: userPayload,
         token
       });
     }
@@ -79,11 +93,19 @@ const loginUser = async (req, res, next) => {
         });
       }
 
-      return sendSuccess(res, 'Logged in as Demo User.', {
+      const token = generateToken(demoUser._id);
+      const userPayload = {
         _id: demoUser._id,
         name: demoUser.name,
         email: demoUser.email,
-        token: generateToken(demoUser._id)
+        token
+      };
+      return res.status(200).json({
+        success: true,
+        message: 'Logged in as Demo User.',
+        data: userPayload,
+        user: userPayload,
+        token
       });
     }
 
