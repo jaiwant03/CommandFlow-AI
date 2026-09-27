@@ -13,14 +13,16 @@ export const parseCommand = async (command) => {
   }
 };
 
-export const executeCommand = async (command, inputType = 'text', attachments = []) => {
+export const executeCommand = async (command, inputType = 'text', attachments = [], customIdempotencyKey = null) => {
   try {
     const hasFiles = Array.isArray(attachments) && attachments.length > 0;
+    const idempotencyKey = customIdempotencyKey || `idem-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
 
     if (hasFiles) {
       const formData = new FormData();
       formData.append('command', command);
       formData.append('inputType', inputType);
+      formData.append('idempotencyKey', idempotencyKey);
 
       const cleanAttachments = attachments.map(a => ({
         filename: a.filename || (a.file ? a.file.name : 'attachment.png'),
@@ -57,13 +59,19 @@ export const executeCommand = async (command, inputType = 'text', attachments = 
       const response = await API.post('/automations', formData);
       return response.data;
     } else {
-      const response = await API.post('/automations', { command, inputType, attachments: [] });
+      const response = await API.post('/automations', {
+        command,
+        inputType,
+        attachments: [],
+        idempotencyKey
+      });
       return response.data;
     }
   } catch (err) {
     return {
       success: false,
-      message: err.response?.data?.message || err.message
+      message: err.response?.data?.message || err.message,
+      error: err.response?.data?.error || null
     };
   }
 };
@@ -79,7 +87,7 @@ export const fetchAutomations = async () => {
 
 export const fetchLogs = async () => {
   try {
-    const response = await API.get('/automations');
+    const response = await API.get('/automations/logs');
     return response.data;
   } catch (err) {
     return { success: false, data: [] };
@@ -92,6 +100,30 @@ export const fetchAutomationDetails = async (id) => {
     return response.data;
   } catch (err) {
     return { success: false, message: err.response?.data?.message || err.message };
+  }
+};
+
+export const retryCommand = async (id) => {
+  try {
+    const response = await API.post(`/automations/${id}/retry`);
+    return response.data;
+  } catch (err) {
+    return {
+      success: false,
+      message: err.response?.data?.message || err.message
+    };
+  }
+};
+
+export const cancelCommand = async (id) => {
+  try {
+    const response = await API.post(`/automations/${id}/cancel`);
+    return response.data;
+  } catch (err) {
+    return {
+      success: false,
+      message: err.response?.data?.message || err.message
+    };
   }
 };
 
@@ -128,5 +160,39 @@ export const connectIntegration = async (service, credentials) => {
     return response.data;
   } catch (err) {
     return { success: false, message: err.response?.data?.message || err.message };
+  }
+};
+
+// Contacts API
+export const fetchContacts = async () => {
+  try {
+    const response = await API.get('/contacts');
+    return response.data;
+  } catch (err) {
+    return { success: false, data: [] };
+  }
+};
+
+export const createContact = async (contactData) => {
+  try {
+    const response = await API.post('/contacts', contactData);
+    return response.data;
+  } catch (err) {
+    return {
+      success: false,
+      message: err.response?.data?.message || err.message
+    };
+  }
+};
+
+export const deleteContact = async (id) => {
+  try {
+    const response = await API.delete(`/contacts/${id}`);
+    return response.data;
+  } catch (err) {
+    return {
+      success: false,
+      message: err.response?.data?.message || err.message
+    };
   }
 };
