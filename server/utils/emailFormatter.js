@@ -35,8 +35,14 @@ function formatEmailContent({ subject = 'CommandFlow AI Notification', content =
   let signoffClosing = 'Regards,';
   let signoffName = senderName;
 
-  const signoffRegex = /(?:\n\s*|\.\s+)((?:Regards|Warm regards|Best regards|Kind regards|With regards|Yours sincerely|Yours faithfully|Sincerely|Thanks & Regards|Thanks and regards|Thank you very much|Thank you)[,\s]*([\s\S]*))$/i;
-  const signoffMatch = bodyText.match(signoffRegex);
+  const signoffRegex = /(?:\n\s*|\.\s+)((?:Regards|Warm regards|Best regards|Kind regards|With regards|Yours sincerely|Yours faithfully|Sincerely|Thanks & Regards|Thanks and regards|Yours truly)[,\s]*([\s\S]*))$/i;
+  let signoffMatch = bodyText.match(signoffRegex);
+  
+  if (!signoffMatch) {
+    const thankYouSignoff = /(?:\n\s*)((?:Thank you|Thanks)[,\s]*\n+[\s\S]+)$/i;
+    signoffMatch = bodyText.match(thankYouSignoff);
+  }
+
   if (signoffMatch) {
     const fullSignoff = signoffMatch[1].trim();
     bodyText = bodyText.substring(0, bodyText.lastIndexOf(signoffMatch[1])).trim().replace(/\.$/, '.');
