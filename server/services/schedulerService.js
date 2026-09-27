@@ -47,17 +47,34 @@ const initScheduler = () => {
             }
           }
 
-          const generatedBody = auto.generatedContent?.body || auto.generatedContent?.content || '';
-          const generatedSubject = auto.generatedContent?.subject || 'Scheduled Communication';
-          const generatedHtml = auto.generatedContent?.htmlBody || generatedBody;
+          let generatedBody = auto.generatedContent?.body || auto.generatedContent?.content || '';
+          let generatedSubject = auto.generatedContent?.subject || '';
+          let generatedHtml = auto.generatedContent?.htmlBody || generatedBody;
+
+          // If subject or body is missing, dynamically generate via AI engine
+          if (!generatedBody || !generatedSubject) {
+            console.log(`[Scheduler Worker] Missing generated content for ${auto.automationId}, generating via AI...`);
+            try {
+              const groqService = require('./groqService');
+              const aiParsed = await groqService.processCommand({ userCommand: auto.originalCommand || sched.command });
+              generatedSubject = generatedSubject || aiParsed.subject || 'Scheduled Communication';
+              generatedBody = generatedBody || aiParsed.message || aiParsed.content || sched.command;
+              generatedHtml = generatedHtml || aiParsed.htmlBody || generatedBody;
+            } catch (aiErr) {
+              console.warn(`[Scheduler Worker AI Warning]: ${aiErr.message}`);
+              generatedSubject = generatedSubject || 'Scheduled Notification';
+              generatedBody = generatedBody || sched.command;
+              generatedHtml = generatedHtml || generatedBody;
+            }
+          }
 
           // Dispatch payload to guaranteed delivery engine
           const n8nResult = await n8nService.triggerWorkflow({
             automationId: auto.automationId,
             userCommand: auto.originalCommand || sched.command,
             userId: auto.userId.toString(),
-            intent: auto.intent,
-            channel: auto.channel,
+            intent: auto.intent || (auto.channel === 'gmail' ? 'send_email' : 'send_message'),
+            channel: auto.channel || 'gmail',
             recipient: {
               name: auto.recipient?.name || 'Recipient',
               email: recipientsList[0] || auto.recipient?.email,
@@ -89,8 +106,8 @@ const initScheduler = () => {
             await ActivityLog.create({
               userId: auto.userId,
               automationId: auto.automationId,
-              action: `SCHEDULED_EXECUTION_${auto.channel.toUpperCase()}`,
-              channel: auto.channel,
+              action: `SCHEDULED_EXECUTION_${(auto.channel || 'gmail').toUpperCase()}`,
+              channel: auto.channel || 'gmail',
               status: 'SUCCESS',
               message: `Scheduled automation executed and delivered successfully via ${viaMsg} (${n8nResult.n8nExecutionId})`
             });
@@ -107,8 +124,8 @@ const initScheduler = () => {
             await ActivityLog.create({
               userId: auto.userId,
               automationId: auto.automationId,
-              action: `SCHEDULED_EXECUTION_${auto.channel.toUpperCase()}_FAILED`,
-              channel: auto.channel,
+              action: `SCHEDULED_EXECUTION_${(auto.channel || 'gmail').toUpperCase()}_FAILED`,
+              channel: auto.channel || 'gmail',
               status: 'FAILED',
               message: `Scheduled execution failed: ${n8nResult.error}`
             });
@@ -116,8 +133,34 @@ const initScheduler = () => {
             console.error(`[Scheduler Worker] Failed to execute ${sched.automationId}: ${n8nResult.error}`);
           }
         } else {
-          sched.status = 'FAILED';
-          await sched.save();
+          // If no Automation record exists, dynamically process the scheduled command
+          console.log(`[Scheduler Worker] No Automation record for ${sched.automationId}, processing command directly...`);
+          try {
+            const groqService = require('./groqService');
+            const emailService = require('./emailService');
+            const aiParsed = await groqService.processCommand({ userCommand: sched.command });
+            const emailMatch = (sched.command || '').match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [];
+            const targetRecipients = aiParsed.recipients?.length > 0 ? aiParsed.recipients : emailMatch;
+            
+            if (targetRecipients.length > 0) {
+              const emailResult = await emailService.sendEmail({
+                to: targetRecipients,
+                subject: aiParsed.subject || 'Scheduled Communication',
+                content: aiParsed.message || aiParsed.content || sched.command,
+                htmlContent: aiParsed.htmlBody || ''
+              });
+              sched.status = 'SUCCESS';
+              await sched.save();
+              console.log(`[Scheduler Worker] Successfully dispatched orphan schedule ${sched.automationId} to ${targetRecipients.join(', ')}`);
+            } else {
+              sched.status = 'FAILED';
+              await sched.save();
+            }
+          } catch (e) {
+            console.error(`[Scheduler Worker] Failed processing orphan schedule: ${e.message}`);
+            sched.status = 'FAILED';
+            await sched.save();
+          }
         }
       }
     } catch (err) {
