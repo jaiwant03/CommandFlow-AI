@@ -386,54 +386,9 @@ Return ONLY a valid JSON object with the following schema:
    * Generate clean, professional HTML email body
    */
   generateHtmlEmailBody({ subject, content, attachments = [] }) {
-    const safeContent = content || '';
-
-    // Strip any raw <img> tags or broken cid placeholders to prevent broken image boxes in Gmail
-    const cleanTextContent = safeContent
-      .replace(/<img[^>]*>/gi, '')
-      .replace(/\[broken image[^\]]*\]/gi, '')
-      .trim();
-
-    const paragraphs = cleanTextContent
-      .split(/\n\n+/)
-      .map(p => p.trim())
-      .filter(p => p.length > 0)
-      .map(p => `<p style="margin: 0 0 16px 0; line-height: 1.6; color: #334155; font-size: 15px;">${p.replace(/\n/g, '<br/>')}</p>`)
-      .join('');
-
-    return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${subject || 'CommandFlow AI Notification'}</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
-  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; padding: 30px 15px;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); overflow: hidden;">
-          <tr>
-            <td style="background-color: #2563eb; padding: 24px 32px; text-align: left;">
-              <span style="color: #ffffff; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; font-family: 'Segoe UI', Arial, sans-serif;">CommandFlow AI</span>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 32px; text-align: left; color: #334155;">
-              ${paragraphs}
-            </td>
-          </tr>
-          <tr>
-            <td style="background-color: #f1f5f9; padding: 16px 32px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b;">
-              Sent automatically via <strong style="color: #2563eb;">CommandFlow AI Automation Platform</strong>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+    const { formatEmailContent } = require('../utils/emailFormatter');
+    const formatted = formatEmailContent({ subject, content });
+    return formatted.html;
   }
 
   /**
@@ -467,7 +422,16 @@ Return ONLY a valid JSON object with the following schema:
       }
     }
 
-    const htmlBody = channel === 'gmail' ? this.generateHtmlEmailBody({ subject: generatedSubject, content: generatedMessage, attachments }) : '';
+    let htmlBody = '';
+    if (channel === 'gmail') {
+      const { formatEmailContent } = require('../utils/emailFormatter');
+      const formatted = formatEmailContent({
+        subject: generatedSubject,
+        content: generatedMessage
+      });
+      generatedMessage = formatted.plainText;
+      htmlBody = formatted.html;
+    }
 
     if (channel === 'gmail') {
       const effectiveRecipients = recipientsList;
