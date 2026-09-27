@@ -23,8 +23,8 @@ const HandwrittenHeading = ({
 
     let wordsArray = [];
 
-    // Special case for "CommandFlow" compound word
-    if (text.toLowerCase() === 'commandflow' || text.toLowerCase() === 'command flow') {
+    // Special case for "command flow" with explicit space
+    if (text.toLowerCase() === 'command flow') {
       wordsArray = [
         { text: 'Command', colorClass: 'hw-color-green' },
         { text: 'Flow', colorClass: 'hw-color-blue' }

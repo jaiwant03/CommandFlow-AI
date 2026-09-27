@@ -1,11 +1,11 @@
 /* ============================================================
    HANDWRITTEN INTRO SPLASH SCREEN STYLES
-   CommandFlow AI — Pure White Model Shining Palette
-   Great Vibes Cursive Theme with Exact Handwriting Motion
-   Multicolor: Rama Green + Peacock Blue + Bright Violet Purple
+   CommandFlow AI — Futuristic Robotics & Agentic System
+   Multi-color Continuous Handwriting Motion (Rama Green -> Peacock Blue -> Violet Purple)
+   Wording: "CommandFlow" (single continuous word) + "AI"
    ============================================================ */
 
-/* Main Stage: Pure, luminous white background */
+/* Main Stage: Pure, luminous high-tech laboratory canvas */
 .handwritten-white-stage {
   position: fixed;
   inset: 0;
@@ -24,37 +24,30 @@
 
 .handwritten-white-stage.fading-out {
   opacity: 0;
-  transform: scale(1.02);
+  transform: scale(1.025);
   pointer-events: none;
 }
 
 /* ============================================================
-   MODEL SHINING PALETTE: Luxury Studio Lighting on Pure White
+   STUDIO LIGHTING & MODEL SHINING PALETTE
    ============================================================ */
 .model-shine-backdrop {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background: 
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 60%, #FFFFFF 100%),
-    radial-gradient(circle at 26% 45%, rgba(0, 200, 150, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 54% 50%, rgba(0, 136, 204, 0.07) 0%, transparent 50%),
-    radial-gradient(circle at 80% 55%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.85) 60%, #FFFFFF 100%),
+    radial-gradient(circle at 22% 38%, rgba(0, 229, 170, 0.08) 0%, transparent 48%),
+    radial-gradient(circle at 52% 48%, rgba(0, 144, 226, 0.07) 0%, transparent 50%),
+    radial-gradient(circle at 82% 56%, rgba(139, 92, 246, 0.08) 0%, transparent 48%);
   animation: modelShineBreathe 6s ease-in-out infinite alternate;
 }
 
 @keyframes modelShineBreathe {
-  0% {
-    opacity: 0.85;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1.04);
-  }
+  0% { opacity: 0.88; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.03); }
 }
 
-/* Luminous Caustic Light Beam */
 .model-caustic-beam {
   position: absolute;
   width: 200%;
@@ -64,57 +57,86 @@
   background: linear-gradient(
     135deg,
     transparent 42%,
-    rgba(255, 255, 255, 0.6) 48%,
-    rgba(0, 200, 150, 0.04) 50%,
+    rgba(255, 255, 255, 0.7) 48%,
+    rgba(0, 229, 170, 0.04) 50%,
     rgba(139, 92, 246, 0.04) 52%,
     transparent 58%
   );
   pointer-events: none;
-  animation: causticDrift 8s linear infinite;
+  animation: causticDrift 9s linear infinite;
 }
 
 @keyframes causticDrift {
-  0% {
-    transform: translate(-10%, -10%) rotate(0deg);
-  }
-  100% {
-    transform: translate(10%, 10%) rotate(0deg);
-  }
+  0% { transform: translate(-8%, -8%) rotate(0deg); }
+  100% { transform: translate(8%, 8%) rotate(0deg); }
 }
 
-/* Prismatic Center Halo */
 .model-prism-glow {
   position: absolute;
-  width: 820px;
-  height: 400px;
+  width: 860px;
+  height: 420px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: radial-gradient(
     ellipse,
-    rgba(0, 200, 150, 0.09) 0%,
-    rgba(2, 132, 199, 0.07) 40%,
+    rgba(0, 229, 170, 0.09) 0%,
+    rgba(0, 144, 226, 0.07) 40%,
     rgba(124, 58, 237, 0.06) 70%,
     transparent 100%
   );
-  filter: blur(40px);
+  filter: blur(42px);
   pointer-events: none;
   animation: prismPulse 4s ease-in-out infinite alternate;
 }
 
 @keyframes prismPulse {
-  0% {
-    opacity: 0.7;
-    transform: translate(-50%, -50%) scale(0.96);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.05);
-  }
+  0% { opacity: 0.7; transform: translate(-50%, -50%) scale(0.96); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
 }
 
-/* Micro Diamond Sparkles */
+/* ============================================================
+   CYBERNETIC CIRCUIT GRID & HOLOGRAPHIC SCANNER
+   ============================================================ */
+.cyber-circuit-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
+  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
+  opacity: 0.7;
+}
+
+.cyber-scanning-laser-plane {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 229, 170, 0.2) 20%,
+    rgba(0, 144, 226, 0.7) 50%,
+    rgba(139, 92, 246, 0.2) 80%,
+    transparent 100%
+  );
+  box-shadow: 0 0 12px rgba(0, 144, 226, 0.4), 0 0 24px rgba(0, 229, 170, 0.2);
+  pointer-events: none;
+  animation: scanLaserPlane 4s ease-in-out infinite alternate;
+}
+
+@keyframes scanLaserPlane {
+  0% { top: 8%; opacity: 0.25; }
+  50% { opacity: 0.85; }
+  100% { top: 92%; opacity: 0.25; }
+}
+
+/* Micro Sparkle Flares */
 .sparkle-flare {
   position: absolute;
   width: 6px;
@@ -122,30 +144,378 @@
   border-radius: 50%;
   pointer-events: none;
   background: #FFFFFF;
-  box-shadow: 0 0 10px rgba(0, 200, 150, 0.8),
+  box-shadow: 0 0 10px rgba(0, 229, 170, 0.8),
               0 0 18px rgba(139, 92, 246, 0.6);
   opacity: 0;
   animation: sparkleTwinkle 3s ease-in-out infinite;
 }
 
-.sparkle-1 { top: 28%; left: 20%; animation-delay: 0.6s; }
-.sparkle-2 { top: 68%; left: 34%; animation-delay: 1.8s; }
-.sparkle-3 { top: 24%; right: 22%; animation-delay: 1.2s; }
-.sparkle-4 { top: 70%; right: 16%; animation-delay: 2.4s; }
+.sparkle-1 { top: 26%; left: 18%; animation-delay: 0.4s; }
+.sparkle-2 { top: 72%; left: 32%; animation-delay: 1.6s; }
+.sparkle-3 { top: 22%; right: 20%; animation-delay: 1.0s; }
+.sparkle-4 { top: 68%; right: 18%; animation-delay: 2.2s; }
 
 @keyframes sparkleTwinkle {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0.3) rotate(0deg);
-  }
-  50% {
-    opacity: 0.9;
-    transform: scale(1.3) rotate(45deg);
-  }
+  0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+  50% { opacity: 0.95; transform: scale(1.3) rotate(45deg); }
 }
 
 /* ============================================================
-   CENTER STAGE: ONLY the word "CommandFlow AI"
+   ROBOTIC HUD TOPBAR & TELEMETRY
+   ============================================================ */
+.robotic-hud-topbar {
+  position: absolute;
+  top: 1.1rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 30;
+  pointer-events: auto;
+}
+
+.hud-brand-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.38rem 0.75rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+}
+
+.hud-beacon-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00D29E;
+  box-shadow: 0 0 8px #00D29E;
+  animation: beaconBlink 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes beaconBlink {
+  0% { opacity: 0.4; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1.25); }
+}
+
+.hud-icon-bot {
+  color: #0284C7;
+}
+
+.hud-core-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: #0F172A;
+}
+
+.hud-frequency-equalizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 12px;
+  margin-left: 0.2rem;
+}
+
+.freq-bar {
+  width: 2.5px;
+  background: #00D29E;
+  border-radius: 1px;
+  animation: freqBounce 0.8s ease-in-out infinite alternate;
+}
+
+.freq-bar.bar-1 { height: 40%; animation-delay: 0.1s; }
+.freq-bar.bar-2 { height: 85%; animation-delay: 0.3s; background: #0090E2; }
+.freq-bar.bar-3 { height: 60%; animation-delay: 0.2s; background: #0090E2; }
+.freq-bar.bar-4 { height: 100%; animation-delay: 0.4s; background: #8B5CF6; }
+.freq-bar.bar-5 { height: 50%; animation-delay: 0.15s; background: #8B5CF6; }
+
+@keyframes freqBounce {
+  0% { transform: scaleY(0.3); }
+  100% { transform: scaleY(1); }
+}
+
+.hud-center-status {
+  display: flex;
+  align-items: center;
+}
+
+.hud-status-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #334155;
+  padding: 0.32rem 0.7rem;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 144, 226, 0.2);
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(0, 144, 226, 0.08);
+}
+
+.hud-chip-icon {
+  color: #0090E2;
+  animation: chipPulse 2s ease-in-out infinite;
+}
+
+@keyframes chipPulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+.hud-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.hud-metric-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #64748B;
+  padding: 0.32rem 0.6rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 6px;
+}
+
+.hud-skip-button {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 9999px;
+  color: #334155;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hud-skip-button:hover {
+  background: #0F172A;
+  color: #FFFFFF;
+  border-color: #0F172A;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+}
+
+.hud-kbd-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  padding: 0.1rem 0.3rem;
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 4px;
+  color: inherit;
+}
+
+.hud-skip-button:hover .hud-kbd-tag {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================================
+   VIEWPORT CORNER CALIBRATION BRACKETS
+   ============================================================ */
+.cyber-corner-bracket {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.bracket-tl {
+  top: 1rem;
+  left: 1rem;
+  border-top: 2px solid rgba(0, 210, 158, 0.6);
+  border-left: 2px solid rgba(0, 210, 158, 0.6);
+}
+
+.bracket-tr {
+  top: 1rem;
+  right: 1rem;
+  border-top: 2px solid rgba(0, 144, 226, 0.6);
+  border-right: 2px solid rgba(0, 144, 226, 0.6);
+}
+
+.bracket-bl {
+  bottom: 1rem;
+  left: 1rem;
+  border-bottom: 2px solid rgba(0, 144, 226, 0.6);
+  border-left: 2px solid rgba(0, 144, 226, 0.6);
+}
+
+.bracket-br {
+  bottom: 1rem;
+  right: 1rem;
+  border-bottom: 2px solid rgba(139, 92, 246, 0.6);
+  border-right: 2px solid rgba(139, 92, 246, 0.6);
+}
+
+/* ============================================================
+   4 AUTONOMOUS AGENT NODES (CONSTELLATION)
+   ============================================================ */
+.agent-pod {
+  position: absolute;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05),
+              0 2px 6px rgba(15, 23, 42, 0.03);
+  pointer-events: none;
+  transition: transform 0.4s ease;
+  animation: floatAgentPod 5s ease-in-out infinite alternate;
+}
+
+@keyframes floatAgentPod {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-4px); }
+}
+
+.agent-pod-topleft {
+  top: 4.8rem;
+  left: 2.2rem;
+  animation-delay: 0s;
+  border-left: 3px solid #00D29E;
+}
+
+.agent-pod-topright {
+  top: 4.8rem;
+  right: 2.2rem;
+  animation-delay: 1.2s;
+  border-right: 3px solid #0090E2;
+}
+
+.agent-pod-bottomleft {
+  bottom: 4.4rem;
+  left: 2.2rem;
+  animation-delay: 2.4s;
+  border-left: 3px solid #2563EB;
+}
+
+.agent-pod-bottomright {
+  bottom: 4.4rem;
+  right: 2.2rem;
+  animation-delay: 3.6s;
+  border-right: 3px solid #8B5CF6;
+}
+
+.agent-pod-header {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.agent-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-green { background: rgba(0, 210, 158, 0.12); color: #00B894; }
+.avatar-blue { background: rgba(0, 144, 226, 0.12); color: #0090E2; }
+.avatar-cobalt { background: rgba(37, 99, 235, 0.12); color: #2563EB; }
+.avatar-purple { background: rgba(139, 92, 246, 0.12); color: #7C3AED; }
+
+.agent-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.agent-callsign {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #0F172A;
+}
+
+.agent-role {
+  font-size: 0.64rem;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.agent-pod-telemetry {
+  display: flex;
+  align-items: center;
+}
+
+.agent-telemetry-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 0.18rem 0.45rem;
+  border-radius: 4px;
+}
+
+.pill-green { background: rgba(0, 210, 158, 0.1); color: #00A884; }
+.pill-blue { background: rgba(0, 144, 226, 0.1); color: #0080DB; }
+.pill-cobalt { background: rgba(37, 99, 235, 0.1); color: #1D4ED8; }
+.pill-purple { background: rgba(139, 92, 246, 0.1); color: #6D28D9; }
+
+.agent-mini-pulse {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+  animation: agentPulseBlink 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes agentPulseBlink {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+/* Agentic Synaptic Grid SVG */
+.agent-synaptic-grid-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.synapse-path {
+  animation: synapseStream 3s linear infinite;
+}
+
+@keyframes synapseStream {
+  0% { stroke-dashoffset: 40; }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* ============================================================
+   CENTER STAGE: "CommandFlow" (SINGLE WORD) + "AI"
    Great Vibes Cursive Penmanship Stage
    ============================================================ */
 .handwritten-center-box {
@@ -156,7 +526,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 20;
 }
 
 .great-vibes-stage {
@@ -165,94 +535,94 @@
   align-items: baseline;
   justify-content: center;
   font-family: 'Great Vibes', cursive;
-  font-size: clamp(4.2rem, 8.5vw, 7.4rem);
+  font-size: clamp(4.4rem, 8.8vw, 7.8rem);
   font-weight: 400;
-  line-height: 1.8;
-  letter-spacing: 1px;
+  line-height: 1.7;
+  letter-spacing: 0.5px;
   overflow: visible;
-  filter: drop-shadow(0 6px 18px rgba(0, 200, 150, 0.16))
-          drop-shadow(0 10px 26px rgba(124, 58, 237, 0.14));
+  filter: drop-shadow(0 6px 20px rgba(0, 210, 158, 0.18))
+          drop-shadow(0 10px 28px rgba(124, 58, 237, 0.15));
 }
 
-/* Spacers between words with natural handwriting distance */
-.gv-word-spacer {
-  display: inline-block;
-  width: clamp(14px, 2.2vw, 24px);
-}
-
-/* Word Segments: Each word carries its multicolor gradient */
-.gv-word {
+/* Word 1: CommandFlow — SINGLE UNIFIED WORD SPAN (No internal space) */
+.gv-word-commandflow {
   display: inline-flex;
   align-items: baseline;
   overflow: visible;
+  white-space: nowrap;
 }
 
-/* Word 1: Command -> Rama Green (#00D29E -> #00B894 -> #009E7E) */
-.gv-word-command .gv-char {
-  background: linear-gradient(135deg, #00D29E 0%, #00B894 55%, #009E7E 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Word Spacer before "AI" */
+.gv-word-spacer {
+  display: inline-block;
+  width: clamp(16px, 2.4vw, 28px);
 }
 
-/* Word 2: Flow -> Peacock Blue (#00A3E0 -> #0088CC -> #0284C7) */
-.gv-word-flow .gv-char {
-  background: linear-gradient(135deg, #00A3E0 0%, #0088CC 50%, #0284C7 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Word 3: AI -> Bright Violet Purple (#8B5CF6 -> #7C3AED -> #6D28D9) */
-.gv-word-ai .gv-char {
-  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 55%, #6D28D9 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Specific Font Styling for 100% letter visibility */
-.font-gv {
-  font-family: 'Great Vibes', cursive !important;
-}
-
-/* Full tall letter 'd' from Pinyon Script with complete ascender */
-.font-pinyon-d {
-  font-family: 'Pinyon Script', 'Allura', cursive !important;
-  font-size: 1.05em;
-  margin-left: -2px;
-}
-
-/* True Capital 'A' for AI */
-.font-capital-a {
-  font-family: 'Dancing Script', 'Alex Brush', cursive !important;
-  font-weight: 700;
-  font-size: 0.92em;
-  letter-spacing: 0.5px;
-}
-
-/* Full, clean Capital 'I' for AI with top and bottom serifs */
-.font-capital-i {
-  font-family: 'Dancing Script', 'Alex Brush', cursive !important;
-  font-weight: 700;
-  font-size: 0.92em;
-  margin-left: 1px;
+/* Word 2: AI */
+.gv-word-ai {
+  display: inline-flex;
+  align-items: baseline;
+  overflow: visible;
+  white-space: nowrap;
 }
 
 /* ============================================================
-   AUTHENTIC CURSIVE WRITE-IN MOTION: SLANTED INK FLOW
-   Simulates a fountain pen flowing ink along the 18° cursive slant
+   CONTINUOUS 11-LETTER CHROMATIC SPECTRUM ACROSS "CommandFlow"
+   From Rama Green -> Turquoise -> Peacock Blue -> Cobalt -> Violet
    ============================================================ */
+.gv-color-0 {
+  background: linear-gradient(135deg, #00F5B8 0%, #00E5AA 50%, #00D29E 100%);
+}
+.gv-color-1 {
+  background: linear-gradient(135deg, #00E5AA 0%, #00D29E 50%, #00C4A4 100%);
+}
+.gv-color-2 {
+  background: linear-gradient(135deg, #00D29E 0%, #00C4A4 50%, #00BFA9 100%);
+}
+.gv-color-3 {
+  background: linear-gradient(135deg, #00C4A4 0%, #00BFA9 50%, #00B5B6 100%);
+}
+.gv-color-4 {
+  background: linear-gradient(135deg, #00BFA9 0%, #00B5B6 50%, #00AAC4 100%);
+}
+.gv-color-5 {
+  background: linear-gradient(135deg, #00B5B6 0%, #00AAC4 50%, #009ED6 100%);
+}
+.gv-color-6 {
+  background: linear-gradient(135deg, #00AAC4 0%, #009ED6 50%, #0090E2 100%);
+}
+.gv-color-7 {
+  background: linear-gradient(135deg, #009ED6 0%, #0090E2 50%, #0284C7 100%);
+}
+.gv-color-8 {
+  background: linear-gradient(135deg, #0090E2 0%, #0284C7 50%, #2563EB 100%);
+}
+.gv-color-9 {
+  background: linear-gradient(135deg, #0284C7 0%, #2563EB 50%, #4F46E5 100%);
+}
+.gv-color-10 {
+  background: linear-gradient(135deg, #2563EB 0%, #4F46E5 50%, #7C3AED 100%);
+}
+
+/* AI Colors: Electric Violet */
+.gv-color-ai-a {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 55%, #6D28D9 100%);
+}
+.gv-color-ai-i {
+  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 55%, #581C87 100%);
+}
+
+/* Individual letter styling */
 .gv-char {
   display: inline-block;
   padding-top: 80px;
   margin-top: -80px;
   padding-bottom: 50px;
   margin-bottom: -50px;
-  padding-left: 10px;
-  margin-left: -10px;
-  padding-right: 10px;
-  margin-right: -10px;
+  padding-left: 8px;
+  margin-left: -8px;
+  padding-right: 8px;
+  margin-right: -8px;
   overflow: visible;
   opacity: 0;
   clip-path: inset(-200% 100% -200% -50%);
@@ -261,6 +631,9 @@
   animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
   animation-fill-mode: forwards;
   will-change: clip-path, opacity, transform;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 @keyframes writeCursiveChar {
@@ -288,9 +661,38 @@
   }
 }
 
-/* ============================================================
-   CALLIGRAPHIC SIGNATURE FLOURISH UNDERLINE
-   ============================================================ */
+/* Typography Overrides */
+.font-gv {
+  font-family: 'Great Vibes', cursive !important;
+}
+
+.font-pinyon-d {
+  font-family: 'Pinyon Script', 'Allura', cursive !important;
+  font-size: 1.05em;
+  margin-left: -2px;
+}
+
+.font-cf-capital-f {
+  font-family: 'Great Vibes', cursive !important;
+  margin-left: 2px;
+  margin-right: 0px;
+}
+
+.font-capital-a {
+  font-family: 'Dancing Script', 'Alex Brush', cursive !important;
+  font-weight: 700;
+  font-size: 0.92em;
+  letter-spacing: 0.5px;
+}
+
+.font-capital-i {
+  font-family: 'Dancing Script', 'Alex Brush', cursive !important;
+  font-weight: 700;
+  font-size: 0.92em;
+  margin-left: 1px;
+}
+
+/* Calligraphic Flourish Underline */
 .gv-flourish-svg {
   width: 95%;
   max-width: 960px;
@@ -298,133 +700,384 @@
   margin-top: -12px;
   overflow: visible;
   pointer-events: none;
-  filter: drop-shadow(0 4px 12px rgba(0, 200, 150, 0.22));
+  filter: drop-shadow(0 4px 14px rgba(0, 210, 158, 0.25));
 }
 
 .gv-flourish-stroke {
   opacity: 0;
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
-  animation: drawGvFlourish 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: 2.95s;
+  animation: drawGvFlourish 0.84s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 2.76s;
 }
 
 @keyframes drawGvFlourish {
-  0% {
-    stroke-dashoffset: 1000;
-    opacity: 0;
-  }
-  5% {
-    opacity: 1;
-  }
-  100% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
+  0% { stroke-dashoffset: 1000; opacity: 0; }
+  5% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
 }
 
 /* ============================================================
-   TRAVELING LIQUID INK BEAD (ACTIVE PEN TIP)
-   Locked precisely to the active writing stroke
+   HIGH-TECH ROBOTIC STYLUS & DRONE HEAD (Active Writing Assembly)
    ============================================================ */
-.gv-traveling-ink-bead {
+.robotic-stylus-assembly {
   position: absolute;
   top: 0;
   left: 0;
   width: 0;
   height: 0;
   pointer-events: none;
-  z-index: 20;
+  z-index: 50;
   transition: transform 0.04s linear;
 }
 
-.ink-bead-halo {
-  position: absolute;
-  top: -12px;
-  left: -12px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  opacity: 0.28;
-  filter: blur(4px);
-  animation: beadPulse 0.4s ease-in-out infinite alternate;
+.stylus-standby {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  animation: stylusHoverBreath 3s ease-in-out infinite alternate;
 }
 
-.ink-bead-core {
+@keyframes stylusHoverBreath {
+  0% { transform: translate(var(--tw-translate-x), var(--tw-translate-y)) translateY(0); }
+  100% { transform: translate(var(--tw-translate-x), var(--tw-translate-y)) translateY(-8px); }
+}
+
+/* Holographic Laser Targeting Reticle */
+.robotic-reticle-gyro {
   position: absolute;
-  top: -3.5px;
-  left: -3.5px;
-  width: 7px;
-  height: 7px;
+  top: -24px;
+  left: -24px;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+}
+
+.reticle-bracket {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-color: var(--stylus-color, #00D29E);
+  opacity: 0.85;
+}
+
+.r-tl { top: 0; left: 0; border-top: 1.5px solid; border-left: 1.5px solid; }
+.r-tr { top: 0; right: 0; border-top: 1.5px solid; border-right: 1.5px solid; }
+.r-bl { bottom: 0; left: 0; border-bottom: 1.5px solid; border-left: 1.5px solid; }
+.r-br { bottom: 0; right: 0; border-bottom: 1.5px solid; border-right: 1.5px solid; }
+
+.reticle-crosshair-h {
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  right: 6px;
+  height: 1px;
+  background: var(--stylus-color, #00D29E);
+  opacity: 0.35;
+  transform: translateY(-50%);
+}
+
+.reticle-crosshair-v {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--stylus-color, #00D29E);
+  opacity: 0.35;
+  transform: translateX(-50%);
+}
+
+.reticle-radar-spin {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px dashed var(--stylus-color, #00D29E);
+  opacity: 0.45;
+  animation: reticleSpin 5s linear infinite;
+}
+
+@keyframes reticleSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Precision Laser Projection Beam */
+.robotic-laser-emitter-beam {
+  position: absolute;
+  top: -38px;
+  left: -0.8px;
+  width: 1.6px;
+  height: 38px;
+  box-shadow: 0 0 10px var(--stylus-color, #00D29E), 0 0 20px var(--stylus-color, #00D29E);
+  opacity: 0.9;
+}
+
+/* Plasma Spark Focal Core */
+.robotic-plasma-focal-core {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.plasma-halo {
+  position: absolute;
+  top: -14px;
+  left: -14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  opacity: 0.35;
+  filter: blur(6px);
+  animation: plasmaPulse 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes plasmaPulse {
+  0% { transform: scale(0.85); opacity: 0.25; }
+  100% { transform: scale(1.2); opacity: 0.45; }
+}
+
+.plasma-core-white {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #FFFFFF;
-  box-shadow: 0 0 8px currentColor, 0 0 14px currentColor;
+  box-shadow: 0 0 8px #FFFFFF, 0 0 16px var(--stylus-color, #00D29E);
 }
 
-@keyframes beadPulse {
-  0% { transform: scale(0.85); opacity: 0.22; }
-  100% { transform: scale(1.15); opacity: 0.34; }
+.plasma-micro-spark {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 0 6px var(--stylus-color, #00D29E);
+  opacity: 0;
+  animation: sparkDischarge 0.6s ease-out infinite;
+}
+
+.spark-a { top: -6px; left: 10px; animation-delay: 0.1s; }
+.spark-b { top: 8px; left: -8px; animation-delay: 0.3s; }
+.spark-c { top: -10px; left: -6px; animation-delay: 0.45s; }
+
+@keyframes sparkDischarge {
+  0% { opacity: 1; transform: scale(1) translate(0, 0); }
+  100% { opacity: 0; transform: scale(0.2) translate(12px, -10px); }
+}
+
+/* Cybernetic Stylus Arm Body */
+.robotic-stylus-chassis {
+  position: absolute;
+  top: -68px;
+  left: 18px;
+  transform: rotate(-35deg);
+  transform-origin: bottom left;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stylus-carbon-barrel {
+  position: relative;
+  width: 10px;
+  height: 52px;
+  background: linear-gradient(90deg, #1E293B 0%, #0F172A 50%, #334155 100%);
+  border-radius: 3px 3px 1px 1px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.stylus-neon-strip {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 3.5px;
+  width: 3px;
+  border-radius: 2px;
+  box-shadow: 0 0 6px var(--stylus-color, #00D29E);
+}
+
+.stylus-joint-ring {
+  position: absolute;
+  top: 14px;
+  left: -2px;
+  right: -2px;
+  height: 4px;
+  background: #64748B;
+  border-radius: 1px;
+}
+
+.stylus-nozzle-tip {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 16px solid #0F172A;
+}
+
+/* Micro Live Telemetry HUD Tag */
+.stylus-telemetry-tag {
+  position: absolute;
+  top: -36px;
+  left: 34px;
+  white-space: nowrap;
+  padding: 0.2rem 0.5rem;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--stylus-color, #00D29E);
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+}
+
+.stylus-telemetry-text {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #F8FAFC;
+  letter-spacing: 0.4px;
+}
+
+.telemetry-live-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--stylus-color, #00D29E);
+  box-shadow: 0 0 6px var(--stylus-color, #00D29E);
+  animation: beaconBlink 0.8s infinite alternate;
 }
 
 /* ============================================================
-   MODEL SHINING PALETTE: Specular Gloss Sheen Sweep
+   BOTTOM AGENTIC COMMAND EXECUTION TICKER
    ============================================================ */
-.gv-specular-gloss-sheen {
+.agentic-terminal-footer {
   position: absolute;
-  inset: -15% -10%;
+  bottom: 1.2rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
   pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    transparent 25%,
-    rgba(255, 255, 255, 0.7) 48%,
-    rgba(255, 255, 255, 0.95) 50%,
-    rgba(255, 255, 255, 0.7) 52%,
-    transparent 75%
-  );
-  background-size: 200% 100%;
-  opacity: 0;
-  mix-blend-mode: overlay;
-  animation: gvSheenSweep 1.5s cubic-bezier(0.35, 0, 0.25, 1) forwards;
-  animation-delay: 3.4s;
 }
 
-@keyframes gvSheenSweep {
-  0% {
-    opacity: 0;
-    background-position: -120% 0;
+.terminal-ticker-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.42rem 1.1rem;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 210, 158, 0.35);
+  border-radius: 9999px;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.18),
+              0 0 16px rgba(0, 210, 158, 0.12);
+}
+
+.terminal-icon {
+  color: #00E5AA;
+}
+
+.terminal-prefix {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #00E5AA;
+  letter-spacing: 0.5px;
+}
+
+.terminal-stream-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #F1F5F9;
+  letter-spacing: 0.4px;
+}
+
+.terminal-cursor-blink {
+  display: inline-block;
+  width: 6px;
+  height: 12px;
+  background: #00E5AA;
+  animation: cursorBlink 0.9s infinite;
+}
+
+@keyframes cursorBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* ============================================================
+   RESPONSIVE SCALING
+   ============================================================ */
+@media (max-width: 1024px) {
+  .agent-pod {
+    padding: 0.5rem 0.7rem;
   }
-  25% {
-    opacity: 0.9;
+  .agent-pod-topleft,
+  .agent-pod-topright {
+    top: 4.4rem;
   }
-  75% {
-    opacity: 0.9;
-  }
-  100% {
-    opacity: 0;
-    background-position: 120% 0;
+  .agent-pod-bottomleft,
+  .agent-pod-bottomright {
+    bottom: 3.8rem;
   }
 }
 
-/* Responsive Font Scaling */
 @media (max-width: 768px) {
   .great-vibes-stage {
-    font-size: clamp(3.4rem, 9.5vw, 5.4rem);
+    font-size: clamp(3.2rem, 9.4vw, 5.2rem);
   }
   .gv-flourish-svg {
-    height: 42px;
+    height: 40px;
     margin-top: -10px;
+  }
+  .agent-pod {
+    display: none; /* Keep clean on small devices */
+  }
+  .agent-synaptic-grid-svg {
+    display: none;
+  }
+  .robotic-hud-topbar {
+    top: 0.8rem;
+    left: 1rem;
+    right: 1rem;
+  }
+  .hud-core-tag,
+  .hud-frequency-equalizer {
+    display: none;
+  }
+  .hud-center-status {
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
   .great-vibes-stage {
-    font-size: clamp(2.6rem, 10vw, 4.0rem);
+    font-size: clamp(2.5rem, 9.8vw, 3.8rem);
   }
   .gv-word-spacer {
     width: 12px;
   }
   .gv-flourish-svg {
-    height: 32px;
+    height: 30px;
     margin-top: -8px;
+  }
+  .terminal-ticker-box {
+    padding: 0.35rem 0.8rem;
+    max-width: 90vw;
+  }
+  .terminal-stream-msg {
+    font-size: 0.64rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
