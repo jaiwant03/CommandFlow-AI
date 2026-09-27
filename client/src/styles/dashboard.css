@@ -72,12 +72,9 @@
 
   color: var(--cf-text);
 
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 
@@ -306,15 +303,13 @@
 .cf-command-label {
   display: flex;
   align-items: center;
-
   gap: 7px;
-
   color: var(--cf-green-dark);
-
-  font-size: 11px;
-  font-weight: 800;
-
-  letter-spacing: 0.04em;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .cf-command-label span {
@@ -323,15 +318,12 @@
 
 .cf-command-title {
   margin: 7px 0 0;
-
   color: var(--cf-text);
-
-  font-size: 21px;
-  line-height: 1.2;
-
+  font-family: var(--font-heading);
+  font-size: 1.45rem;
+  line-height: 1.25;
   font-weight: 800;
-
-  letter-spacing: -0.025em;
+  letter-spacing: -0.035em;
 }
 
 
@@ -577,58 +569,30 @@ button:active,
 
 .cf-command-card
 .command-example-chip {
-
   display: inline-flex;
-
   align-items: center;
-
-  min-height: 27px;
-
+  min-height: 30px;
   max-width: 100%;
-
-  padding: 4px 11px;
-
+  padding: 5px 13px;
   border: 1px solid #b8eadb;
-
   border-radius: 999px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #f0fdf9,
-      #effdfb
-    );
-
+  background: linear-gradient(135deg, #f0fdf9, #effdfb);
   color: var(--cf-green-dark);
-
-  font-size: 10px;
-
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   line-height: 1.25;
-
   white-space: nowrap;
-
   overflow: hidden;
-
   text-overflow: ellipsis;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .cf-command-card
 .command-example-chip:hover {
-
-  background:
-    linear-gradient(
-      135deg,
-      #e7faf3,
-      #ecfeff
-    );
-
+  background: linear-gradient(135deg, #e7faf3, #ecfeff);
   border-color: #7dd3be;
-
   transform: translateY(-1px);
 }
 
@@ -638,44 +602,31 @@ button:active,
    ============================================================ */
 
 .cf-execution-card {
-
   overflow: hidden;
-
   margin-bottom: 16px;
-
   background: #ffffff;
-
   border: 1px solid #d9e5f0;
-
   border-radius: 16px;
-
   box-shadow: var(--cf-shadow);
 }
 
 .cf-execution-header {
-
   display: flex;
   align-items: center;
-
   min-height: 56px;
-
   padding: 0 18px;
-
   border-bottom: 1px solid var(--cf-border-soft);
 }
 
 .cf-execution-title {
-
   display: flex;
   align-items: center;
-
   gap: 8px;
-
   color: var(--cf-text);
-
-  font-size: 13px;
-
-  font-weight: 800;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
 }
 
 .cf-execution-title svg {
@@ -688,62 +639,43 @@ button:active,
    ============================================================ */
 
 .cf-progress-steps {
-
   display: flex;
-
-  gap: 7px;
-
-  padding: 12px 16px;
-
+  gap: 8px;
+  padding: 12px 18px;
   overflow-x: auto;
-
   background: #f8fbff;
-
   border-bottom: 1px solid var(--cf-border-soft);
   scrollbar-width: thin;
 }
 
 .cf-progress-pill {
-
   display: inline-flex;
-
   align-items: center;
-
-  gap: 5px;
-
+  gap: 6px;
   flex: 0 0 auto;
-
-  padding: 6px 9px;
-
+  padding: 7px 13px;
   border: 1px solid #dce6f0;
-
   border-radius: 8px;
-
   background: #ffffff;
-
-  color: #718096;
-
-  font-size: 9px;
-
-  font-weight: 700;
+  color: #64748b;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .cf-progress-pill.current {
-
   color: var(--cf-blue);
-
   border-color: #93c5fd;
-
   background: #eff6ff;
+  font-weight: 650;
 }
 
 .cf-progress-pill.done {
-
   color: var(--cf-green-dark);
-
   border-color: #a7ead5;
-
   background: #ecfdf5;
+  font-weight: 650;
 }
 
 
