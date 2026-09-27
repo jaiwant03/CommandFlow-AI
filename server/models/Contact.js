@@ -4,7 +4,8 @@ const contactSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
+    index: true
   },
   name: {
     type: String,
@@ -42,5 +43,10 @@ const contactSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+// Compound indexes for user contact book lookups
+contactSchema.index({ userId: 1, name: 1 });
+contactSchema.index({ userId: 1, email: 1 });
+contactSchema.index({ userId: 1, relationship: 1 });
 
 module.exports = mongoose.model('Contact', contactSchema);

@@ -11,11 +11,23 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     lowercase: true,
-    trim: true
+    trim: true,
+    index: true
   },
   password: {
     type: String,
-    required: true
+    required: function() {
+      return !this.googleId;
+    }
+  },
+  googleId: {
+    type: String,
+    sparse: true,
+    index: true
+  },
+  avatar: {
+    type: String,
+    default: ''
   },
   role: {
     type: String,
