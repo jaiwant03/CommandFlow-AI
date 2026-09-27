@@ -4,12 +4,28 @@ const automationSchema = new mongoose.Schema({
   automationId: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    index: true
+  },
+  idempotencyKey: {
+    type: String,
+    sparse: true,
+    index: true
+  },
+  executionId: {
+    type: String,
+    sparse: true,
+    index: true
+  },
+  jobId: {
+    type: String,
+    default: null
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
+    index: true
   },
   originalCommand: {
     type: String,
@@ -39,7 +55,8 @@ const automationSchema = new mongoose.Schema({
     email: { type: String, default: '' },
     recipients: [{ type: String }],
     phone: { type: String, default: '' },
-    telegramId: { type: String, default: '' }
+    telegramId: { type: String, default: '' },
+    contactId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact', default: null }
   },
   generatedContent: {
     subject: { type: String, default: '' },
@@ -72,8 +89,26 @@ const automationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['PENDING', 'SCHEDULED', 'PROCESSING', 'SUCCESS', 'FAILED', 'WAITING', 'CANCELLED', 'RUNNING', 'Processing', 'Scheduled', 'Running', 'Success', 'Failed', 'Waiting', 'Cancelled'],
-    default: 'PROCESSING'
+    enum: [
+      'CREATED', 'QUEUED', 'PROCESSING', 'SENDING', 'SENT', 'SUCCESS', 'FAILED',
+      'RETRYING', 'SCHEDULED', 'CANCELLED', 'WAITING', 'RUNNING',
+      // Legacy case compatibility
+      'Pending', 'Processing', 'Scheduled', 'Running', 'Success', 'Failed', 'Waiting', 'Cancelled'
+    ],
+    default: 'QUEUED',
+    index: true
+  },
+  attempts: {
+    type: Number,
+    default: 0
+  },
+  maxRetries: {
+    type: Number,
+    default: 3
+  },
+  lastError: {
+    type: String,
+    default: null
   },
   n8nExecutionId: {
     type: String,
@@ -106,9 +141,17 @@ const automationSchema = new mongoose.Schema({
   completedAt: {
     type: Date,
     default: null
+  },
+  metadata: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
   }
 }, {
   timestamps: true
 });
+
+// Compound indexes for optimal production querying
+automationSchema.index({ userId: 1, createdAt: -1 });
+automationSchema.index({ status: 1, 'schedule.nextExecution': 1 });
 
 module.exports = mongoose.model('Automation', automationSchema);
