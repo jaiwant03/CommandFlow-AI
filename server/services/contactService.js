@@ -33,7 +33,7 @@ class ContactService {
     });
     if (contact) return contact;
 
-    // 4. Check if any word in query matches contact name (e.g., query "Jaswant Karun" matches contact "Jaswant")
+    // 4. Check if any word token in query matches contact name (e.g., query "Jaswant Karun" matches contact "Jaswant")
     const queryTokens = cleanQuery.split(/\s+/).filter(w => w.length > 2);
     for (const token of queryTokens) {
       contact = await Contact.findOne({
@@ -43,14 +43,16 @@ class ContactService {
       if (contact) return contact;
     }
 
-    // 5. Check if any contact's name is contained in the query
+    // 5. Check if any contact's full name matches with word boundaries in the query
     try {
       const allUserContacts = await Contact.find(userFilter);
+      // Sort longer names first so "Jaswant Karun" matches before "Jaswant"
+      allUserContacts.sort((a, b) => (b.name || '').length - (a.name || '').length);
+
       for (const c of allUserContacts) {
         if (!c.name) continue;
-        const cLower = c.name.toLowerCase().trim();
-        const qLower = cleanQuery.toLowerCase().trim();
-        if (qLower.includes(cLower) || cLower.includes(qLower)) {
+        const nameWordRegex = new RegExp(`\\b${this.escapeRegex(c.name.trim())}\\b`, 'i');
+        if (nameWordRegex.test(cleanQuery)) {
           return c;
         }
       }
@@ -68,9 +70,12 @@ class ContactService {
     });
     if (contact) return contact;
 
-    // If userId was provided and nothing found, try global fallback across contacts
+    // If userId was provided and user has 0 contacts, try fallback
     if (userId) {
-      return this.findContact(null, query);
+      const userCount = await Contact.countDocuments({ userId });
+      if (userCount === 0) {
+        return this.findContact(null, query);
+      }
     }
 
     return null;
@@ -91,19 +96,22 @@ class ContactService {
     // 2. Scan user contacts against the command text to see if any contact name is mentioned
     try {
       let allUserContacts = userId ? await Contact.find({ userId }) : [];
-      if (allUserContacts.length === 0) {
+      if (allUserContacts.length === 0 && !userId) {
         allUserContacts = await Contact.find({});
       }
 
+      // Sort longer names first
+      allUserContacts.sort((a, b) => (b.name || '').length - (a.name || '').length);
+
       for (const contact of allUserContacts) {
         if (!contact.name) continue;
-        const nameRegex = new RegExp(`\\b${this.escapeRegex(contact.name)}\\b`, 'i');
+        const nameRegex = new RegExp(`\\b${this.escapeRegex(contact.name.trim())}\\b`, 'i');
         if (nameRegex.test(commandText)) {
           return this.formatContactResult(contact, channel);
         }
 
         // Also check first name if multi-word (e.g. "Arun" in "Arun Kumar")
-        const firstName = contact.name.split(' ')[0];
+        const firstName = contact.name.trim().split(/\s+/)[0];
         if (firstName && firstName.length > 2) {
           const firstNameRegex = new RegExp(`\\b${this.escapeRegex(firstName)}\\b`, 'i');
           if (firstNameRegex.test(commandText)) {
@@ -111,9 +119,9 @@ class ContactService {
           }
         }
 
-        // Check relationship (e.g. "advisor")
+        // Check relationship (e.g. "advisor", "friend")
         if (contact.relationship && contact.relationship.length > 2) {
-          const relRegex = new RegExp(`\\b${this.escapeRegex(contact.relationship)}\\b`, 'i');
+          const relRegex = new RegExp(`\\b${this.escapeRegex(contact.relationship.trim())}\\b`, 'i');
           if (relRegex.test(commandText)) {
             return this.formatContactResult(contact, channel);
           }
