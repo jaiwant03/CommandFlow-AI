@@ -46,6 +46,19 @@ const parseAICommand = async (req, res) => {
       }
     }
 
+    // Format email message with generous spacing, line breaks, and executive structure
+    if (parsed.channel === 'gmail' && (parsed.message || parsed.content)) {
+      const { formatEmailContent } = require('../utils/emailFormatter');
+      const formatted = formatEmailContent({
+        subject: parsed.subject,
+        content: parsed.message || parsed.content,
+        htmlContent: parsed.htmlBody
+      });
+      parsed.message = formatted.plainText;
+      parsed.content = formatted.plainText;
+      parsed.htmlBody = formatted.html;
+    }
+
     // Check missing recipient details
     let clarificationNeeded = false;
     let clarificationQuestion = null;
