@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getCurrentUser } from '../services/authService';
+import HandwrittenHeading from '../components/HandwrittenHeading';
 import { Save, Globe, Clock, Bell, User, ShieldCheck } from 'lucide-react';
 import '../styles/global.css';
 
@@ -19,7 +20,7 @@ const Settings = () => {
   return (
     <div className="page-container">
       <div style={{ marginBottom: '1.5rem' }}>
-        <h1 className="page-title">Settings</h1>
+        <HandwrittenHeading text="Settings" size="normal" withFlourish={true} />
         <p className="page-subtitle">Configure application language, timezone, notification preferences, and account info.</p>
       </div>
 

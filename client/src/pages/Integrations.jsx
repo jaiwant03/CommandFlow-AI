@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import HandwrittenHeading from '../components/HandwrittenHeading';
 import { Mail, Send, Cpu, Layers, Database, Globe, Search, ShieldCheck, CheckCircle } from 'lucide-react';
 import '../styles/global.css';
 import '../styles/integrations.css';
@@ -76,7 +77,7 @@ const Integrations = () => {
             <div className="integration-eyebrow">
               🌐 ECOSYSTEM & PLUGINS
             </div>
-            <h1 className="page-title integration-page-title">Connected Services & Ecosystem</h1>
+            <HandwrittenHeading text="Connected Services & Ecosystem" size="normal" withFlourish={true} />
             <p className="page-subtitle integration-page-subtitle">
               Multi-channel communication nodes and AI execution infrastructure.
             </p>
