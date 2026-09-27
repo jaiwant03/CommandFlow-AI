@@ -1,13 +1,15 @@
-import React from 'react';
-import { getCurrentUser, logoutUser } from '../services/authService';
+import React, { useState } from 'react';
+import { getAvatarUrl, getCurrentUser, logoutUser } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Zap, Menu } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
+import EditProfileModal from './EditProfileModal';
 import '../styles/navbar.css';
 
 const Navbar = ({ toggleSidebar, currentLanguage, setLanguage }) => {
   const navigate = useNavigate();
-  const user = getCurrentUser() || { name: 'Demo User', email: 'demo@commandflow.ai' };
+  const [user, setUser] = useState(() => getCurrentUser() || { name: 'Demo User', email: 'demo@commandflow.ai' });
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleLogout = () => {
     logoutUser();
@@ -35,10 +37,16 @@ const Navbar = ({ toggleSidebar, currentLanguage, setLanguage }) => {
       <div className="navbar-right">
         <LanguageSelector selectedLanguage={currentLanguage} onSelectLanguage={setLanguage} />
 
-        <div className="user-profile">
-          <div className="avatar">{user.name ? user.name.charAt(0).toUpperCase() : 'U'}</div>
+        <button className="user-profile" type="button" onClick={() => setIsProfileOpen(true)} title="Edit Profile">
+          <div className="avatar">
+            {user.avatar ? (
+              <img src={getAvatarUrl(user.avatar)} alt="" />
+            ) : (
+              user.name ? user.name.charAt(0).toUpperCase() : 'U'
+            )}
+          </div>
           <span className="user-name">{user.name}</span>
-        </div>
+        </button>
 
         <button
           className="btn btn-secondary"
@@ -50,6 +58,16 @@ const Navbar = ({ toggleSidebar, currentLanguage, setLanguage }) => {
           <span>Logout</span>
         </button>
       </div>
+      {isProfileOpen && (
+        <EditProfileModal
+          user={user}
+          onClose={() => setIsProfileOpen(false)}
+          onSave={(updatedUser) => {
+            setUser(updatedUser);
+            setIsProfileOpen(false);
+          }}
+        />
+      )}
     </header>
   );
 };

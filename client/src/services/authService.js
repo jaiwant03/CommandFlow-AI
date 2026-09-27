@@ -28,6 +28,25 @@ export const getCurrentUser = () => {
   return JSON.parse(localStorage.getItem('commandflow_user') || 'null');
 };
 
+export const getAvatarUrl = (avatar) => {
+  if (!avatar) return '';
+  return new URL(avatar, API.defaults.baseURL).toString();
+};
+
+export const updateProfile = async (name, avatarFile) => {
+  const formData = new FormData();
+  formData.append('name', name);
+  if (avatarFile) formData.append('avatar', avatarFile);
+
+  const response = await API.put('/auth/profile', formData);
+  const updatedUser = {
+    ...getCurrentUser(),
+    ...response.data.data
+  };
+  localStorage.setItem('commandflow_user', JSON.stringify(updatedUser));
+  return updatedUser;
+};
+
 export const logoutUser = () => {
   localStorage.removeItem('commandflow_user');
 };

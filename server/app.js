@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const path = require('path');
 const config = require('./config/env');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 const { apiLimiter } = require('./middleware/rateLimiter');
@@ -32,6 +33,7 @@ app.use(cors({
 // Body Parsing with size limits
 app.use(express.json({ limit: '25mb' }));
 app.use(express.urlencoded({ extended: true, limit: '25mb' }));
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Health Check Endpoints
 app.get('/health', getHealthStatus);

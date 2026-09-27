@@ -70,6 +70,19 @@
   background: #F7FAFD;
   border: 1px solid #DCE6F0;
   border-radius: 9999px;
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.user-profile:hover {
+  background: #FFFFFF;
+  border-color: #A7EAD5;
+}
+
+.user-profile:focus-visible {
+  outline: 2px solid #10B981;
+  outline-offset: 2px;
 }
 
 .avatar {
@@ -83,6 +96,124 @@
   justify-content: center;
   font-weight: 700;
   font-size: 0.8rem;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.45);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+.profile-modal {
+  width: min(100%, 440px);
+  padding: 1.75rem;
+  background: #FFFFFF;
+  border: 1px solid #DCE6F0;
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.2);
+}
+
+.profile-modal-header,
+.profile-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.profile-modal-header {
+  margin-bottom: 1.5rem;
+}
+
+.profile-modal-header h2 {
+  margin: 0;
+  color: #0F172A;
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+}
+
+.profile-modal-header p {
+  margin: 0.25rem 0 0;
+  color: #64748B;
+  font-size: 0.85rem;
+}
+
+.profile-modal-close {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: #475569;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.profile-modal-close:hover {
+  background: #F1F5F9;
+}
+
+.profile-photo-picker {
+  display: grid;
+  justify-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-photo-preview {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-photo-fallback {
+  display: grid;
+  place-items: center;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #10B981, #06B6D4);
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.profile-photo-button {
+  cursor: pointer;
+}
+
+.profile-photo-hint {
+  color: #64748B;
+  font-size: 0.75rem;
+}
+
+.profile-name-input {
+  width: 100%;
+  margin-top: 0.35rem;
+}
+
+.profile-form-error {
+  margin: 0.75rem 0 0;
+  color: #B91C1C;
+  font-size: 0.82rem;
+}
+
+.profile-modal-actions {
+  justify-content: flex-end;
+  margin-top: 1.5rem;
 }
 
 .user-name {

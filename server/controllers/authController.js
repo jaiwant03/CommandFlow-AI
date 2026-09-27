@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 const User = require('../models/User');
 const config = require('../config/env');
 const { sendSuccess, sendError } = require('../utils/responseFormatter');
@@ -37,6 +39,7 @@ const registerUser = async (req, res, next) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      avatar: user.avatar || '',
       token
     };
 
@@ -69,6 +72,7 @@ const loginUser = async (req, res, next) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        avatar: user.avatar || '',
         token
       };
       return res.status(200).json({
@@ -98,6 +102,7 @@ const loginUser = async (req, res, next) => {
         _id: demoUser._id,
         name: demoUser.name,
         email: demoUser.email,
+        avatar: demoUser.avatar || '',
         token
       };
       return res.status(200).json({
@@ -193,9 +198,45 @@ const getMe = async (req, res, next) => {
   }
 };
 
+const updateProfile = async (req, res, next) => {
+  try {
+    const name = typeof req.body.name === 'string' ? req.body.name.trim() : '';
+    if (!name || name.length > 80) {
+      return sendError(res, 'Please provide a name between 1 and 80 characters.', 400, 'INVALID_PROFILE_NAME');
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return sendError(res, 'Account not found.', 404, 'USER_NOT_FOUND');
+    }
+
+    const previousAvatar = user.avatar;
+    user.name = name;
+    if (req.file) {
+      user.avatar = `/uploads/profiles/${req.file.filename}`;
+    }
+    await user.save();
+
+    if (req.file && previousAvatar?.startsWith('/uploads/profiles/')) {
+      const previousFile = path.basename(previousAvatar);
+      fs.promises.unlink(path.join(__dirname, '../public/uploads/profiles', previousFile)).catch(() => {});
+    }
+
+    return sendSuccess(res, 'Profile updated successfully.', {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar || ''
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   googleAuth,
-  getMe
+  getMe,
+  updateProfile
 };
