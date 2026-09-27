@@ -1,298 +1,295 @@
 /* ============================================================
    HANDWRITTEN INTRO SPLASH SCREEN STYLES
-   CommandFlow AI — Ultra-luxury Handwritten Animation
+   CommandFlow AI — Pure White Model Shining Palette
+   Multicolor: Rama Green + Peacock Blue + Bright Violet Purple
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Outfit:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Dancing+Script:wght@600;700&family=Great+Vibes&display=swap');
 
-.handwritten-splash-container {
+/* Main Stage: Pure, clean, luminous white background */
+.handwritten-white-stage {
   position: fixed;
   inset: 0;
   z-index: 99999;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #060913;
-  color: #FFFFFF;
+  background: #FFFFFF;
+  color: #1E293B;
   overflow: hidden;
   user-select: none;
   transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
-              filter 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: opacity, transform, filter;
+              transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
 }
 
-.handwritten-splash-container.fading-out {
+.handwritten-white-stage.fading-out {
   opacity: 0;
-  transform: scale(1.04);
-  filter: blur(8px);
+  transform: scale(1.02);
   pointer-events: none;
 }
 
-/* Ambient dynamic background lighting */
-.splash-ambient-mesh {
+/* ============================================================
+   MODEL SHINING PALETTE: Radiant luxury studio ambient lighting
+   ============================================================ */
+.model-shine-backdrop {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  overflow: hidden;
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 60%, #FFFFFF 100%),
+    radial-gradient(circle at 30% 45%, rgba(0, 200, 150, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 55% 50%, rgba(0, 136, 204, 0.07) 0%, transparent 50%),
+    radial-gradient(circle at 75% 55%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+  animation: modelShineBreathe 6s ease-in-out infinite alternate;
 }
 
-.splash-ambient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.38;
-  will-change: transform;
-}
-
-.splash-orb-emerald {
-  width: 580px;
-  height: 580px;
-  top: 10%;
-  left: 10%;
-  background: radial-gradient(circle, #10B981 0%, rgba(16, 185, 129, 0) 70%);
-  animation: orbDrift1 10s ease-in-out infinite alternate;
-}
-
-.splash-orb-cyan {
-  width: 620px;
-  height: 620px;
-  top: 20%;
-  right: 15%;
-  background: radial-gradient(circle, #06B6D4 0%, rgba(6, 182, 212, 0) 70%);
-  animation: orbDrift2 12s ease-in-out infinite alternate;
-}
-
-.splash-orb-purple {
-  width: 520px;
-  height: 520px;
-  bottom: 8%;
-  left: 32%;
-  background: radial-gradient(circle, #8B5CF6 0%, rgba(139, 92, 246, 0) 70%);
-  animation: orbDrift3 14s ease-in-out infinite alternate;
-}
-
-@keyframes orbDrift1 {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(60px, 40px) scale(1.15); }
-}
-
-@keyframes orbDrift2 {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(-50px, 50px) scale(1.1); }
-}
-
-@keyframes orbDrift3 {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(40px, -40px) scale(1.2); }
-}
-
-/* Subtle background grid pattern */
-.splash-grid-overlay {
-  position: absolute;
-  inset: 0;
-  background-image: 
-    radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 32px 32px;
-  opacity: 0.25;
-  pointer-events: none;
-}
-
-/* Floating Stardust Particles */
-.splash-particle {
-  position: absolute;
-  border-radius: 50%;
-  background: #FFFFFF;
-  pointer-events: none;
-  animation: particleFloat linear infinite;
-}
-
-@keyframes particleFloat {
+@keyframes modelShineBreathe {
   0% {
-    transform: translateY(100vh) scale(0);
-    opacity: 0;
-  }
-  20% {
-    opacity: 0.8;
-  }
-  80% {
-    opacity: 0.6;
+    opacity: 0.85;
+    transform: scale(1);
   }
   100% {
-    transform: translateY(-20px) scale(1.2);
-    opacity: 0;
-  }
-}
-
-/* Skip Button */
-.splash-skip-btn {
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
-  color: #94A3B8;
-  padding: 0.5rem 1rem;
-  border-radius: 9999px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.splash-skip-btn:hover {
-  background: rgba(255, 255, 255, 0.14);
-  color: #FFFFFF;
-  border-color: rgba(6, 182, 212, 0.4);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.2);
-}
-
-.splash-skip-btn kbd {
-  font-size: 0.7rem;
-  padding: 0.15rem 0.4rem;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #CBD5E1;
-}
-
-/* Main Content Area */
-.splash-main-content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  width: 100%;
-  max-width: 1100px;
-  padding: 2rem;
-}
-
-/* Top Emblem */
-.splash-badge-container {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.45rem 1.1rem;
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  border-radius: 9999px;
-  margin-bottom: 1.5rem;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 25px rgba(16, 185, 129, 0.12);
-  animation: badgeSlideDown 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes badgeSlideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1.04);
   }
 }
 
-.splash-badge-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #10B981;
-  animation: pulseIcon 2s ease-in-out infinite;
+/* Luminous Caustic Light Beam */
+.model-caustic-beam {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: linear-gradient(
+    135deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.6) 48%,
+    rgba(0, 200, 150, 0.04) 50%,
+    rgba(139, 92, 246, 0.04) 52%,
+    transparent 58%
+  );
+  pointer-events: none;
+  animation: causticDrift 8s linear infinite;
 }
 
-@keyframes pulseIcon {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px #10B981); }
-  50% { transform: scale(1.12); filter: drop-shadow(0 0 14px #06B6D4); }
+@keyframes causticDrift {
+  0% {
+    transform: translate(-10%, -10%) rotate(0deg);
+  }
+  100% {
+    transform: translate(10%, 10%) rotate(0deg);
+  }
 }
 
-.splash-badge-text {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  background: linear-gradient(90deg, #10B981, #06B6D4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Prismatic Center Halo */
+.model-prism-glow {
+  position: absolute;
+  width: 720px;
+  height: 380px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse,
+    rgba(0, 200, 150, 0.09) 0%,
+    rgba(2, 132, 199, 0.07) 40%,
+    rgba(124, 58, 237, 0.06) 70%,
+    transparent 100%
+  );
+  filter: blur(40px);
+  pointer-events: none;
+  animation: prismPulse 4s ease-in-out infinite alternate;
 }
 
-/* SVG Handwritten Container */
-.splash-handwritten-stage {
+@keyframes prismPulse {
+  0% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+
+/* Micro Diamond Sparkles on White Canvas */
+.sparkle-flare {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: #FFFFFF;
+  box-shadow: 0 0 10px rgba(0, 200, 150, 0.8),
+              0 0 18px rgba(139, 92, 246, 0.6);
+  opacity: 0;
+  animation: sparkleTwinkle 3s ease-in-out infinite;
+}
+
+.sparkle-1 { top: 32%; left: 24%; animation-delay: 0.6s; }
+.sparkle-2 { top: 62%; left: 38%; animation-delay: 1.8s; }
+.sparkle-3 { top: 28%; right: 26%; animation-delay: 1.2s; }
+.sparkle-4 { top: 65%; right: 20%; animation-delay: 2.4s; }
+
+@keyframes sparkleTwinkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.3) rotate(45deg);
+  }
+}
+
+/* ============================================================
+   CENTER STAGE: ONLY the word "CommandFlow AI"
+   ============================================================ */
+.handwritten-center-box {
   position: relative;
-  width: 100%;
-  max-width: 1050px;
-  height: 250px;
+  width: 92vw;
+  max-width: 1040px;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
 }
 
-.handwritten-svg {
+.handwritten-canvas-svg {
   width: 100%;
-  height: 100%;
+  height: auto;
   overflow: visible;
+  filter: drop-shadow(0 6px 16px rgba(0, 200, 150, 0.14))
+          drop-shadow(0 10px 24px rgba(124, 58, 237, 0.12));
 }
 
-/* SVG Text Styles */
-.svg-handwritten-text {
-  font-family: 'Alex Brush', cursive;
-  font-size: 116px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  dominant-baseline: central;
+/* Master Calligraphy Typography */
+.hw-calligraphy-text {
+  font-family: 'Great Vibes', 'Alex Brush', cursive;
+  font-size: 114px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  fill: url(#ramaPeacockVioletGrad);
+  transform-origin: center;
 }
 
-/* Gradient fill for "Commandflow" */
-.handwritten-gradient-fill {
-  fill: url(#introBrandGrad);
-  filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.6))
-          drop-shadow(0 0 45px rgba(16, 185, 129, 0.3));
-}
-
-/* Electric Violet/Cyan fill for "AI" */
-.handwritten-ai-fill {
-  fill: url(#introAIGrad);
-  filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.8))
-          drop-shadow(0 0 35px rgba(6, 182, 212, 0.5));
-}
-
-/* Subtle stroke outline for extra crispness */
-.handwritten-stroke-accent {
+/* Subtle Stroke Contour for high-definition penmanship sharpness */
+.hw-stroke-contour {
   fill: none;
-  stroke: url(#introBrandGrad);
-  stroke-width: 1.2;
-  opacity: 0.55;
+  stroke: url(#ramaPeacockVioletGrad);
+  stroke-width: 1.2px;
+  stroke-opacity: 0.45;
 }
 
-/* Calligraphy Underline Ribbon Path */
-.calligraphy-ribbon-path {
-  fill: none;
-  stroke: url(#introRibbonGrad);
-  stroke-width: 3.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+/* ============================================================
+   EXACT HANDWRITING MOTION: Progressive Stroke Mask
+   ============================================================ */
+.handwriting-reveal-path {
   stroke-dasharray: 1200;
   stroke-dashoffset: 1200;
-  filter: drop-shadow(0 0 14px rgba(6, 182, 212, 0.85));
-  animation: drawRibbon 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) 1.4s forwards;
+  animation: handwritingMotionDraw 2.4s cubic-bezier(0.42, 0, 0.22, 1) forwards;
+  animation-delay: 0.3s;
 }
 
-@keyframes drawRibbon {
+@keyframes handwritingMotionDraw {
+  0% {
+    stroke-dashoffset: 1200;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ============================================================
+   LIQUID INK DROPLET POINT: Tracking the Exact Writing Motion
+   (No pen/nib graphic — pure luminous liquid ink point)
+   ============================================================ */
+.hw-ink-point-group {
+  opacity: 0;
+  transform: translate(60px, 150px);
+  animation: inkPointMotion 2.4s cubic-bezier(0.42, 0, 0.22, 1) forwards;
+  animation-delay: 0.3s;
+  pointer-events: none;
+}
+
+.ink-glow-outer {
+  fill: #00C896;
+  opacity: 0.45;
+  animation: inkColorTransition 2.4s cubic-bezier(0.42, 0, 0.22, 1) forwards;
+  animation-delay: 0.3s;
+}
+
+.ink-core-droplet {
+  fill: #00C896;
+  animation: inkColorTransition 2.4s cubic-bezier(0.42, 0, 0.22, 1) forwards;
+  animation-delay: 0.3s;
+}
+
+@keyframes inkColorTransition {
+  0% {
+    fill: #00C896; /* Rama Green */
+  }
+  45% {
+    fill: #0088CC; /* Peacock Blue */
+  }
+  85% {
+    fill: #8B5CF6; /* Bright Violet */
+  }
+  100% {
+    fill: #7C3AED; /* Bright Violet Purple */
+  }
+}
+
+@keyframes inkPointMotion {
+  0% {
+    opacity: 0;
+    transform: translate(60px, 165px) scale(0.6);
+  }
+  3% {
+    opacity: 1;
+    transform: translate(80px, 163px) scale(1);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(320px, 160px) scale(1.05);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(570px, 165px) scale(1);
+  }
+  75% {
+    opacity: 1;
+    transform: translate(820px, 160px) scale(1.05);
+  }
+  95% {
+    opacity: 1;
+    transform: translate(1040px, 163px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(1065px, 165px) scale(0.2);
+  }
+}
+
+/* ============================================================
+   SIGNATURE UNDERLINE FLOURISH: Handwritten Ribbon
+   ============================================================ */
+.hw-flourish-ribbon {
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  animation: flourishDraw 1.1s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  animation-delay: 2.65s;
+}
+
+@keyframes flourishDraw {
   0% {
     stroke-dashoffset: 1200;
     opacity: 0;
   }
-  15% {
+  5% {
     opacity: 1;
   }
   100% {
@@ -301,237 +298,74 @@
   }
 }
 
-/* Sparkling Starburst at the end of flourish */
-.flourish-starburst {
-  animation: starburstPop 0.7s cubic-bezier(0.17, 0.89, 0.32, 1.4) 2.7s forwards;
+/* Flourish Completion Sparkle Starburst */
+.hw-flourish-sparkle {
   opacity: 0;
-  filter: drop-shadow(0 0 14px #FDE047) drop-shadow(0 0 26px #06B6D4);
+  transform: translate(1010px, 250px) scale(0);
+  animation: flourishSparklePop 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+  animation-delay: 3.65s;
 }
 
-@keyframes starburstPop {
+.sparkle-star {
+  filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.7));
+}
+
+@keyframes flourishSparklePop {
   0% {
-    transform: scale(0) rotate(-45deg);
     opacity: 0;
+    transform: translate(1010px, 250px) scale(0) rotate(0deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(1010px, 250px) scale(1.25) rotate(45deg);
+  }
+  100% {
+    opacity: 0.9;
+    transform: translate(1010px, 250px) scale(1) rotate(90deg);
+  }
+}
+
+/* ============================================================
+   MODEL SHINING PALETTE: Specular Gloss Sheen Sweep
+   ============================================================ */
+.hw-gloss-sweep {
+  fill: url(#modelGlossGrad);
+  opacity: 0;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  animation: glossSheenSweep 1.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay: 3.2s;
+}
+
+@keyframes glossSheenSweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  40% {
+    opacity: 0.85;
   }
   70% {
-    transform: scale(1.4) rotate(15deg);
-    opacity: 1;
+    opacity: 0.7;
   }
   100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-}
-
-/* In-SVG Pen Nib Assembly Animation */
-.svg-pen-assembly {
-  animation: penSvgTravel 2.4s cubic-bezier(0.25, 0.1, 0.25, 1) 0.25s forwards,
-             penSvgBobbing 0.22s ease-in-out infinite alternate;
-  will-change: transform, opacity;
-}
-
-@keyframes penSvgTravel {
-  0% {
-    transform: translate(140px, 135px);
     opacity: 0;
-  }
-  4% {
-    opacity: 1;
-  }
-  90% {
-    transform: translate(910px, 135px);
-    opacity: 1;
-  }
-  95% {
-    transform: translate(920px, 115px) scale(1.15);
-    opacity: 0.9;
-  }
-  100% {
-    transform: translate(930px, 85px) scale(0);
-    opacity: 0;
+    transform: translateX(40px);
   }
 }
 
-@keyframes penSvgBobbing {
-  0% {
-    transform-origin: center;
-    margin-top: -4px;
-  }
-  100% {
-    transform-origin: center;
-    margin-top: 4px;
-  }
-}
-
-.nib-active-sparkle {
-  animation: sparkleTwinkle 0.3s ease-in-out infinite alternate;
-}
-
-@keyframes sparkleTwinkle {
-  0% { transform: scale(0.8) rotate(0deg); }
-  100% { transform: scale(1.3) rotate(45deg); }
-}
-
-/* Secondary Subtitle & Features */
-.splash-subtitle-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  margin-top: 1rem;
-  opacity: 0;
-  animation: subtitleReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 2.6s forwards;
-}
-
-@keyframes subtitleReveal {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.splash-subtitle {
-  font-size: 0.92rem;
-  font-weight: 600;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: #94A3B8;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.splash-subtitle-line {
-  width: 36px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.6), transparent);
-}
-
-.splash-feature-pills {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.splash-pill {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.85rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 9999px;
-  font-size: 0.8rem;
-  color: #CBD5E1;
-  backdrop-filter: blur(8px);
-  transition: all 0.2s ease;
-}
-
-.splash-pill-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 8px #10B981;
-}
-
-.splash-pill-dot.cyan {
-  background: #06B6D4;
-  box-shadow: 0 0 8px #06B6D4;
-}
-
-.splash-pill-dot.purple {
-  background: #8B5CF6;
-  box-shadow: 0 0 8px #8B5CF6;
-}
-
-/* Bottom Progress Bar & Countdown (5 seconds) */
-.splash-bottom-bar {
-  position: absolute;
-  bottom: 2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  max-width: 420px;
-  padding: 0 1.5rem;
-  z-index: 5;
-}
-
-.splash-countdown-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #64748B;
-  letter-spacing: 0.05em;
-}
-
-.splash-countdown-badge {
-  color: #06B6D4;
-  font-weight: 700;
-  font-family: 'Fira Code', monospace;
-}
-
-.splash-progress-track {
-  width: 100%;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 9999px;
-  overflow: hidden;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.splash-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #10B981, #06B6D4, #3B82F6, #8B5CF6);
-  border-radius: 9999px;
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.8);
-  transition: width 0.05s linear;
-}
-
-/* Responsive adjustments */
+/* Responsive Scaling for smaller screens */
 @media (max-width: 768px) {
-  .splash-handwritten-stage {
-    height: 170px;
+  .handwritten-center-box {
+    width: 96vw;
   }
-  .svg-handwritten-text {
-    font-size: 80px;
-  }
-  .splash-subtitle {
-    font-size: 0.78rem;
-    letter-spacing: 0.18em;
-  }
-  .splash-skip-btn {
-    top: 1rem;
-    right: 1rem;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.78rem;
-  }
-  .splash-bottom-bar {
-    bottom: 1.5rem;
+  .hw-calligraphy-text {
+    font-size: 104px;
   }
 }
 
-@keyframes loginEntrance {
-  0% {
-    opacity: 0;
-    transform: translateY(24px) scale(0.97);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+@media (max-width: 480px) {
+  .hw-calligraphy-text {
+    font-size: 88px;
   }
 }
