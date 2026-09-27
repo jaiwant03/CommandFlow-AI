@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../services/authService';
-import { Bot, ArrowRight, Lock, Mail } from 'lucide-react';
+import { Bot, ArrowRight, Lock, Mail, Sparkles } from 'lucide-react';
+import HandwrittenIntro from '../components/HandwrittenIntro';
 import '../styles/global.css';
 
 const Login = () => {
+  const [showIntro, setShowIntro] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -29,6 +31,15 @@ const Login = () => {
     }
   };
 
+  if (showIntro) {
+    return (
+      <HandwrittenIntro
+        duration={5000}
+        onComplete={() => setShowIntro(false)}
+      />
+    );
+  }
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -39,7 +50,15 @@ const Login = () => {
       background: '#F8FAFC',
       backgroundImage: 'radial-gradient(circle at 15% 15%, rgba(0, 200, 150, 0.08) 0%, transparent 40%), radial-gradient(circle at 85% 75%, rgba(0, 200, 150, 0.06) 0%, transparent 45%)'
     }}>
-      <div className="glass-card" style={{ width: '100%', maxWidth: '440px', padding: '2.5rem' }}>
+      <div
+        className="glass-card"
+        style={{
+          width: '100%',
+          maxWidth: '440px',
+          padding: '2.5rem',
+          animation: 'loginEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        }}
+      >
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div className="brand-logo" style={{ margin: '0 auto 1rem', width: '48px', height: '48px' }}>
             <Bot size={28} />
@@ -111,6 +130,40 @@ const Login = () => {
 
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
           Don't have an account? <Link to="/signup" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>Create Account</Link>
+        </div>
+
+        <div style={{ marginTop: '1.2rem', textAlign: 'center' }}>
+          <button
+            type="button"
+            onClick={() => setShowIntro(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              background: 'rgba(0, 0, 0, 0.03)',
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              color: 'var(--text-muted)',
+              fontSize: '0.78rem',
+              cursor: 'pointer',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '9999px',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--primary-dark)';
+              e.currentTarget.style.borderColor = 'var(--primary)';
+              e.currentTarget.style.background = 'var(--primary-light)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-muted)';
+              e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+              e.currentTarget.style.background = 'rgba(0, 0, 0, 0.03)';
+            }}
+            title="Replay the 5-second handwritten Commandflow AI animation"
+          >
+            <Sparkles size={13} color="var(--primary)" />
+            <span>Replay Handwritten Intro (5s)</span>
+          </button>
         </div>
       </div>
     </div>

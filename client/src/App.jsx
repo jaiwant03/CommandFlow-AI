@@ -49,14 +49,7 @@ const App = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
 
-      <Route
-        path="/"
-        element={
-          <ProtectedLayout currentLanguage={currentLanguage} setLanguage={setCurrentLanguage}>
-            <Navigate to="/dashboard" replace />
-          </ProtectedLayout>
-        }
-      />
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
       <Route
         path="/dashboard"
