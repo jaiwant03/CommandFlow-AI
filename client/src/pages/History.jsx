@@ -72,7 +72,7 @@ const History = () => {
       {/* Page Title Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <h1 className="page-title">Analytics & Execution History</h1>
+          <HandwrittenHeading text="Analytics & Execution History" size="normal" withFlourish={true} />
           <p className="page-subtitle">Real-time performance metrics and frozen execution trace logs.</p>
         </div>
         <button className="btn btn-secondary" onClick={loadLogs}>

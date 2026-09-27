@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchContacts, createContact, deleteContact } from '../services/automationService';
+import HandwrittenHeading from '../components/HandwrittenHeading';
 import { Users, UserPlus, Trash2, Mail, Phone, MessageSquare, Send, Tag } from 'lucide-react';
 import '../styles/contacts.css';
 

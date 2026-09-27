@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchSchedules, deleteSchedule } from '../services/automationService';
+import HandwrittenHeading from '../components/HandwrittenHeading';
 import { Calendar, Clock, Trash2, RefreshCw, Mail, Send } from 'lucide-react';
 import '../styles/global.css';
 
@@ -36,7 +37,7 @@ const Schedules = () => {
     <div className="page-container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <h1 className="page-title">Schedules</h1>
+          <HandwrittenHeading text="Schedules" size="normal" withFlourish={true} />
           <p className="page-subtitle">Upcoming scheduled commands to be dispatched automatically by the background worker.</p>
         </div>
         <button className="btn btn-secondary" onClick={loadSchedules} title="Refresh Schedules">
