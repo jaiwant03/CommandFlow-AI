@@ -159,7 +159,7 @@ const Login = () => {
               e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.08)';
               e.currentTarget.style.background = 'rgba(0, 0, 0, 0.03)';
             }}
-            title="Replay the 5-second handwritten Commandflow AI animation"
+            title="Replay the 5-second handwritten CommandFlow AI animation"
           >
             <Sparkles size={13} color="var(--primary)" />
             <span>Replay Handwritten Intro (5s)</span>

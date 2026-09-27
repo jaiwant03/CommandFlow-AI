@@ -23,7 +23,7 @@ Voice-to-Action Multi-Channel Automation Platform built with React (Vite), Node.
 ## 🏗️ Architecture Flow
 
 ```text
-                 COMMAND FLOW AI
+                 COMMANDFLOW AI
                        │
                        ▼
                 React Frontend
