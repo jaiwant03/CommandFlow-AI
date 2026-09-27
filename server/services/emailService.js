@@ -171,13 +171,8 @@ class EmailService {
           previewUrl: previewUrl || null
         };
       } catch (error) {
-        console.error(`[EmailService Delivery Warning]: ${error.message}`);
-        return {
-          success: true,
-          messageId: `sim-msg-${Date.now()}`,
-          provider: 'nodemailer-simulated',
-          note: `Email queued for delivery to ${primaryRecipient}. (${error.message})`
-        };
+        console.error(`[EmailService Delivery Error]: ${error.message}`);
+        throw error;
       }
     }
 

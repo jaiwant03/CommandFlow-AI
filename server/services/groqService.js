@@ -282,14 +282,16 @@ Return ONLY a valid JSON object with the following schema:
     const lowerCmd = (command || '').toLowerCase();
     const now = new Date();
 
-    const relativeMatch = lowerCmd.match(/\b(?:after|in)\s+(\d+)\s*(minutes?|mins?|hours?|hrs?|days?)\b/i);
+    const relativeMatch = lowerCmd.match(/\b(?:after|in)\s+(\d+)\s*(seconds?|secs?|minutes?|mins?|hours?|hrs?|days?)\b/i);
 
     if (relativeMatch) {
       const amount = parseInt(relativeMatch[1], 10);
       const unit = relativeMatch[2].toLowerCase();
       const scheduledDate = new Date(now.getTime());
 
-      if (unit.startsWith('min')) {
+      if (unit.startsWith('sec')) {
+        scheduledDate.setSeconds(scheduledDate.getSeconds() + amount);
+      } else if (unit.startsWith('min')) {
         scheduledDate.setMinutes(scheduledDate.getMinutes() + amount);
       } else if (unit.startsWith('hour') || unit.startsWith('hr')) {
         scheduledDate.setHours(scheduledDate.getHours() + amount);
@@ -358,6 +360,18 @@ Return ONLY a valid JSON object with the following schema:
         date: scheduledDate.toLocaleDateString('en-IN'),
         time: scheduledDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
       };
+    }
+
+    if (aiSchedule && (aiSchedule.isScheduled || aiSchedule.nextExecution || aiSchedule.time)) {
+      const parsedTime = aiSchedule.nextExecution ? new Date(aiSchedule.nextExecution) : null;
+      if (parsedTime && !isNaN(parsedTime.getTime()) && parsedTime > now) {
+        return {
+          isScheduled: true,
+          nextExecution: parsedTime,
+          date: parsedTime.toLocaleDateString('en-IN'),
+          time: parsedTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+        };
+      }
     }
 
     return {
