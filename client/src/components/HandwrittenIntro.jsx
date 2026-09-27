@@ -199,9 +199,6 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
                 </span>
               ))}
           </span>
-
-          {/* Luxury Specular Gloss Sheen Sweep */}
-          <span className="gv-specular-gloss-sheen" />
         </div>
 
         {/* Calligraphic Signature Flourish Underline */}

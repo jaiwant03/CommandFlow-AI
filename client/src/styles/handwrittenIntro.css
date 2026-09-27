@@ -167,8 +167,9 @@
   font-family: 'Great Vibes', cursive;
   font-size: clamp(4.2rem, 8.5vw, 7.4rem);
   font-weight: 400;
-  line-height: 1.15;
+  line-height: 1.8;
   letter-spacing: 1px;
+  overflow: visible;
   filter: drop-shadow(0 6px 18px rgba(0, 200, 150, 0.16))
           drop-shadow(0 10px 26px rgba(124, 58, 237, 0.14));
 }
@@ -183,6 +184,7 @@
 .gv-word {
   display: inline-flex;
   align-items: baseline;
+  overflow: visible;
 }
 
 /* Word 1: Command -> Rama Green (#00D29E -> #00B894 -> #009E7E) */
@@ -212,8 +214,17 @@
    ============================================================ */
 .gv-char {
   display: inline-block;
+  padding-top: 80px;
+  margin-top: -80px;
+  padding-bottom: 50px;
+  margin-bottom: -50px;
+  padding-left: 10px;
+  margin-left: -10px;
+  padding-right: 10px;
+  margin-right: -10px;
+  overflow: visible;
   opacity: 0;
-  clip-path: inset(-120% 100% -120% -20%);
+  clip-path: inset(-200% 100% -200% -50%);
   transform: translateY(3px) scale(0.96) skewX(-14deg);
   animation-name: writeCursiveChar;
   animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -224,7 +235,7 @@
 @keyframes writeCursiveChar {
   0% {
     opacity: 0;
-    clip-path: inset(-120% 100% -120% -20%);
+    clip-path: inset(-200% 100% -200% -50%);
     transform: translateY(3px) scale(0.96) skewX(-14deg);
     filter: blur(1.5px);
   }
@@ -234,7 +245,7 @@
   }
   99% {
     opacity: 1;
-    clip-path: inset(-120% 0% -120% -20%);
+    clip-path: inset(-200% 0% -200% -50%);
     transform: translateY(0) scale(1) skewX(0deg);
     filter: blur(0);
   }
