@@ -20,8 +20,8 @@
   flex-wrap: wrap;
   row-gap: 0.15rem;
   column-gap: 0.45rem;
-  font-family: 'Great Vibes', cursive;
-  font-weight: 400;
+  font-family: 'Great Vibes', cursive !important;
+  font-weight: 400 !important;
   line-height: 1.35;
   letter-spacing: 0.5px;
   overflow: visible;

@@ -83,8 +83,8 @@ const HandwrittenHeading = ({
         // Determine special font class for optimal legibility
         let fontClass = '';
         if (ch === 'd' || ch === 'D') fontClass = 'font-pinyon-d';
-        else if (ch === 'A') fontClass = 'font-capital-a';
-        else if (ch === 'I') fontClass = 'font-capital-i';
+        else if (ch === 'A' && group.text.trim().toUpperCase() === 'AI') fontClass = 'font-capital-a';
+        else if (ch === 'I' && group.text.trim().toUpperCase() === 'AI') fontClass = 'font-capital-i';
 
         return {
           char: ch,
