@@ -10,7 +10,6 @@ const redisOptions = {
   password: config.redis.password,
   maxRetriesPerRequest: null, // Required by BullMQ
   enableReadyCheck: false,    // Required by BullMQ
-  lazyConnect: true,          // Do not crash if Redis is starting up
   retryStrategy: (times) => {
     // Reconnect with exponential backoff up to 3 seconds
     const delay = Math.min(times * 200, 3000);
@@ -20,7 +19,10 @@ const redisOptions = {
 
 const getRedisClient = () => {
   if (!redisClient) {
-    redisClient = new Redis(config.redis.url || redisOptions);
+    redisClient = new Redis({
+      ...redisOptions,
+      ...(config.redis.url ? { path: undefined } : {})
+    });
 
     redisClient.on('connect', () => {
       isConnected = true;
@@ -33,9 +35,8 @@ const getRedisClient = () => {
 
     redisClient.on('error', (err) => {
       isConnected = false;
-      // Log connection error without spamming or crashing
       if (err.code === 'ECONNREFUSED') {
-        // Suppress noisy trace, single line warning
+        // Suppress noisy trace
       } else {
         console.warn(`[Redis Notice]: ${err.message}`);
       }
@@ -52,11 +53,8 @@ const getRedisClient = () => {
 const isRedisAvailable = () => isConnected;
 
 const checkRedisConnection = async () => {
-  const client = getRedisClient();
   try {
-    if (!isConnected) {
-      await client.connect();
-    }
+    const client = getRedisClient();
     const ping = await client.ping();
     isConnected = ping === 'PONG';
     return isConnected;
