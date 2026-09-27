@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-const { Routes, Route, Navigate } = require ? require('react-router-dom') : {};
-import { Routes as RRoutes, Route as RRoute, Navigate as RNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import { getCurrentUser } from './services/authService';
@@ -25,7 +24,7 @@ const ProtectedLayout = ({ children, currentLanguage, setLanguage }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (!user) {
-    return <RNavigate to="/login" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return (
@@ -47,11 +46,11 @@ const App = () => {
   const [currentLanguage, setCurrentLanguage] = useState('auto');
 
   return (
-    <RRoutes>
+    <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
 
-      <Route path="/" element={<RNavigate to="/login" replace />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
       <Route
         path="/dashboard"
@@ -125,8 +124,8 @@ const App = () => {
         }
       />
 
-      <Route path="*" element={<RNavigate to="/dashboard" replace />} />
-    </RRoutes>
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   );
 };
 
