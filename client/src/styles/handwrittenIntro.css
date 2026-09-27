@@ -1,12 +1,11 @@
 /* ============================================================
    HANDWRITTEN INTRO SPLASH SCREEN STYLES
    CommandFlow AI — Pure White Model Shining Palette
+   Authentic Real Human Handwriting Format
    Multicolor: Rama Green + Peacock Blue + Bright Violet Purple
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Dancing+Script:wght@600;700&family=Great+Vibes&display=swap');
-
-/* Main Stage: Pure, clean, luminous white background */
+/* Main Stage: Pure, luminous white background */
 .handwritten-white-stage {
   position: fixed;
   inset: 0;
@@ -30,7 +29,7 @@
 }
 
 /* ============================================================
-   MODEL SHINING PALETTE: Radiant luxury studio ambient lighting
+   MODEL SHINING PALETTE: Luxury Studio Lighting
    ============================================================ */
 .model-shine-backdrop {
   position: absolute;
@@ -38,9 +37,9 @@
   pointer-events: none;
   background: 
     radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 60%, #FFFFFF 100%),
-    radial-gradient(circle at 30% 45%, rgba(0, 200, 150, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 55% 50%, rgba(0, 136, 204, 0.07) 0%, transparent 50%),
-    radial-gradient(circle at 75% 55%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+    radial-gradient(circle at 26% 45%, rgba(0, 200, 150, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 54% 50%, rgba(0, 136, 204, 0.07) 0%, transparent 50%),
+    radial-gradient(circle at 80% 55%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
   animation: modelShineBreathe 6s ease-in-out infinite alternate;
 }
 
@@ -86,7 +85,7 @@
 /* Prismatic Center Halo */
 .model-prism-glow {
   position: absolute;
-  width: 720px;
+  width: 760px;
   height: 380px;
   top: 50%;
   left: 50%;
@@ -115,7 +114,7 @@
   }
 }
 
-/* Micro Diamond Sparkles on White Canvas */
+/* Micro Diamond Sparkles */
 .sparkle-flare {
   position: absolute;
   width: 6px;
@@ -129,10 +128,10 @@
   animation: sparkleTwinkle 3s ease-in-out infinite;
 }
 
-.sparkle-1 { top: 32%; left: 24%; animation-delay: 0.6s; }
-.sparkle-2 { top: 62%; left: 38%; animation-delay: 1.8s; }
-.sparkle-3 { top: 28%; right: 26%; animation-delay: 1.2s; }
-.sparkle-4 { top: 65%; right: 20%; animation-delay: 2.4s; }
+.sparkle-1 { top: 30%; left: 22%; animation-delay: 0.6s; }
+.sparkle-2 { top: 64%; left: 36%; animation-delay: 1.8s; }
+.sparkle-3 { top: 26%; right: 24%; animation-delay: 1.2s; }
+.sparkle-4 { top: 66%; right: 18%; animation-delay: 2.4s; }
 
 @keyframes sparkleTwinkle {
   0%, 100% {
@@ -150,171 +149,277 @@
    ============================================================ */
 .handwritten-center-box {
   position: relative;
-  width: 92vw;
-  max-width: 1040px;
+  width: 94vw;
+  max-width: 1080px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 10;
 }
 
-.handwritten-canvas-svg {
-  width: 100%;
-  height: auto;
-  overflow: visible;
-  filter: drop-shadow(0 6px 16px rgba(0, 200, 150, 0.14))
-          drop-shadow(0 10px 24px rgba(124, 58, 237, 0.12));
+/* Real Cursive Handwriting Text Wrapper */
+.real-handwriting-word {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  font-family: 'Alex Brush', 'Dancing Script', cursive;
+  font-size: clamp(3.8rem, 7.5vw, 6.8rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: 0.5px;
+  filter: drop-shadow(0 6px 16px rgba(0, 200, 150, 0.16))
+          drop-shadow(0 10px 24px rgba(124, 58, 237, 0.14));
 }
 
-/* Master Calligraphy Typography */
-.hw-calligraphy-text {
-  font-family: 'Great Vibes', 'Alex Brush', cursive;
-  font-size: 114px;
-  font-weight: 400;
-  letter-spacing: 2px;
-  fill: url(#ramaPeacockVioletGrad);
-  transform-origin: center;
+/* Spacers between words with realistic handwriting distance */
+.hw-word-spacer {
+  display: inline-block;
+  width: clamp(14px, 2.2vw, 26px);
 }
 
-/* Subtle Stroke Contour for high-definition penmanship sharpness */
-.hw-stroke-contour {
-  fill: none;
-  stroke: url(#ramaPeacockVioletGrad);
-  stroke-width: 1.2px;
-  stroke-opacity: 0.45;
+/* Word Segments: Each word carries its multicolor gradient */
+.hw-word {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+/* Word 1: Command -> Rama Green (#00C896 -> #00B894 -> #0088CC) */
+.hw-word-command .hw-char {
+  background: linear-gradient(100deg, #00C896 0%, #00B894 55%, #0088CC 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Word 2: Flow -> Peacock Blue into Violet (#0088CC -> #0284C7 -> #8B5CF6) */
+.hw-word-flow .hw-char {
+  background: linear-gradient(100deg, #0088CC 0%, #0284C7 55%, #8B5CF6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Word 3: AI -> Bright Violet Purple (#8B5CF6 -> #7C3AED -> #9333EA) */
+.hw-word-ai .hw-char {
+  background: linear-gradient(100deg, #8B5CF6 0%, #7C3AED 55%, #9333EA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* ============================================================
-   EXACT HANDWRITING MOTION: Progressive Stroke Mask
+   AUTHENTIC HUMAN HANDWRITING WRITE-IN: LETTER-BY-LETTER
    ============================================================ */
-.handwriting-reveal-path {
-  stroke-dasharray: 1200;
-  stroke-dashoffset: 1200;
-  animation: handwritingMotionDraw 2.4s cubic-bezier(0.42, 0, 0.22, 1) forwards;
-  animation-delay: 0.3s;
+.hw-char {
+  display: inline-block;
+  opacity: 0;
+  clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  transform: translateY(3px) scale(0.95);
+  animation-name: writeLetterStroke;
+  animation-timing-function: cubic-bezier(0.22, 0.1, 0.25, 1);
+  animation-fill-mode: forwards;
+  will-change: clip-path, opacity, transform;
 }
 
-@keyframes handwritingMotionDraw {
+@keyframes writeLetterStroke {
   0% {
-    stroke-dashoffset: 1200;
+    opacity: 0;
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+    transform: translateY(3px) scale(0.95);
+    filter: blur(1.5px);
+  }
+  30% {
+    opacity: 1;
+    filter: blur(0.8px);
+  }
+  100% {
+    opacity: 1;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* ============================================================
+   MODEL SHINING PALETTE: Specular Gloss Sweep across the letters
+   ============================================================ */
+.hw-model-gloss-shine {
+  position: absolute;
+  inset: -10% -5%;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.75) 48%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.75) 52%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  opacity: 0;
+  mix-blend-mode: overlay;
+  animation: modelSheenSweep 1.5s cubic-bezier(0.35, 0, 0.25, 1) forwards;
+  animation-delay: 3.35s;
+}
+
+@keyframes modelSheenSweep {
+  0% {
+    opacity: 0;
+    background-position: -120% 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  75% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    background-position: 120% 0;
+  }
+}
+
+/* ============================================================
+   CALLIGRAPHIC SIGNATURE FLOURISH UNDERLINE
+   ============================================================ */
+.hw-flourish-svg {
+  width: 90%;
+  max-width: 820px;
+  height: 48px;
+  margin-top: -12px;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 10px rgba(0, 200, 150, 0.2));
+}
+
+.hw-flourish-stroke {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawFlourish 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 3.3s;
+}
+
+@keyframes drawFlourish {
+  0% {
+    stroke-dashoffset: 1000;
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
   }
   100% {
     stroke-dashoffset: 0;
+    opacity: 1;
   }
 }
 
 /* ============================================================
-   LIQUID INK DROPLET POINT: Tracking the Exact Writing Motion
-   (No pen/nib graphic — pure luminous liquid ink point)
+   LUMINOUS INK DROPLET TIP: Guides the Penmanship Cadence
+   (No pen/nib graphic — purely the radiant liquid ink bead)
    ============================================================ */
-.hw-ink-point-group {
-  opacity: 0;
-  transform: translate(60px, 150px);
-  animation: inkPointMotion 2.4s cubic-bezier(0.42, 0, 0.22, 1) forwards;
-  animation-delay: 0.3s;
+.hw-traveling-ink-tip {
+  position: absolute;
+  top: 42%;
+  left: 5%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
   pointer-events: none;
-}
-
-.ink-glow-outer {
-  fill: #00C896;
-  opacity: 0.45;
-  animation: inkColorTransition 2.0s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  opacity: 0;
+  box-shadow: 0 0 12px currentColor,
+              0 0 20px currentColor;
+  animation: inkTipCadence 3.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
   animation-delay: 0.2s;
 }
 
-.ink-core-droplet {
-  fill: #00C896;
-  animation: inkColorTransition 2.0s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
-  animation-delay: 0.2s;
-}
-
-@keyframes inkColorTransition {
-  0% {
-    fill: #00C896; /* Rama Green */
-  }
-  38% {
-    fill: #0088CC; /* Peacock Blue */
-  }
-  75% {
-    fill: #8B5CF6; /* Bright Violet */
-  }
-  100% {
-    fill: #7C3AED; /* Bright Violet Purple */
-  }
-}
-
-@keyframes inkPointMotion {
+@keyframes inkTipCadence {
+  /* C */
   0% {
     opacity: 0;
-    transform: translate(110px, 165px) scale(0);
+    left: 4%;
+    top: 38%;
+    color: #00C896;
+    transform: scale(0.4);
   }
   3% {
     opacity: 1;
-    transform: translate(130px, 165px) scale(1);
+    left: 7%;
+    top: 48%;
+    color: #00C896;
+    transform: scale(1);
   }
-  25% {
-    opacity: 1;
-    transform: translate(340px, 162px) scale(1.05);
+  /* o-m-m-a-n-d */
+  12% { left: 16%; top: 46%; color: #00C896; }
+  24% { left: 26%; top: 48%; color: #00B894; }
+  35% { left: 36%; top: 46%; color: #0088CC; }
+  42% { left: 45%; top: 48%; color: #0088CC; }
+  /* Pen lift pause between Command & Flow */
+  46% {
+    opacity: 0.3;
+    left: 47%;
+    top: 36%;
+    transform: scale(0.6);
   }
-  50% {
+  49% {
     opacity: 1;
-    transform: translate(550px, 166px) scale(1);
+    left: 50%;
+    top: 44%;
+    color: #0088CC;
+    transform: scale(1);
   }
-  75% {
-    opacity: 1;
-    transform: translate(780px, 160px) scale(1.05);
+  /* F-l-o-w */
+  58% { left: 58%; top: 46%; color: #0284C7; }
+  68% { left: 69%; top: 48%; color: #8B5CF6; }
+  /* Pen lift pause between Flow & AI */
+  72% {
+    opacity: 0.3;
+    left: 71%;
+    top: 36%;
+    transform: scale(0.6);
   }
-  95% {
+  76% {
     opacity: 1;
-    transform: translate(960px, 163px) scale(1);
+    left: 75%;
+    top: 44%;
+    color: #8B5CF6;
+    transform: scale(1);
+  }
+  /* A-I */
+  86% { left: 83%; top: 46%; color: #7C3AED; }
+  94% { left: 91%; top: 48%; color: #9333EA; }
+  98% {
+    opacity: 0.9;
+    left: 93%;
+    top: 48%;
+    transform: scale(1.3);
   }
   100% {
     opacity: 0;
-    transform: translate(985px, 165px) scale(0);
+    left: 94%;
+    top: 48%;
+    transform: scale(0);
   }
 }
 
-/* ============================================================
-   MODEL SHINING PALETTE: Specular Gloss Sheen Sweep
-   ============================================================ */
-.hw-gloss-sweep {
-  fill: url(#modelGlossGrad);
-  opacity: 0;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  animation: glossSheenSweep 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  animation-delay: 2.3s;
-}
-
-@keyframes glossSheenSweep {
-  0% {
-    opacity: 0;
-    transform: translateX(-40px);
-  }
-  40% {
-    opacity: 0.85;
-  }
-  70% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(40px);
-  }
-}
-
-/* Responsive Scaling for smaller screens */
+/* Responsive Font Scaling */
 @media (max-width: 768px) {
-  .handwritten-center-box {
-    width: 96vw;
+  .real-handwriting-word {
+    font-size: clamp(3.2rem, 9vw, 5.2rem);
   }
-  .hw-calligraphy-text {
-    font-size: 104px;
+  .hw-flourish-svg {
+    height: 38px;
+    margin-top: -8px;
   }
 }
 
 @media (max-width: 480px) {
-  .hw-calligraphy-text {
-    font-size: 88px;
+  .real-handwriting-word {
+    font-size: clamp(2.4rem, 10vw, 3.8rem);
+  }
+  .hw-word-spacer {
+    width: 12px;
+  }
+  .hw-flourish-svg {
+    height: 30px;
+    margin-top: -6px;
   }
 }
