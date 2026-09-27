@@ -571,45 +571,84 @@
    From Rama Green -> Turquoise -> Peacock Blue -> Cobalt -> Violet
    ============================================================ */
 .gv-color-0 {
-  background: linear-gradient(135deg, #00F5B8 0%, #00E5AA 50%, #00D29E 100%);
+  background-image: linear-gradient(135deg, #00F5B8 0%, #00E5AA 50%, #00D29E 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 .gv-color-1 {
-  background: linear-gradient(135deg, #00E5AA 0%, #00D29E 50%, #00C4A4 100%);
+  background-image: linear-gradient(135deg, #00E5AA 0%, #00D29E 50%, #00C4A4 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 .gv-color-2 {
-  background: linear-gradient(135deg, #00D29E 0%, #00C4A4 50%, #00BFA9 100%);
+  background-image: linear-gradient(135deg, #00D29E 0%, #00C4A4 50%, #00BFA9 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 .gv-color-3 {
-  background: linear-gradient(135deg, #00C4A4 0%, #00BFA9 50%, #00B5B6 100%);
+  background-image: linear-gradient(135deg, #00C4A4 0%, #00BFA9 50%, #00B5B6 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 .gv-color-4 {
-  background: linear-gradient(135deg, #00BFA9 0%, #00B5B6 50%, #00AAC4 100%);
+  background-image: linear-gradient(135deg, #00BFA9 0%, #00B5B6 50%, #00AAC4 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 .gv-color-5 {
-  background: linear-gradient(135deg, #00B5B6 0%, #00AAC4 50%, #009ED6 100%);
+  background-image: linear-gradient(135deg, #00B5B6 0%, #00AAC4 50%, #009ED6 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 .gv-color-6 {
-  background: linear-gradient(135deg, #00AAC4 0%, #009ED6 50%, #0090E2 100%);
+  background-image: linear-gradient(135deg, #00AAC4 0%, #009ED6 50%, #0090E2 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 .gv-color-7 {
-  background: linear-gradient(135deg, #009ED6 0%, #0090E2 50%, #0284C7 100%);
+  background-image: linear-gradient(135deg, #009ED6 0%, #0090E2 50%, #0284C7 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 .gv-color-8 {
-  background: linear-gradient(135deg, #0090E2 0%, #0284C7 50%, #2563EB 100%);
+  background-image: linear-gradient(135deg, #0090E2 0%, #0284C7 50%, #2563EB 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 .gv-color-9 {
-  background: linear-gradient(135deg, #0284C7 0%, #2563EB 50%, #4F46E5 100%);
+  background-image: linear-gradient(135deg, #0284C7 0%, #2563EB 50%, #4F46E5 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 .gv-color-10 {
-  background: linear-gradient(135deg, #2563EB 0%, #4F46E5 50%, #7C3AED 100%);
+  background-image: linear-gradient(135deg, #2563EB 0%, #4F46E5 50%, #7C3AED 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 /* AI Colors: Electric Violet */
 .gv-color-ai-a {
-  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 55%, #6D28D9 100%);
+  background-image: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 55%, #6D28D9 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 .gv-color-ai-i {
-  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 55%, #581C87 100%);
+  background-image: linear-gradient(135deg, #7C3AED 0%, #6D28D9 55%, #581C87 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 /* Individual letter styling */
