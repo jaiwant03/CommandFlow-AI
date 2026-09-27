@@ -1,8 +1,10 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const config = require('./config/env');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 const { apiLimiter } = require('./middleware/rateLimiter');
+const { getHealthStatus } = require('./controllers/healthController');
 
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
@@ -16,29 +18,27 @@ const documentRoutes = require('./routes/documentRoutes');
 
 const app = express();
 
-// Global Middleware
+// Security Headers
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+// CORS Configuration
 app.use(cors({
-  origin: config.clientUrl,
+  origin: config.clientUrl || 'http://localhost:5173',
   credentials: true
 }));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Body Parsing with size limits
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
+
+// Health Check Endpoints
+app.get('/health', getHealthStatus);
+app.get('/api/health', getHealthStatus);
 
 // Apply rate limiter to API routes
 app.use('/api', apiLimiter);
-
-// Health Check Endpoints (both /health and /api/health)
-const healthHandler = (req, res) => {
-  res.json({
-    status: 'online',
-    system: 'CommandFlow AI Modular Monolith',
-    timestamp: new Date().toISOString(),
-    environment: config.env
-  });
-};
-
-app.get('/health', healthHandler);
-app.get('/api/health', healthHandler);
 
 // Favicon Handler
 app.get('/favicon.ico', (req, res) => res.status(204).end());
@@ -46,6 +46,7 @@ app.get('/favicon.ico', (req, res) => res.status(204).end());
 // Mount API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/automations', automationRoutes);
+app.use('/api/commands', automationRoutes); // Alias for clean API contract
 app.use('/api/ai', aiRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use('/api/integrations', integrationRoutes);
