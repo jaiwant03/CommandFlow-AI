@@ -33,17 +33,35 @@ const HandwrittenHeading = ({
       const rawWords = text.trim().split(/\s+/);
 
       if (rawWords.length === 1) {
-        // Single word: split characters into 3 vibrant gradient color zones
+        // Single word (e.g. "Automations", "Schedules", "Settings")
+        // Keep in ONE word span so cursive letters connect continuously without gaps
         const singleWord = rawWords[0];
         const len = singleWord.length;
         const part1 = Math.ceil(len * 0.38);
         const part2 = Math.ceil(len * 0.72);
 
-        wordsArray = [
-          { text: singleWord.slice(0, part1), colorClass: 'hw-color-green' },
-          { text: singleWord.slice(part1, part2), colorClass: 'hw-color-blue' },
-          { text: singleWord.slice(part2), colorClass: 'hw-color-purple' }
-        ];
+        const chars = singleWord.split('').map((ch, idx) => {
+          let charColor = 'hw-color-purple';
+          if (idx < part1) charColor = 'hw-color-green';
+          else if (idx < part2) charColor = 'hw-color-blue';
+
+          const delay = (idx * 0.04) + 0.08;
+          let fontClass = '';
+          if (ch === 'd' || ch === 'D') fontClass = 'font-pinyon-d';
+
+          return {
+            char: ch,
+            delay: delay.toFixed(2),
+            isSpace: false,
+            fontClass,
+            colorClass: charColor
+          };
+        });
+
+        return {
+          words: [{ text: singleWord, colorClass: '', chars }],
+          totalLetters: len
+        };
       } else if (rawWords.length === 2) {
         // 2 words: e.g. "Saved Contacts", "Command Center"
         wordsArray = [
@@ -74,7 +92,7 @@ const HandwrittenHeading = ({
 
     // Build letter tokens with staggered delay
     let letterIndex = 0;
-    const structuredWords = wordsArray.map((group, gIdx) => {
+    const structuredWords = wordsArray.map((group) => {
       const chars = group.text.split('').map((ch) => {
         const isSpace = ch === ' ';
         const delay = isSpace ? 0 : (letterIndex * 0.04) + 0.08;
@@ -90,7 +108,8 @@ const HandwrittenHeading = ({
           char: ch,
           delay: delay.toFixed(2),
           isSpace,
-          fontClass
+          fontClass,
+          colorClass: ''
         };
       });
 
@@ -119,7 +138,7 @@ const HandwrittenHeading = ({
               ) : (
                 <span
                   key={cIdx}
-                  className={`hw-char ${item.fontClass}`}
+                  className={`hw-char ${item.fontClass} ${item.colorClass}`}
                   style={{ animationDelay: `${item.delay}s` }}
                 >
                   {item.char}
