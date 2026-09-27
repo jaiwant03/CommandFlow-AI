@@ -3,8 +3,11 @@ import React, { useState, useEffect } from 'react';
 import {
   fetchAutomations,
   executeCommand,
-  parseCommand
+  parseCommand,
+  retryCommand,
+  cancelCommand
 } from '../services/automationService';
+import socketService from '../services/socketService';
 
 import CommandInput from '../components/CommandInput';
 import VoiceRecorder from '../components/VoiceRecorder';
@@ -48,45 +51,90 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
   const [aiPreview, setAiPreview] = useState(null);
   const [executionResult, setExecutionResult] = useState(null);
 
+  const [activeAutomationId, setActiveAutomationId] = useState(null);
   const [selectedAutomation, setSelectedAutomation] =
     useState(null);
 
 
   /* ==========================================================
-     LOAD DATA
+     LOAD DATA & REAL-TIME SOCKET SUBSCRIPTION
   ========================================================== */
 
   const loadData = async () => {
     try {
-
       const autoRes = await fetchAutomations();
-
       if (autoRes.success) {
         setAutomations(autoRes.data || []);
       }
-
     } catch (err) {
-      console.warn(
-        'Dashboard data fetch error:',
-        err
-      );
+      console.warn('Dashboard data fetch error:', err);
     }
   };
 
 
   useEffect(() => {
-
     loadData();
 
-    const interval = setInterval(
-      loadData,
-      4000
-    );
+    // Subscribe to real-time status updates via Socket.IO
+    const unsubscribe = socketService.subscribeStatus((event) => {
+      loadData();
+      if (event.automationId && (event.automationId === activeAutomationId || isExecuting)) {
+        if (event.status === 'PROCESSING' || event.status === 'SENDING') {
+          setExecutionStep(6);
+        } else if (event.status === 'SUCCESS' || event.status === 'SENT') {
+          setExecutionStep(7);
+          setIsExecuting(false);
+          setExecutionResult({
+            type: 'immediate',
+            status: 'SUCCESS',
+            message: event.message || 'Automation executed successfully!'
+          });
+        } else if (event.status === 'FAILED') {
+          setExecutionStep(7);
+          setIsExecuting(false);
+          setExecutionResult({
+            type: 'immediate',
+            status: 'FAILED',
+            message: event.error || event.message || 'Automation execution failed.'
+          });
+        }
+      }
+    });
 
-    return () =>
+    const interval = setInterval(loadData, 4000);
+
+    return () => {
       clearInterval(interval);
+      unsubscribe();
+    };
+  }, [activeAutomationId, isExecuting]);
 
-  }, []);
+
+  const handleRetry = async (id, e) => {
+    if (e) e.stopPropagation();
+    try {
+      const res = await retryCommand(id);
+      if (res.success) {
+        setActiveAutomationId(id);
+        socketService.joinAutomation(id);
+        setIsExecuting(true);
+        setExecutionStep(5);
+        await loadData();
+      }
+    } catch (err) {
+      console.error('Retry error:', err);
+    }
+  };
+
+  const handleCancel = async (id, e) => {
+    if (e) e.stopPropagation();
+    try {
+      await cancelCommand(id);
+      await loadData();
+    } catch (err) {
+      console.error('Cancel error:', err);
+    }
+  };
 
 
   /* ==========================================================
