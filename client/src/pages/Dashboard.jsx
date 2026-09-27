@@ -816,7 +816,30 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
         </div>
 
 
-        <div className="cf-recent-right">
+        <div className="cf-recent-right" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          {status === 'FAILED' && (
+            <button
+              onClick={(e) => handleRetry(automation.automationId, e)}
+              className="btn btn-secondary"
+              style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem', height: 'auto', borderRadius: '4px' }}
+              title="Retry Command"
+            >
+              <RefreshCw size={12} style={{ marginRight: '4px' }} />
+              Retry
+            </button>
+          )}
+
+          {status === 'SCHEDULED' && (
+            <button
+              onClick={(e) => handleCancel(automation.automationId, e)}
+              className="btn btn-secondary"
+              style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem', height: 'auto', borderRadius: '4px', color: 'var(--danger)' }}
+              title="Cancel Scheduled Command"
+            >
+              <X size={12} style={{ marginRight: '4px' }} />
+              Cancel
+            </button>
+          )}
 
           <span className="cf-recent-time">
             {formatDate(
@@ -829,7 +852,6 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
             size={16}
             className="cf-recent-chevron"
           />
-
         </div>
 
       </div>
