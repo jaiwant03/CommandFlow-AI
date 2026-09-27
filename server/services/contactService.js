@@ -70,12 +70,9 @@ class ContactService {
     });
     if (contact) return contact;
 
-    // If userId was provided and user has 0 contacts, try fallback
+    // If userId was provided and no match found in user's contacts, try global fallback across contacts
     if (userId) {
-      const userCount = await Contact.countDocuments({ userId });
-      if (userCount === 0) {
-        return this.findContact(null, query);
-      }
+      return this.findContact(null, query);
     }
 
     return null;
@@ -96,10 +93,6 @@ class ContactService {
     // 2. Scan user contacts against the command text to see if any contact name is mentioned
     try {
       let allUserContacts = userId ? await Contact.find({ userId }) : [];
-      if (allUserContacts.length === 0 && !userId) {
-        allUserContacts = await Contact.find({});
-      }
-
       // Sort longer names first
       allUserContacts.sort((a, b) => (b.name || '').length - (a.name || '').length);
 
@@ -120,6 +113,33 @@ class ContactService {
         }
 
         // Check relationship (e.g. "advisor", "friend")
+        if (contact.relationship && contact.relationship.length > 2) {
+          const relRegex = new RegExp(`\\b${this.escapeRegex(contact.relationship.trim())}\\b`, 'i');
+          if (relRegex.test(commandText)) {
+            return this.formatContactResult(contact, channel);
+          }
+        }
+      }
+
+      // Fallback: If not found in user's own contacts, check remaining contacts in database
+      const fallbackContacts = await Contact.find(userId ? { userId: { $ne: userId } } : {});
+      fallbackContacts.sort((a, b) => (b.name || '').length - (a.name || '').length);
+
+      for (const contact of fallbackContacts) {
+        if (!contact.name) continue;
+        const nameRegex = new RegExp(`\\b${this.escapeRegex(contact.name.trim())}\\b`, 'i');
+        if (nameRegex.test(commandText)) {
+          return this.formatContactResult(contact, channel);
+        }
+
+        const firstName = contact.name.trim().split(/\s+/)[0];
+        if (firstName && firstName.length > 2) {
+          const firstNameRegex = new RegExp(`\\b${this.escapeRegex(firstName)}\\b`, 'i');
+          if (firstNameRegex.test(commandText)) {
+            return this.formatContactResult(contact, channel);
+          }
+        }
+
         if (contact.relationship && contact.relationship.length > 2) {
           const relRegex = new RegExp(`\\b${this.escapeRegex(contact.relationship.trim())}\\b`, 'i');
           if (relRegex.test(commandText)) {
