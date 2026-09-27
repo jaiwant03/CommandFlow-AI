@@ -1076,38 +1076,40 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
 
               <div className="cf-ai-preview">
 
-                <div className="cf-ai-preview-title">
-
-                  <Bot size={17} />
-
-                  <span>AI Interpretation & Execution Trace</span>
-
+                <div className="cf-ai-preview-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Bot size={17} color="#2563EB" />
+                  <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 750, fontSize: '1.05rem', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+                    AI Interpretation & Execution Trace
+                  </span>
                 </div>
 
                 <div className="cf-trace-debug-card" style={{
-                  background: '#0F172A',
+                  background: '#0B132B',
                   color: '#F8FAFC',
                   borderRadius: 'var(--radius-lg)',
-                  padding: '1.25rem',
+                  padding: '1.35rem',
                   marginTop: '1rem',
-                  fontFamily: 'Consolas, Monaco, "Courier New", monospace',
-                  fontSize: '0.875rem',
-                  lineHeight: '1.6',
-                  border: '1px solid #334155',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.925rem',
+                  lineHeight: '1.7',
+                  letterSpacing: '-0.012em',
+                  border: '1px solid #1E293B',
+                  boxShadow: '0 8px 24px rgba(11, 19, 43, 0.25)'
                 }}>
-                  <div style={{ marginBottom: '0.65rem' }}>
-                    <span style={{ color: '#38BDF8', fontWeight: 700 }}>USER COMMAND:</span>{' '}
+                  <div style={{ marginBottom: '0.75rem' }}>
+                    <span style={{ color: '#38BDF8', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.05em' }}>USER COMMAND:</span>{' '}
                     <span style={{ color: '#F1F5F9', fontWeight: 500 }}>{aiPreview.userCommand || commandText}</span>
                   </div>
 
-                  <div style={{ marginBottom: '0.65rem' }}>
-                    <span style={{ color: '#38BDF8', fontWeight: 700 }}>CHANNEL:</span><br />
-                    <span style={{ color: '#F1F5F9', fontWeight: 600 }}>{aiPreview.channel?.toUpperCase() || 'GMAIL'}</span>
+                  <div style={{ marginBottom: '0.75rem' }}>
+                    <span style={{ color: '#38BDF8', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.05em' }}>CHANNEL:</span>{' '}
+                    <span style={{ color: '#10B981', fontWeight: 700, backgroundColor: 'rgba(16, 185, 129, 0.15)', padding: '2px 8px', borderRadius: '4px' }}>
+                      {aiPreview.channel?.toUpperCase() || 'GMAIL'}
+                    </span>
                   </div>
 
-                  <div style={{ marginBottom: '0.65rem' }}>
-                    <span style={{ color: '#38BDF8', fontWeight: 700 }}>RECIPIENT:</span>{' '}
+                  <div style={{ marginBottom: '0.75rem' }}>
+                    <span style={{ color: '#38BDF8', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.05em' }}>RECIPIENT:</span>{' '}
                     <span style={{ color: '#F1F5F9', fontWeight: 500 }}>
                       {(aiPreview.recipients && aiPreview.recipients.length > 0)
                         ? aiPreview.recipients.join(', ')
@@ -1115,22 +1117,24 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
                     </span>
                   </div>
 
-                  <div style={{ marginBottom: '0.65rem' }}>
-                    <span style={{ color: '#38BDF8', fontWeight: 700 }}>GENERATED SUBJECT:</span>{' '}
-                    <span style={{ color: '#F1F5F9', fontWeight: 500 }}>{aiPreview.subject || 'N/A'}</span>
+                  <div style={{ marginBottom: '0.75rem' }}>
+                    <span style={{ color: '#38BDF8', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.05em' }}>GENERATED SUBJECT:</span>{' '}
+                    <span style={{ color: '#F1F5F9', fontWeight: 600 }}>{aiPreview.subject || 'N/A'}</span>
                   </div>
 
                   <div>
-                    <span style={{ color: '#38BDF8', fontWeight: 700 }}>GENERATED MESSAGE:</span>
+                    <span style={{ color: '#38BDF8', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.05em' }}>GENERATED MESSAGE:</span>
                     <div style={{
                       color: '#F1F5F9',
                       whiteSpace: 'pre-wrap',
-                      marginTop: '0.35rem',
-                      backgroundColor: '#1E293B',
-                      padding: '0.85rem',
-                      borderRadius: '6px',
-                      border: '1px solid #475569',
-                      fontFamily: 'inherit'
+                      marginTop: '0.45rem',
+                      backgroundColor: '#162038',
+                      padding: '1rem',
+                      borderRadius: '8px',
+                      border: '1px solid #233554',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.925rem',
+                      lineHeight: '1.75'
                     }}>
                       {aiPreview.message || aiPreview.content || 'N/A'}
                     </div>

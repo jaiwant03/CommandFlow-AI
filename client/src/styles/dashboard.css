@@ -1230,18 +1230,14 @@ path:not(.chart-fill) {
 }
 
 .cf-section-title {
-
   display: flex;
-
   align-items: center;
-
   gap: 8px;
-
   color: var(--cf-text);
-
-  font-size: 13px;
-
-  font-weight: 800;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
 }
 
 .cf-section-title svg {
@@ -1255,25 +1251,17 @@ path:not(.chart-fill) {
 
 .cf-view-all,
 .cf-manage-btn {
-
   display: inline-flex;
-
   align-items: center;
-
-  gap: 2px;
-
+  gap: 3px;
   border: 0;
-
   background: transparent;
-
   color: var(--cf-blue);
-
-  font-size: 11px;
-
-  font-weight: 800;
-
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
   cursor: pointer;
-
   transition:
     color 0.2s ease,
     transform 0.2s ease;
@@ -1281,14 +1269,11 @@ path:not(.chart-fill) {
 
 .cf-view-all:hover,
 .cf-manage-btn:hover {
-
   color: var(--cf-blue-dark);
-
   transform: translateX(1px);
 }
 
 .cf-view-arrow {
-
   transition:
     transform 0.2s ease;
 }
@@ -1387,9 +1372,11 @@ path:not(.chart-fill) {
 
 .cf-recent-title {
   overflow: hidden !important;
-  color: #111827 !important;
-  font-size: 13px !important;
-  font-weight: 750 !important;
+  color: #0F172A !important;
+  font-family: var(--font-heading) !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.015em !important;
   white-space: nowrap !important;
   text-overflow: ellipsis !important;
   min-width: 0 !important;
@@ -1400,9 +1387,11 @@ path:not(.chart-fill) {
 
 .cf-recent-meta {
   overflow: hidden !important;
-  color: #7a8797 !important;
-  font-size: 11px !important;
+  color: #64748B !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.8125rem !important;
   font-weight: 500 !important;
+  letter-spacing: -0.01em !important;
   white-space: nowrap !important;
   text-overflow: ellipsis !important;
   min-width: 0 !important;
@@ -1428,17 +1417,20 @@ path:not(.chart-fill) {
 }
 
 .cf-status-pill {
-  width: 96px !important;
-  min-width: 96px !important;
-  max-width: 96px !important;
+  width: 105px !important;
+  min-width: 105px !important;
+  max-width: 105px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 6px !important;
-  padding: 5px 8px !important;
+  padding: 5px 9px !important;
   border-radius: 999px !important;
-  font-size: 10px !important;
-  font-weight: 800 !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.75rem !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
   white-space: nowrap !important;
   text-align: center !important;
   box-sizing: border-box !important;
@@ -1495,7 +1487,9 @@ path:not(.chart-fill) {
 
 .cf-recent-time {
   color: #94a3b8;
-  font-size: 11px;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   text-align: right;
   flex: 1;
