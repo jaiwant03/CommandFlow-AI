@@ -4,6 +4,7 @@ import '../styles/handwrittenIntro.css';
 /**
  * HandwrittenIntro Component
  * Great Vibes Cursive Theme with Exact Handwriting Motion
+ * Featuring full tall letter 'd' in Command and True Capital 'A' and 'I' in AI
  * Pure White Background with Model Shining Palette
  * Multicolor: Rama Green + Peacock Blue + Bright Violet Purple
  * ONLY "CommandFlow AI" with calligraphic flourish underline
@@ -24,7 +25,7 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
       if (onComplete) onComplete();
     }, duration);
 
-    // Keyboard bypass
+    // Subtle keyboard bypass
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
         clearTimeout(fadeTimer);
@@ -44,33 +45,34 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
     };
   }, [duration, onComplete]);
 
-  // Cursive handwriting letter configuration for Great Vibes
-  // Word 1: Command (Rama Green) -> 0.20s - 1.40s
-  // Word 2: Flow (Peacock Blue) -> 1.52s - 2.26s
-  // Word 3: AI (Bright Violet Purple) -> 2.38s - 2.84s
+  // Cursive handwriting letters configuration:
+  // Word 1: Command (Great Vibes with tall Pinyon 'd' for 100% visibility)
+  // Word 2: Flow (Great Vibes cursive)
+  // Word 3: AI (True bold Capital 'A' and Capital 'I' with full vertical stem & serifs)
   const letters = useMemo(() => [
-    // Word 1: Command
-    { id: 'c-0', char: 'C', word: 1, delay: 0.20, dur: 0.26, color: '#00C896' },
-    { id: 'c-1', char: 'o', word: 1, delay: 0.42, dur: 0.16, color: '#00C896' },
-    { id: 'c-2', char: 'm', word: 1, delay: 0.56, dur: 0.20, color: '#00B894' },
-    { id: 'c-3', char: 'm', word: 1, delay: 0.74, dur: 0.20, color: '#00B894' },
-    { id: 'c-4', char: 'a', word: 1, delay: 0.92, dur: 0.16, color: '#00A884' },
-    { id: 'c-5', char: 'n', word: 1, delay: 1.06, dur: 0.16, color: '#00A884' },
-    { id: 'c-6', char: 'd', word: 1, delay: 1.20, dur: 0.22, color: '#0088CC' },
+    // Word 1: Command (Rama Green)
+    { id: 'c-0', char: 'C', word: 1, delay: 0.20, dur: 0.26, color: '#00C896', fontClass: 'font-gv' },
+    { id: 'c-1', char: 'o', word: 1, delay: 0.42, dur: 0.16, color: '#00C896', fontClass: 'font-gv' },
+    { id: 'c-2', char: 'm', word: 1, delay: 0.56, dur: 0.20, color: '#00B894', fontClass: 'font-gv' },
+    { id: 'c-3', char: 'm', word: 1, delay: 0.74, dur: 0.20, color: '#00B894', fontClass: 'font-gv' },
+    { id: 'c-4', char: 'a', word: 1, delay: 0.92, dur: 0.16, color: '#00A884', fontClass: 'font-gv' },
+    { id: 'c-5', char: 'n', word: 1, delay: 1.06, dur: 0.16, color: '#00A884', fontClass: 'font-gv' },
+    // Letter 'd' styled with tall elegant ascender so it is 100% fully visible as a complete 'd'
+    { id: 'c-6', char: 'd', word: 1, delay: 1.20, dur: 0.22, color: '#0088CC', fontClass: 'font-pinyon-d' },
 
     // Pen lift pause (120ms)
 
-    // Word 2: Flow
-    { id: 'f-0', char: 'F', word: 2, delay: 1.52, dur: 0.26, color: '#0088CC' },
-    { id: 'f-1', char: 'l', word: 2, delay: 1.76, dur: 0.18, color: '#0284C7' },
-    { id: 'f-2', char: 'o', word: 2, delay: 1.92, dur: 0.16, color: '#0284C7' },
-    { id: 'f-3', char: 'w', word: 2, delay: 2.06, dur: 0.20, color: '#0369A1' },
+    // Word 2: Flow (Peacock Blue)
+    { id: 'f-0', char: 'F', word: 2, delay: 1.52, dur: 0.26, color: '#0088CC', fontClass: 'font-gv' },
+    { id: 'f-1', char: 'l', word: 2, delay: 1.76, dur: 0.18, color: '#0284C7', fontClass: 'font-gv' },
+    { id: 'f-2', char: 'o', word: 2, delay: 1.92, dur: 0.16, color: '#0284C7', fontClass: 'font-gv' },
+    { id: 'f-3', char: 'w', word: 2, delay: 2.06, dur: 0.20, color: '#0369A1', fontClass: 'font-gv' },
 
     // Pen lift pause (120ms)
 
-    // Word 3: AI
-    { id: 'ai-0', char: 'A', word: 3, delay: 2.38, dur: 0.24, color: '#8B5CF6' },
-    { id: 'ai-1', char: 'I', word: 3, delay: 2.60, dur: 0.24, color: '#7C3AED' },
+    // Word 3: AI (Bright Violet Purple) - True Capital A and fully visible Capital I
+    { id: 'ai-0', char: 'A', word: 3, delay: 2.38, dur: 0.24, color: '#8B5CF6', fontClass: 'font-capital-a' },
+    { id: 'ai-1', char: 'I', word: 3, delay: 2.60, dur: 0.24, color: '#7C3AED', fontClass: 'font-capital-i' },
   ], []);
 
   // Synchronize liquid ink tip with the active letter being written
@@ -88,7 +90,7 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
 
       const containerRect = containerRef.current.getBoundingClientRect();
 
-      // Find which letter is currently being written
+      // Find which letter is currently active
       const activeChar = letters.find(
         (l) => elapsed >= l.delay && elapsed < l.delay + l.dur
       );
@@ -98,7 +100,6 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
         const rect = el.getBoundingClientRect();
         const progress = Math.min((elapsed - activeChar.delay) / activeChar.dur, 1);
 
-        // Tip travels from left to right edge of the active cursive letter
         const x = rect.left + rect.width * progress - containerRect.left;
         const y = rect.top + rect.height * 0.65 - containerRect.top;
 
@@ -136,10 +137,10 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
       <div className="sparkle-flare sparkle-3" />
       <div className="sparkle-flare sparkle-4" />
 
-      {/* Center Stage: ONLY the word "CommandFlow AI" in Great Vibes Cursive */}
+      {/* Center Stage: ONLY the word "CommandFlow AI" */}
       <div className="handwritten-center-box" ref={containerRef}>
         <div className="great-vibes-stage">
-          {/* Word 1: Command (Rama Green) */}
+          {/* Word 1: Command (Rama Green) with full tall letter 'd' */}
           <span className="gv-word gv-word-command">
             {letters
               .filter((l) => l.word === 1)
@@ -147,7 +148,7 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
                 <span
                   key={l.id}
                   ref={(el) => (charRefs.current[l.id] = el)}
-                  className="gv-char"
+                  className={`gv-char ${l.fontClass}`}
                   style={{
                     animationDelay: `${l.delay}s`,
                     animationDuration: `${l.dur}s`,
@@ -168,7 +169,7 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
                 <span
                   key={l.id}
                   ref={(el) => (charRefs.current[l.id] = el)}
-                  className="gv-char"
+                  className={`gv-char ${l.fontClass}`}
                   style={{
                     animationDelay: `${l.delay}s`,
                     animationDuration: `${l.dur}s`,
@@ -181,7 +182,7 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
 
           <span className="gv-word-spacer" />
 
-          {/* Word 3: AI (Bright Violet Purple) */}
+          {/* Word 3: AI (Bright Violet Purple) - True Capital A and Capital I */}
           <span className="gv-word gv-word-ai">
             {letters
               .filter((l) => l.word === 3)
@@ -189,7 +190,7 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
                 <span
                   key={l.id}
                   ref={(el) => (charRefs.current[l.id] = el)}
-                  className="gv-char"
+                  className={`gv-char ${l.fontClass}`}
                   style={{
                     animationDelay: `${l.delay}s`,
                     animationDuration: `${l.dur}s`,
