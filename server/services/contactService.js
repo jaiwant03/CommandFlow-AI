@@ -10,24 +10,25 @@ class ContactService {
   async findContact(userId, query) {
     if (!query || typeof query !== 'string' || !query.trim()) return null;
     const cleanQuery = query.trim();
+    const userFilter = userId ? { userId } : {};
 
     // 1. Exact Name match (case-insensitive)
     let contact = await Contact.findOne({
-      userId,
+      ...userFilter,
       name: { $regex: new RegExp(`^${this.escapeRegex(cleanQuery)}$`, 'i') }
     });
     if (contact) return contact;
 
     // 2. Email match
     contact = await Contact.findOne({
-      userId,
+      ...userFilter,
       email: cleanQuery.toLowerCase()
     });
     if (contact) return contact;
 
     // 3. Name starts with or contains query (e.g., "Arun" -> "Arun Kumar")
     contact = await Contact.findOne({
-      userId,
+      ...userFilter,
       name: { $regex: new RegExp(`\\b${this.escapeRegex(cleanQuery)}`, 'i') }
     });
     if (contact) return contact;
@@ -36,7 +37,7 @@ class ContactService {
     const queryTokens = cleanQuery.split(/\s+/).filter(w => w.length > 2);
     for (const token of queryTokens) {
       contact = await Contact.findOne({
-        userId,
+        ...userFilter,
         name: { $regex: new RegExp(`^${this.escapeRegex(token)}$`, 'i') }
       });
       if (contact) return contact;
@@ -44,7 +45,7 @@ class ContactService {
 
     // 5. Check if any contact's name is contained in the query
     try {
-      const allUserContacts = await Contact.find({ userId });
+      const allUserContacts = await Contact.find(userFilter);
       for (const c of allUserContacts) {
         if (!c.name) continue;
         const cLower = c.name.toLowerCase().trim();
@@ -59,13 +60,18 @@ class ContactService {
 
     // 6. Role / Relationship match (e.g., "advisor", "class advisor", "mentor", "hod", "friend")
     contact = await Contact.findOne({
-      userId,
+      ...userFilter,
       $or: [
         { relationship: { $regex: new RegExp(this.escapeRegex(cleanQuery), 'i') } },
         { category: { $regex: new RegExp(this.escapeRegex(cleanQuery), 'i') } }
       ]
     });
     if (contact) return contact;
+
+    // If userId was provided and nothing found, try global fallback across contacts
+    if (userId) {
+      return this.findContact(null, query);
+    }
 
     return null;
   }
@@ -74,19 +80,21 @@ class ContactService {
    * Resolve recipient name/hint or command text to a verified contact
    */
   async resolveRecipient(userId, { nameHint, commandText, channel = 'gmail' }) {
-    if (!userId) return null;
-
     // 1. Try resolving using nameHint if provided
     if (nameHint && typeof nameHint === 'string' && nameHint.toLowerCase() !== 'recipient') {
-      const matched = await this.findContact(userId, nameHint);
+      let matched = await this.findContact(userId, nameHint);
       if (matched) {
         return this.formatContactResult(matched, channel);
       }
     }
 
-    // 2. Scan all user contacts against the command text to see if any contact name is mentioned
+    // 2. Scan user contacts against the command text to see if any contact name is mentioned
     try {
-      const allUserContacts = await Contact.find({ userId });
+      let allUserContacts = userId ? await Contact.find({ userId }) : [];
+      if (allUserContacts.length === 0) {
+        allUserContacts = await Contact.find({});
+      }
+
       for (const contact of allUserContacts) {
         if (!contact.name) continue;
         const nameRegex = new RegExp(`\\b${this.escapeRegex(contact.name)}\\b`, 'i');

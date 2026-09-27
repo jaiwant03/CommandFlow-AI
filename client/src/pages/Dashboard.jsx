@@ -266,17 +266,27 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
           socketService.joinAutomation(autoId);
         }
 
+        const verifiedRecipient = execRes.data?.recipient || parsedData.recipient;
+        const verifiedRecipients = execRes.data?.recipients || (verifiedRecipient?.email ? [verifiedRecipient.email] : parsedData.recipients);
+
+        setAiPreview(prev => prev ? ({
+          ...prev,
+          recipient: verifiedRecipient,
+          recipients: verifiedRecipients
+        }) : prev);
+
         if (execRes.success && execRes.data?.status === 'SUCCESS') {
           setExecutionStep(7);
           setExecutionResult({
             type: 'immediate',
             status: 'SUCCESS',
-            channel: parsedData.channel,
-            recipient: parsedData.recipient,
+            channel: execRes.data?.channel || parsedData.channel,
+            recipient: verifiedRecipient,
+            recipients: verifiedRecipients,
             intent: parsedData.intent,
             content: parsedData.message || parsedData.content,
             subject: parsedData.subject,
-            message: `✓ Successfully executed via ${parsedData.channel?.toUpperCase()} engine!`
+            message: `✓ Successfully executed via ${(execRes.data?.channel || parsedData.channel)?.toUpperCase()} engine!`
           });
         } else if (execRes.success && (execRes.data?.status === 'QUEUED' || execRes.data?.status === 'PROCESSING')) {
           // Worker is currently executing in background, Socket.IO will trigger step 6 -> 7
@@ -284,8 +294,9 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
           setExecutionResult({
             type: 'immediate',
             status: 'PROCESSING',
-            channel: parsedData.channel,
-            recipient: parsedData.recipient,
+            channel: execRes.data?.channel || parsedData.channel,
+            recipient: verifiedRecipient,
+            recipients: verifiedRecipients,
             intent: parsedData.intent,
             content: parsedData.message || parsedData.content,
             subject: parsedData.subject,
@@ -296,12 +307,13 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
           setExecutionResult({
             type: 'immediate',
             status: 'SUCCESS',
-            channel: parsedData.channel,
-            recipient: parsedData.recipient,
+            channel: execRes.data?.channel || parsedData.channel,
+            recipient: verifiedRecipient,
+            recipients: verifiedRecipients,
             intent: parsedData.intent,
             content: parsedData.message || parsedData.content,
             subject: parsedData.subject,
-            message: `Successfully executed via ${parsedData.channel?.toUpperCase()} engine!`
+            message: `Successfully executed via ${(execRes.data?.channel || parsedData.channel)?.toUpperCase()} engine!`
           });
         } else {
           setExecutionStep(7);
@@ -309,7 +321,8 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
             type: 'immediate',
             status: 'FAILED',
             channel: parsedData.channel,
-            recipient: parsedData.recipient,
+            recipient: verifiedRecipient,
+            recipients: verifiedRecipients,
             intent: parsedData.intent,
             error: execRes.message || execRes.error?.message || execRes.data?.error || 'Automation execution failed',
             message: execRes.message || 'Execution failed.'
