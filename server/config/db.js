@@ -46,7 +46,15 @@ mongoose.connection.on('reconnected', () => {
 });
 
 const connectDB = async () => {
-  const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/commandflow_ai';
+  let uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/commandflow_ai';
+  if (process.env.MONGO_DIRECT_URI) {
+    uri = process.env.MONGO_DIRECT_URI;
+  } else if (process.platform === 'win32' && uri.startsWith('mongodb+srv://')) {
+    const directUri = getDirectReplicaUri(uri);
+    if (directUri && directUri !== uri) {
+      uri = directUri;
+    }
+  }
 
   const connectionOptions = {
     serverSelectionTimeoutMS: 10000,
