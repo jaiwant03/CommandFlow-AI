@@ -17,6 +17,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
  * using ONLY credentials provided in the environment variable. Zero hardcoded secrets.
  */
 const getDirectReplicaUri = (srvUri) => {
+  if (process.env.MONGO_DIRECT_URI) return process.env.MONGO_DIRECT_URI;
   if (!srvUri || !srvUri.startsWith('mongodb+srv://')) return srvUri;
   const match = srvUri.match(/mongodb\+srv:\/\/([^@]+)@([^/?]+)(?:\/([^?]+))?(?:\?(.*))?/);
   if (!match) return srvUri;
