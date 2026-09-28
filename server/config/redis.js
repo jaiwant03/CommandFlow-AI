@@ -53,9 +53,16 @@ const getRedisClient = () => {
 const isRedisAvailable = () => isConnected;
 
 const checkRedisConnection = async () => {
+  if (!isConnected && (!redisClient || redisClient.status !== 'ready')) {
+    return false;
+  }
   try {
     const client = getRedisClient();
-    const ping = await client.ping();
+    const pingPromise = client.ping();
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Redis ping timeout')), 800)
+    );
+    const ping = await Promise.race([pingPromise, timeoutPromise]);
     isConnected = ping === 'PONG';
     return isConnected;
   } catch (error) {
