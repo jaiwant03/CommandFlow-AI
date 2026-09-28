@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const cron = require('node-cron');
 const Schedule = require('../models/Schedule');
 const Automation = require('../models/Automation');
@@ -14,6 +15,11 @@ const initScheduler = () => {
   console.log('[Scheduler] Initialized background scheduler runner (evaluating every 10s)...');
 
   cron.schedule('*/10 * * * * *', async () => {
+    // Only execute if MongoDB is fully connected
+    if (mongoose.connection.readyState !== 1) {
+      return;
+    }
+
     try {
       const now = new Date();
       // Find schedules with status 'SCHEDULED' or 'Scheduled' where nextExecution <= now

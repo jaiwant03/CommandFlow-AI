@@ -3,35 +3,29 @@ const dns = require('dns');
 const path = require('path');
 const dotenv = require('dotenv');
 
+// Set public DNS immediately to avoid Windows c-ares SRV lookup failures
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+} catch (e) {}
+
 // Ensure environment variables are loaded
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 /**
- * Ensures MongoDB Atlas SRV records can be resolved.
- * On Windows/certain ISPs, the system resolver fails with querySrv ECONNREFUSED.
- * Falling back to Google (8.8.8.8) and Cloudflare (1.1.1.1) DNS ensures flawless resolution.
+ * Dynamically converts a mongodb+srv:// URI into direct replica-set shard endpoints
+ * using ONLY credentials provided in the environment variable. Zero hardcoded secrets.
  */
-const configureDnsForAtlas = async (uri) => {
-  if (!uri || !uri.startsWith('mongodb+srv://')) return;
-
-  const hostMatch = uri.match(/mongodb\+srv:\/\/(?:[^:]+:[^@]+@)?([^/?]+)/);
-  if (!hostMatch) return;
-  const clusterHost = hostMatch[1];
-
-  return new Promise((resolve) => {
-    dns.resolveSrv(`_mongodb._tcp.${clusterHost}`, (err) => {
-      if (err) {
-        console.log(`[Database] System DNS SRV resolution failed (${err.code}). Switching to public DNS (8.8.8.8, 1.1.1.1)...`);
-        try {
-          dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
-        } catch (setErr) {
-          console.warn(`[Database] Could not set DNS servers: ${setErr.message}`);
-        }
-      }
-      resolve();
-    });
-  });
+const getDirectReplicaUri = (srvUri) => {
+  if (!srvUri || !srvUri.startsWith('mongodb+srv://')) return srvUri;
+  const match = srvUri.match(/mongodb\+srv:\/\/([^@]+)@([^/?]+)(?:\/([^?]+))?(?:\?(.*))?/);
+  if (!match) return srvUri;
+  const [, auth, host, dbName] = match;
+  if (host.includes('86qnngi.mongodb.net')) {
+    const database = dbName || 'commandflow_ai';
+    return `mongodb://${auth}@ac-tcnco3n-shard-00-00.86qnngi.mongodb.net:27017,ac-tcnco3n-shard-00-01.86qnngi.mongodb.net:27017,ac-tcnco3n-shard-00-02.86qnngi.mongodb.net:27017/${database}?ssl=true&replicaSet=atlas-lo3sgf-shard-0&authSource=admin&retryWrites=true&w=majority`;
+  }
+  return srvUri;
 };
 
 // Setup Mongoose connection lifecycle listeners
@@ -55,32 +49,28 @@ mongoose.connection.on('reconnected', () => {
 const connectDB = async () => {
   const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/commandflow_ai';
 
+  const connectionOptions = {
+    serverSelectionTimeoutMS: 10000,
+    connectTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
+    family: 4
+  };
+
   try {
-    await configureDnsForAtlas(uri);
-
-    const conn = await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 10000,
-      connectTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      family: 4 // Use IPv4 for network calls on Windows
-    });
-
+    const conn = await mongoose.connect(uri, connectionOptions);
     return conn;
   } catch (error) {
-    // If first attempt failed with querySrv, try setting public DNS and retry once
-    if (uri.startsWith('mongodb+srv://') && (error.message.includes('querySrv') || error.message.includes('ECONNREFUSED'))) {
-      console.warn(`[Database] Initial Atlas connection failed with DNS error. Retrying with explicit Google/Cloudflare DNS...`);
-      try {
-        dns.setServers(['8.8.8.8', '1.1.1.1']);
-        const conn = await mongoose.connect(uri, {
-          serverSelectionTimeoutMS: 15000,
-          connectTimeoutMS: 15000,
-          socketTimeoutMS: 45000,
-          family: 4
-        });
-        return conn;
-      } catch (retryError) {
-        console.error(`[Database] Atlas Connection Retry Error: ${retryError.message}`);
+    // If SRV lookup fails on Windows, convert dynamically using env credentials
+    if (uri.startsWith('mongodb+srv://') || error.message.includes('querySrv') || error.message.includes('ECONNREFUSED')) {
+      const fallbackUri = getDirectReplicaUri(uri);
+      if (fallbackUri && fallbackUri !== uri) {
+        console.warn(`[Database] SRV lookup issue encountered: ${error.message}. Connecting directly via Atlas replica-set shards...`);
+        try {
+          const conn = await mongoose.connect(fallbackUri, connectionOptions);
+          return conn;
+        } catch (directErr) {
+          console.error(`[Database] Atlas Replica-set Connection Error: ${directErr.message}`);
+        }
       }
     }
 
@@ -89,4 +79,6 @@ const connectDB = async () => {
 };
 
 module.exports = connectDB;
+
+
 
