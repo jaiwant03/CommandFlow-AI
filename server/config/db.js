@@ -3,10 +3,8 @@ const dns = require('dns');
 const path = require('path');
 const dotenv = require('dotenv');
 
-// Set public DNS immediately to avoid Windows c-ares SRV lookup failures
-try {
-  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
-} catch (e) {}
+// Avoid overriding system DNS globally which causes c-ares timeouts on networks blocking UDP 53
+
 
 // Ensure environment variables are loaded
 dotenv.config({ path: path.resolve(__dirname, '../.env') });

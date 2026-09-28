@@ -1,5 +1,5 @@
 const { Queue } = require('bullmq');
-const { redisOptions, getRedisClient, isRedisAvailable } = require('../config/redis');
+const { redisOptions, getRedisClient, isRedisAvailable, checkRedisConnection } = require('../config/redis');
 
 let commandQueue = null;
 
@@ -34,8 +34,6 @@ const getCommandQueue = () => {
  * Add a command job to BullMQ queue
  */
 const addCommandJob = async ({ automationId, userId, command, inputType = 'text', plan, idempotencyKey, delayMs = 0 }) => {
-  const queue = getCommandQueue();
-
   const jobData = {
     automationId,
     userId: userId ? userId.toString() : null,
@@ -59,8 +57,26 @@ const addCommandJob = async ({ automationId, userId, command, inputType = 'text'
     jobOptions.delay = delayMs;
   }
 
+  // 1. Pre-check Redis availability to avoid offline buffering delays
+  const isHealthy = await checkRedisConnection();
+  if (!isHealthy) {
+    console.warn(`[BullMQ Notice]: Redis is not connected. Triggering resilient in-process execution for ${automationId}...`);
+    return {
+      success: false,
+      fallbackRequired: true,
+      error: 'Redis offline'
+    };
+  }
+
   try {
-    const job = await queue.add('processCommand', jobData, jobOptions);
+    const queue = getCommandQueue();
+    // Add job with a 2.5s safety timeout
+    const addPromise = queue.add('processCommand', jobData, jobOptions);
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('BullMQ queue.add timeout')), 2500)
+    );
+
+    const job = await Promise.race([addPromise, timeoutPromise]);
     console.log(`[BullMQ] Added job ${job.id} for automation ${automationId} (delay: ${delayMs}ms)`);
     return {
       success: true,

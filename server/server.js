@@ -12,10 +12,40 @@ const server = http.createServer(app);
 // Initialize Socket.IO on the HTTP server
 initSocket(server);
 
+const path = require('path');
+const fs = require('fs');
+const { spawn } = require('child_process');
+const { checkRedisConnection } = require('./config/redis');
+
+// Auto-start Redis server on Windows if installed and not already running
+const ensureRedis = async () => {
+  try {
+    const isHealthy = await checkRedisConnection();
+    if (isHealthy) return;
+
+    const wingetRedisPath = path.join(
+      process.env.LOCALAPPDATA || '',
+      'Microsoft/WinGet/Packages/taizod1024.redis-windows-fork_Microsoft.Winget.Source_8wekyb3d8bbwe/Redis-8.10.1-Windows-x64-msys2/redis-server.exe'
+    );
+
+    const redisBin = fs.existsSync(wingetRedisPath) ? wingetRedisPath : 'redis-server';
+    const child = spawn(redisBin, ['--daemonize', 'no'], {
+      detached: true,
+      stdio: 'ignore'
+    });
+    child.unref();
+    console.log('[Redis Auto-Start] Spawned redis-server process.');
+    await new Promise(r => setTimeout(r, 1200));
+  } catch (err) {
+    console.warn('[Redis Auto-Start Notice]: Running in direct fallback mode.');
+  }
+};
+
 // Initialize Database, Worker & Scheduler
 const startServer = async () => {
   try {
     await connectDB();
+    await ensureRedis();
     initWorker();
     initScheduler();
 

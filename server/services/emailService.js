@@ -24,28 +24,39 @@ class EmailService {
       const cleanPass = pass.replace(/\s+/g, '');
       console.log(`[EmailService] Initializing high-speed Gmail SMTP transporter for ${user}...`);
       try {
+        // Resolve host to IPv4 to bypass Windows c-ares/IPv6 resolution delays
+        let targetHost = host;
+        try {
+          const dns = require('dns').promises;
+          const lookup = await dns.lookup(host, { family: 4 });
+          if (lookup?.address) {
+            targetHost = lookup.address;
+          }
+        } catch (dnsErr) {
+          targetHost = host;
+        }
+
         this.transporter = nodemailer.createTransport({
-          service: 'gmail',
-          host,
+          host: targetHost,
           port,
           secure: port === 465,
-          pool: true, // Reuse connections for instant delivery
-          maxConnections: 5,
-          maxMessages: 100,
-          rateLimit: 10,
           auth: {
             user,
             pass: cleanPass
           },
           tls: {
+            servername: host,
             rejectUnauthorized: false
-          }
+          },
+          connectionTimeout: 15000,
+          greetingTimeout: 15000,
+          socketTimeout: 30000
         });
 
         // Verify connection in background
         this.transporter.verify((err) => {
           if (err) {
-            console.warn(`[EmailService] SMTP verification warning: ${err.message}. Ready for direct attempts.`);
+            console.warn(`[EmailService] SMTP verification note: ${err.message}. Ready for direct attempts.`);
           } else {
             console.log(`[EmailService] Gmail SMTP server connection verified successfully for ${user}!`);
           }
