@@ -1,8 +1,9 @@
-/* Integrations Page Styles */
 .integrations-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .integration-header-panel {
@@ -141,3 +142,47 @@
   padding: 0.38rem 0.8rem;
   font-size: 0.8rem;
 }
+
+@media (max-width: 768px) {
+  .integrations-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .integration-header-panel {
+    padding: 1.25rem 1rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .integration-header-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.85rem !important;
+  }
+
+  .integration-search-wrap {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .integration-card {
+    padding: 1.25rem 1rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .integration-card-head {
+    align-items: flex-start !important;
+  }
+
+  .integration-card-footer {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  .integration-config-btn {
+    min-height: 40px !important;
+    padding: 0.5rem 1rem !important;
+  }
+}
+
