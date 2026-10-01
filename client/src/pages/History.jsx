@@ -72,90 +72,90 @@ const History = () => {
   return (
     <div className="page-container" style={{ perspective: 'none' }}>
       {/* Page Title Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div className="history-header-row">
         <div>
           <HandwrittenHeading text="Analytics & Execution History" size="normal" withFlourish={true} />
           <p className="page-subtitle">Real-time performance metrics and frozen execution trace logs.</p>
         </div>
-        <button className="btn btn-secondary" onClick={loadLogs}>
+        <button className="btn btn-secondary history-refresh-btn" onClick={loadLogs}>
           <RefreshCw size={16} className={loading ? 'spin' : ''} />
           <span>Refresh Analytics</span>
         </button>
       </div>
 
-      {/* Floating Top Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2rem', perspective: 'none' }}>
-        <div className="glass-card floating-1" style={{ padding: '1.5rem', background: '#FFFFFF' }}>
+      {/* Responsive Top Metrics Row */}
+      <div className="history-metrics-grid">
+        <div className="glass-card history-metric-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <span style={{ fontSize: '0.775rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>TOTAL EXECUTION RUNS</span>
-              <div style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--font-heading)', marginTop: '0.2rem' }}>
+              <span className="history-metric-title">TOTAL RUNS</span>
+              <div className="history-metric-value">
                 {totalExecutions}
               </div>
             </div>
-            <div style={{ background: 'var(--primary-light)', padding: '0.6rem', borderRadius: 'var(--radius-md)', color: 'var(--primary-dark)' }}>
-              <Zap size={22} />
+            <div style={{ background: 'var(--primary-light)', padding: '0.5rem', borderRadius: 'var(--radius-md)', color: 'var(--primary-dark)', flexShrink: 0 }}>
+              <Zap size={20} />
             </div>
           </div>
-          <div style={{ fontSize: '0.775rem', color: 'var(--primary-dark)', marginTop: '0.5rem', fontWeight: 700 }}>
+          <div className="history-metric-hint" style={{ color: 'var(--primary-dark)' }}>
             {totalExecutions === 0 ? 'No executions recorded yet' : `${successfulExecutions} successful executions`}
           </div>
         </div>
 
-        <div className="glass-card floating-2" style={{ padding: '1.5rem', background: '#FFFFFF' }}>
+        <div className="glass-card history-metric-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <span style={{ fontSize: '0.775rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>SUCCESS RATE</span>
-              <div style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: 'var(--primary-dark)', marginTop: '0.2rem' }}>
+              <span className="history-metric-title">SUCCESS RATE</span>
+              <div className="history-metric-value" style={{ color: 'var(--primary-dark)' }}>
                 {totalExecutions > 0 ? `${successRate.toFixed(1)}%` : '0%'}
               </div>
             </div>
-            <div style={{ background: 'var(--primary-light)', padding: '0.6rem', borderRadius: 'var(--radius-md)', color: 'var(--primary)' }}>
-              <CheckCircle size={22} />
+            <div style={{ background: 'var(--primary-light)', padding: '0.5rem', borderRadius: 'var(--radius-md)', color: 'var(--primary)', flexShrink: 0 }}>
+              <CheckCircle size={20} />
             </div>
           </div>
-          <div style={{ fontSize: '0.775rem', color: 'var(--primary-dark)', marginTop: '0.5rem', fontWeight: 700 }}>
-            {totalExecutions === 0 ? 'Awaiting first execution' : `${successfulExecutions} of ${totalExecutions} completed successfully`}
+          <div className="history-metric-hint" style={{ color: 'var(--primary-dark)' }}>
+            {totalExecutions === 0 ? 'Awaiting first execution' : `${successfulExecutions} of ${totalExecutions} passed`}
           </div>
         </div>
 
-        <div className="glass-card floating-3" style={{ padding: '1.5rem', background: '#FFFFFF' }}>
+        <div className="glass-card history-metric-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <span style={{ fontSize: '0.775rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>AVG RESPONSE TIME</span>
-              <div style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--font-heading)', marginTop: '0.2rem' }}>
+              <span className="history-metric-title">AVG RESPONSE</span>
+              <div className="history-metric-value">
                 {averageResponseTime > 0 ? `${Math.round(averageResponseTime)}ms` : '0ms'}
               </div>
             </div>
-            <div style={{ background: 'var(--primary-light)', padding: '0.6rem', borderRadius: 'var(--radius-md)', color: 'var(--primary-dark)' }}>
-              <Clock size={22} />
+            <div style={{ background: 'var(--primary-light)', padding: '0.5rem', borderRadius: 'var(--radius-md)', color: 'var(--primary-dark)', flexShrink: 0 }}>
+              <Clock size={20} />
             </div>
           </div>
-          <div style={{ fontSize: '0.775rem', color: 'var(--text-muted)', marginTop: '0.5rem', fontWeight: 600 }}>
-            {totalExecutions === 0 ? 'No execution latency available' : 'Based on real execution durations'}
+          <div className="history-metric-hint" style={{ color: 'var(--text-muted)' }}>
+            {totalExecutions === 0 ? 'No latency recorded' : 'Real execution duration'}
           </div>
         </div>
 
-        <div className="glass-card floating-1" style={{ padding: '1.5rem', background: '#FFFFFF' }}>
+        <div className="glass-card history-metric-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <span style={{ fontSize: '0.775rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>AI TOKEN USAGE</span>
-              <div style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--font-heading)', marginTop: '0.2rem' }}>
+              <span className="history-metric-title">AI TOKEN USAGE</span>
+              <div className="history-metric-value">
                 {totalTokenUsage}
               </div>
             </div>
-            <div style={{ background: 'var(--primary-light)', padding: '0.6rem', borderRadius: 'var(--radius-md)', color: 'var(--primary)' }}>
-              <Cpu size={22} />
+            <div style={{ background: 'var(--primary-light)', padding: '0.5rem', borderRadius: 'var(--radius-md)', color: 'var(--primary)', flexShrink: 0 }}>
+              <Cpu size={20} />
             </div>
           </div>
-          <div style={{ fontSize: '0.775rem', color: 'var(--primary-dark)', marginTop: '0.5rem', fontWeight: 700 }}>
-            {totalTokenUsage === 0 ? 'No AI usage captured yet' : 'Actual Groq usage'}
+          <div className="history-metric-hint" style={{ color: 'var(--primary-dark)' }}>
+            {totalTokenUsage === 0 ? 'No AI tokens used yet' : 'Actual Groq tokens'}
           </div>
         </div>
       </div>
 
       {/* Floating Data Charts Section (2D Line & Bar Charts) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem', marginBottom: '2rem', perspective: 'none' }}>
+      <div className="history-charts-grid">
         {/* Main Line Graph with Rama Green Gradient */}
         <div className="glass-card floating-2" style={{ padding: '1.75rem', background: '#FFFFFF', border: '1px solid var(--border-glow)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>

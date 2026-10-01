@@ -145,16 +145,18 @@ const Automations = () => {
           </div>
         </div>
 
-        <div className="cf-recent-middle">
-          <span className={`cf-status-pill ${statusClass}`}>
-            <span className="cf-status-dot" />
-            {status || 'RUNNING'}
-          </span>
-        </div>
+        <div className="cf-recent-bottom-meta">
+          <div className="cf-recent-middle">
+            <span className={`cf-status-pill ${statusClass}`}>
+              <span className="cf-status-dot" />
+              {status || 'RUNNING'}
+            </span>
+          </div>
 
-        <div className="cf-recent-right">
-          <span className="cf-recent-time">{formatDate(automation?.createdAt || automation?.updatedAt)}</span>
-          <ChevronRight size={16} className="cf-recent-chevron" />
+          <div className="cf-recent-right">
+            <span className="cf-recent-time">{formatDate(automation?.createdAt || automation?.updatedAt)}</span>
+            <ChevronRight size={16} className="cf-recent-chevron" />
+          </div>
         </div>
       </div>
     );
