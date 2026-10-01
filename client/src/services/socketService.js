@@ -1,7 +1,8 @@
 import { io } from 'socket.io-client';
 import { getCurrentUser } from './authService';
+import { SERVER_BASE_URL } from './api';
 
-const SOCKET_SERVER_URL = 'http://localhost:5000';
+const SOCKET_SERVER_URL = SERVER_BASE_URL;
 
 class SocketService {
   constructor() {
