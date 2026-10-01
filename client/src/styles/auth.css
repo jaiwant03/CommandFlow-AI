@@ -1,0 +1,602 @@
+/* ============================================================
+   COMMANDFLOW AI — MODELLED AUTH DESIGN SYSTEM
+   Modern 3D / Clay-Glass Sculpted UI & Typography
+   ============================================================ */
+
+.auth-page-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+  background-color: #F8FAFC;
+  background-image: 
+    radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 60%),
+    radial-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 28px 28px;
+  background-position: 0 0, 0 0, 0 0, 0 0;
+  font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+}
+
+/* Ambient 3D Glowing Orbs in the background */
+.auth-ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.65;
+  animation: orbFloat 14s ease-in-out infinite alternate;
+}
+
+.auth-ambient-orb-1 {
+  width: 380px;
+  height: 380px;
+  top: -60px;
+  left: -80px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, rgba(5, 150, 105, 0.08) 70%, transparent 100%);
+}
+
+.auth-ambient-orb-2 {
+  width: 440px;
+  height: 440px;
+  bottom: -100px;
+  right: -100px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, rgba(37, 99, 235, 0.1) 70%, transparent 100%);
+  animation-duration: 18s;
+  animation-direction: alternate-reverse;
+}
+
+.auth-ambient-orb-3 {
+  width: 260px;
+  height: 260px;
+  top: 45%;
+  left: 65%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  animation-duration: 20s;
+}
+
+@keyframes orbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(25px, -20px) scale(1.05); }
+  100% { transform: translate(-20px, 15px) scale(0.96); }
+}
+
+/* ============================================================
+   MODELLED 3D CARD BOX
+   ============================================================ */
+
+.auth-modelled-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border-radius: 28px;
+  padding: 2.75rem 2.25rem 2.25rem;
+  
+  /* Sculpted / Modelled Physical Elevation & Specular Highlights */
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.03),
+    0 2px 4px 0 rgba(15, 23, 42, 0.03),
+    0 12px 28px -4px rgba(15, 23, 42, 0.07),
+    0 36px 68px -12px rgba(16, 185, 129, 0.16),
+    0 0 0 1px rgba(226, 232, 240, 0.55);
+  
+  animation: cardEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+}
+
+/* Top Bevel Specular Sheen */
+.auth-modelled-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 40px;
+  right: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.9) 25%, rgba(16, 185, 129, 0.6) 50%, rgba(6, 182, 212, 0.6) 75%, transparent 100%);
+  border-radius: 2px;
+  opacity: 0.9;
+}
+
+@keyframes cardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================================
+   BRAND HEADER & 3D EMBOSSED LOGO
+   ============================================================ */
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.auth-logo-pedestal {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  margin-bottom: 1.25rem;
+}
+
+/* Outer Pulsing Ring */
+.auth-logo-halo {
+  position: absolute;
+  inset: -6px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(6, 182, 212, 0.3) 50%, rgba(59, 130, 246, 0.25) 100%);
+  filter: blur(8px);
+  opacity: 0.75;
+  animation: logoPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes logoPulse {
+  0% { opacity: 0.55; transform: scale(0.96); }
+  100% { opacity: 0.9; transform: scale(1.04); }
+}
+
+/* Sculpted 3D Emblem */
+.auth-logo-box {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #10B981 0%, #059669 45%, #0284C7 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  
+  /* Modeled 3D bevel & drop reflection */
+  box-shadow: 
+    inset 0 2px 3px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.2),
+    0 10px 22px -3px rgba(16, 185, 129, 0.42),
+    0 3px 8px rgba(0, 0, 0, 0.08);
+  
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.auth-logo-box:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 
+    inset 0 2px 3px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.22),
+    0 14px 28px -3px rgba(16, 185, 129, 0.5),
+    0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.auth-brand-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0F172A;
+  margin: 0 0 0.45rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  line-height: 1.2;
+}
+
+.auth-brand-ai {
+  background: linear-gradient(135deg, #10B981 0%, #06B6D4 55%, #3B82F6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  font-weight: 900;
+}
+
+/* Modelled Pill Badge */
+.auth-subtitle-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.85rem;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 9999px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #047857;
+  letter-spacing: 0.01em;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6), 0 2px 6px rgba(16, 185, 129, 0.06);
+}
+
+/* ============================================================
+   ERROR ALERT
+   ============================================================ */
+
+.auth-alert-error {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #FEF2F2;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #B91C1C;
+  padding: 0.8rem 1rem;
+  border-radius: 14px;
+  margin-bottom: 1.25rem;
+  font-size: 0.84rem;
+  font-weight: 500;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.8), 0 3px 10px rgba(239, 68, 68, 0.08);
+  animation: shakeAlert 0.4s ease;
+}
+
+@keyframes shakeAlert {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+/* ============================================================
+   MODELLED FORM & INPUTS
+   ============================================================ */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.auth-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.auth-field-label {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #334155;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Modelled Inset Cavity Input Container */
+.auth-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-radius: 15px;
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 
+    inset 0 2px 4px rgba(15, 23, 42, 0.04),
+    0 1px 1px rgba(255, 255, 255, 0.9);
+}
+
+.auth-input-wrapper:hover {
+  border-color: #CBD5E1;
+  background: #FFFFFF;
+}
+
+.auth-input-wrapper.is-focused {
+  background: #FFFFFF;
+  border-color: #10B981;
+  box-shadow: 
+    0 0 0 4px rgba(16, 185, 129, 0.14),
+    inset 0 1px 2px rgba(0, 0, 0, 0.02),
+    0 6px 16px rgba(16, 185, 129, 0.08);
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 1.05rem;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.auth-input-wrapper.is-focused .auth-input-icon {
+  color: #10B981;
+  transform: scale(1.08);
+}
+
+.auth-input-field {
+  width: 100%;
+  padding: 0.82rem 1rem 0.82rem 2.85rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #0F172A;
+  background: transparent;
+  border: none;
+  outline: none;
+  border-radius: 15px;
+}
+
+.auth-input-field::placeholder {
+  color: #94A3B8;
+  font-weight: 400;
+}
+
+.auth-password-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0 1rem;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  height: 100%;
+}
+
+.auth-password-toggle:hover {
+  color: #334155;
+}
+
+/* ============================================================
+   REMEMBER ME & AUXILIARY ROW
+   ============================================================ */
+
+.auth-aux-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  margin-top: -0.2rem;
+}
+
+.auth-remember-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #475569;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
+
+.auth-checkbox-custom {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 17px;
+  height: 17px;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 5px;
+  background: #F8FAFC;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.auth-checkbox-custom:checked {
+  background: #10B981;
+  border-color: #10B981;
+}
+
+.auth-checkbox-custom:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.auth-forgot-link {
+  color: #0284C7;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.auth-forgot-link:hover {
+  color: #0369A1;
+  text-decoration: underline;
+}
+
+/* ============================================================
+   MODELLED 3D TACTILE SUBMIT BUTTON
+   ============================================================ */
+
+.auth-modelled-btn {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.88rem 1.5rem;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #FFFFFF;
+  
+  /* Sculpted 3D Multi-Stop Gradient */
+  background: linear-gradient(135deg, #10B981 0%, #059669 45%, #0284C7 100%);
+  
+  /* 3D Chamfer Bevel & Dynamic Drop Elevation */
+  box-shadow: 
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.15),
+    0 8px 22px -3px rgba(16, 185, 129, 0.45),
+    0 3px 6px -1px rgba(2, 132, 199, 0.25);
+  
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Specular Shimmer Sweep */
+.auth-modelled-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-22deg);
+  transition: none;
+}
+
+.auth-modelled-btn:hover:not(:disabled)::after {
+  left: 150%;
+  transition: left 0.85s ease-in-out;
+}
+
+.auth-modelled-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.18),
+    0 14px 28px -4px rgba(16, 185, 129, 0.52),
+    0 6px 12px -2px rgba(2, 132, 199, 0.32);
+}
+
+.auth-modelled-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.25),
+    0 4px 10px rgba(16, 185, 129, 0.3);
+}
+
+.auth-modelled-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Spinner */
+.auth-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   CARD FOOTER & TOGGLES
+   ============================================================ */
+
+.auth-footer {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.auth-switch-text {
+  font-size: 0.86rem;
+  color: #64748B;
+  text-align: center;
+}
+
+.auth-switch-link {
+  color: #059669;
+  font-weight: 700;
+  text-decoration: none;
+  margin-left: 0.25rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.auth-switch-link:hover {
+  color: #047857;
+  text-decoration: underline;
+}
+
+/* Modelled Intro Replay Pill */
+.auth-replay-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 1rem;
+  border-radius: 9999px;
+  background: rgba(241, 245, 249, 0.85);
+  border: 1px solid rgba(203, 213, 225, 0.75);
+  color: #475569;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-replay-pill:hover {
+  background: #ECFDF5;
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12);
+}
+
+/* Feature Highlights Bar */
+.auth-features-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.auth-feature-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}

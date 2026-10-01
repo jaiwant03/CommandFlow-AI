@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../services/authService';
-import { Bot, ArrowRight, Lock, Mail, Sparkles } from 'lucide-react';
+import { Bot, ArrowRight, Lock, Mail, Sparkles, Eye, EyeOff, AlertCircle, ShieldCheck, Zap, Radio } from 'lucide-react';
 import HandwrittenIntro from '../components/HandwrittenIntro';
 import '../styles/global.css';
+import '../styles/auth.css';
 
 const Login = () => {
   const [showIntro, setShowIntro] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+  const [focusedField, setFocusedField] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -22,10 +26,10 @@ const Login = () => {
       if (res.success) {
         navigate('/dashboard');
       } else {
-        setError(res.message || 'Login failed.');
+        setError(res.message || 'Login failed. Please check your credentials.');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid email or password.');
+      setError(err.response?.data?.message || 'Invalid email or password. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -41,129 +45,171 @@ const Login = () => {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '2rem',
-      background: '#F8FAFC',
-      backgroundImage: 'radial-gradient(circle at 15% 15%, rgba(0, 200, 150, 0.08) 0%, transparent 40%), radial-gradient(circle at 85% 75%, rgba(0, 200, 150, 0.06) 0%, transparent 45%)'
-    }}>
-      <div
-        className="glass-card"
-        style={{
-          width: '100%',
-          maxWidth: '440px',
-          padding: '2.5rem',
-          animation: 'loginEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div className="brand-logo" style={{ margin: '0 auto 1rem', width: '48px', height: '48px' }}>
-            <Bot size={28} />
+    <div className="auth-page-container">
+      {/* Dynamic Ambient 3D Glowing Orbs */}
+      <div className="auth-ambient-orb auth-ambient-orb-1" aria-hidden="true" />
+      <div className="auth-ambient-orb auth-ambient-orb-2" aria-hidden="true" />
+      <div className="auth-ambient-orb auth-ambient-orb-3" aria-hidden="true" />
+
+      {/* Modeled 3D Sculpted Card */}
+      <div className="auth-modelled-card">
+        {/* Brand Header */}
+        <div className="auth-header">
+          <div className="auth-logo-pedestal">
+            <div className="auth-logo-halo" />
+            <div className="auth-logo-box">
+              <Bot size={34} strokeWidth={2.2} />
+            </div>
           </div>
-          <h2 className="page-title" style={{ fontSize: '1.75rem' }}>CommandFlow AI</h2>
-          <p className="page-subtitle" style={{ fontSize: '0.85rem' }}>
-            Voice-to-Action Multi-Channel Automation Platform
-          </p>
+
+          <h1 className="auth-brand-title">
+            <span>CommandFlow</span>
+            <span className="auth-brand-ai">AI</span>
+          </h1>
+
+          <div className="auth-subtitle-pill">
+            <Sparkles size={13} color="#059669" />
+            <span>Voice-to-Action Automation Platform</span>
+          </div>
         </div>
 
+        {/* Error Notification */}
         {error && (
-          <div style={{
-            background: 'var(--danger-bg)',
-            border: '1px solid rgba(220, 38, 38, 0.25)',
-            color: 'var(--danger)',
-            padding: '0.75rem',
-            borderRadius: 'var(--radius-md)',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-            textAlign: 'center'
-          }}>
-            {error}
+          <div className="auth-alert-error" role="alert">
+            <AlertCircle size={18} style={{ flexShrink: 0 }} />
+            <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <label className="form-label">Email Address</label>
-            <div style={{ position: 'relative' }}>
-              <Mail size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)' }} />
+        {/* Modeled Form */}
+        <form onSubmit={handleLogin} className="auth-form" noValidate>
+          {/* Email Field */}
+          <div className="auth-field-group">
+            <label className="auth-field-label" htmlFor="auth-email">
+              <span>Email Address</span>
+            </label>
+            <div className={`auth-input-wrapper ${focusedField === 'email' ? 'is-focused' : ''}`}>
+              <div className="auth-input-icon">
+                <Mail size={18} />
+              </div>
               <input
+                id="auth-email"
                 type="email"
-                className="form-input"
-                style={{ paddingLeft: '2.5rem', width: '100%' }}
-                placeholder="name@example.com"
+                className="auth-input-field"
+                placeholder="name@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onFocus={() => setFocusedField('email')}
+                onBlur={() => setFocusedField(null)}
+                autoComplete="email"
                 required
               />
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <div style={{ position: 'relative' }}>
-              <Lock size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)' }} />
+          {/* Password Field */}
+          <div className="auth-field-group">
+            <label className="auth-field-label" htmlFor="auth-password">
+              <span>Password</span>
+            </label>
+            <div className={`auth-input-wrapper ${focusedField === 'password' ? 'is-focused' : ''}`}>
+              <div className="auth-input-icon">
+                <Lock size={18} />
+              </div>
               <input
-                type="password"
-                className="form-input"
-                style={{ paddingLeft: '2.5rem', width: '100%' }}
-                placeholder="••••••••"
+                id="auth-password"
+                type={showPassword ? 'text' : 'password'}
+                className="auth-input-field"
+                placeholder="••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setFocusedField('password')}
+                onBlur={() => setFocusedField(null)}
+                autoComplete="current-password"
                 required
               />
+              <button
+                type="button"
+                className="auth-password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                title={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
+          {/* Auxiliary Options: Remember Me & Forgot Password */}
+          <div className="auth-aux-row">
+            <label className="auth-remember-label">
+              <input
+                type="checkbox"
+                className="auth-checkbox-custom"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <span>Remember me</span>
+            </label>
+            <span className="auth-forgot-link" style={{ opacity: 0.85, cursor: 'pointer' }} onClick={() => setError('Contact your workspace administrator to reset your credentials.')}>
+              Forgot password?
+            </span>
+          </div>
+
+          {/* Modeled 3D Tactile Submit Button */}
           <button
             type="submit"
-            className="btn btn-primary"
-            style={{ width: '100%', marginTop: '1rem', padding: '0.75rem' }}
+            className="auth-modelled-btn"
             disabled={loading}
           >
-            {loading ? 'Authenticating...' : 'Sign In to Workspace'}
-            {!loading && <ArrowRight size={16} />}
+            {loading ? (
+              <>
+                <div className="auth-spinner" />
+                <span>Authenticating Workspace...</span>
+              </>
+            ) : (
+              <>
+                <span>Sign In to Workspace</span>
+                <ArrowRight size={18} strokeWidth={2.4} />
+              </>
+            )}
           </button>
         </form>
 
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-          Don't have an account? <Link to="/signup" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>Create Account</Link>
-        </div>
+        {/* Modeled Card Footer */}
+        <div className="auth-footer">
+          <div className="auth-switch-text">
+            Don't have an account?{' '}
+            <Link to="/signup" className="auth-switch-link">
+              Create Account
+            </Link>
+          </div>
 
-        <div style={{ marginTop: '1.2rem', textAlign: 'center' }}>
           <button
             type="button"
             onClick={() => setShowIntro(true)}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              background: 'rgba(0, 0, 0, 0.03)',
-              border: '1px solid rgba(0, 0, 0, 0.08)',
-              color: 'var(--text-muted)',
-              fontSize: '0.78rem',
-              cursor: 'pointer',
-              padding: '0.4rem 0.8rem',
-              borderRadius: '9999px',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = 'var(--primary-dark)';
-              e.currentTarget.style.borderColor = 'var(--primary)';
-              e.currentTarget.style.background = 'var(--primary-light)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'var(--text-muted)';
-              e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.08)';
-              e.currentTarget.style.background = 'rgba(0, 0, 0, 0.03)';
-            }}
-            title="Replay the 5-second handwritten CommandFlow AI animation"
+            className="auth-replay-pill"
+            title="Replay the 5-second handwritten CommandFlow AI signature animation"
           >
-            <Sparkles size={13} color="var(--primary)" />
+            <Sparkles size={14} color="#10B981" />
             <span>Replay Handwritten Intro (5s)</span>
           </button>
+
+          {/* Trust & Capabilities Bar */}
+          <div className="auth-features-bar">
+            <div className="auth-feature-chip">
+              <Radio size={12} color="#10B981" />
+              <span>Voice Automation</span>
+            </div>
+            <div className="auth-feature-chip">
+              <Zap size={12} color="#0284C7" />
+              <span>Zero Latency</span>
+            </div>
+            <div className="auth-feature-chip">
+              <ShieldCheck size={12} color="#059669" />
+              <span>Enterprise Ready</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

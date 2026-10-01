@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signupUser } from '../services/authService';
-import { Bot, ArrowRight, Lock, Mail, User } from 'lucide-react';
+import { Bot, ArrowRight, Lock, Mail, User, Sparkles, Eye, EyeOff, AlertCircle, ShieldCheck, Zap, Radio } from 'lucide-react';
 import '../styles/global.css';
+import '../styles/auth.css';
 
 const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [focusedField, setFocusedField] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -21,123 +24,179 @@ const Signup = () => {
       if (res.success) {
         navigate('/dashboard');
       } else {
-        setError(res.message || 'Signup failed.');
+        setError(res.message || 'Signup failed. Please try again.');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Error creating account.');
+      setError(err.response?.data?.message || 'Error creating account. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '2rem',
-      background: '#FFFFFF'
-    }}>
-      <div
-        className="glass-card"
-        style={{
-          width: '100%',
-          maxWidth: '440px',
-          padding: '2.5rem',
-          position: 'relative',
-          zIndex: 1,
-          background: '#FFFFFF',
-          boxShadow: '0 18px 48px rgba(15, 23, 42, 0.14)',
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div className="brand-logo" style={{ margin: '0 auto 1rem', width: '48px', height: '48px' }}>
-            <Bot size={28} />
+    <div className="auth-page-container">
+      {/* Dynamic Ambient 3D Glowing Orbs */}
+      <div className="auth-ambient-orb auth-ambient-orb-1" aria-hidden="true" />
+      <div className="auth-ambient-orb auth-ambient-orb-2" aria-hidden="true" />
+      <div className="auth-ambient-orb auth-ambient-orb-3" aria-hidden="true" />
+
+      {/* Modeled 3D Sculpted Card */}
+      <div className="auth-modelled-card">
+        {/* Brand Header */}
+        <div className="auth-header">
+          <div className="auth-logo-pedestal">
+            <div className="auth-logo-halo" />
+            <div className="auth-logo-box">
+              <Bot size={34} strokeWidth={2.2} />
+            </div>
           </div>
-          <h2 className="page-title" style={{ fontSize: '1.75rem' }}>Create Account</h2>
-          <p className="page-subtitle" style={{ fontSize: '0.85rem' }}>
-            Get started with AI-Powered Voice Automations
-          </p>
+
+          <h1 className="auth-brand-title">
+            <span>Create</span>
+            <span className="auth-brand-ai">Account</span>
+          </h1>
+
+          <div className="auth-subtitle-pill">
+            <Sparkles size={13} color="#059669" />
+            <span>Join CommandFlow AI Automation</span>
+          </div>
         </div>
 
+        {/* Error Notification */}
         {error && (
-          <div style={{
-            background: 'rgba(248, 113, 113, 0.15)',
-            border: '1px solid rgba(248, 113, 113, 0.3)',
-            color: 'var(--danger)',
-            padding: '0.75rem',
-            borderRadius: 'var(--radius-md)',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-            textAlign: 'center'
-          }}>
-            {error}
+          <div className="auth-alert-error" role="alert">
+            <AlertCircle size={18} style={{ flexShrink: 0 }} />
+            <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSignup}>
-          <div className="form-group">
-            <label className="form-label">Full Name</label>
-            <div style={{ position: 'relative' }}>
-              <User size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)' }} />
+        {/* Modeled Form */}
+        <form onSubmit={handleSignup} className="auth-form" noValidate>
+          {/* Full Name Field */}
+          <div className="auth-field-group">
+            <label className="auth-field-label" htmlFor="signup-name">
+              <span>Full Name</span>
+            </label>
+            <div className={`auth-input-wrapper ${focusedField === 'name' ? 'is-focused' : ''}`}>
+              <div className="auth-input-icon">
+                <User size={18} />
+              </div>
               <input
+                id="signup-name"
                 type="text"
-                className="form-input"
-                style={{ paddingLeft: '2.5rem', width: '100%' }}
-                placeholder="John Doe"
+                className="auth-input-field"
+                placeholder="Jane Cooper"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                onFocus={() => setFocusedField('name')}
+                onBlur={() => setFocusedField(null)}
+                autoComplete="name"
                 required
               />
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Email Address</label>
-            <div style={{ position: 'relative' }}>
-              <Mail size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)' }} />
+          {/* Email Field */}
+          <div className="auth-field-group">
+            <label className="auth-field-label" htmlFor="signup-email">
+              <span>Email Address</span>
+            </label>
+            <div className={`auth-input-wrapper ${focusedField === 'email' ? 'is-focused' : ''}`}>
+              <div className="auth-input-icon">
+                <Mail size={18} />
+              </div>
               <input
+                id="signup-email"
                 type="email"
-                className="form-input"
-                style={{ paddingLeft: '2.5rem', width: '100%' }}
-                placeholder="name@example.com"
+                className="auth-input-field"
+                placeholder="jane@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onFocus={() => setFocusedField('email')}
+                onBlur={() => setFocusedField(null)}
+                autoComplete="email"
                 required
               />
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <div style={{ position: 'relative' }}>
-              <Lock size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)' }} />
+          {/* Password Field */}
+          <div className="auth-field-group">
+            <label className="auth-field-label" htmlFor="signup-password">
+              <span>Password</span>
+            </label>
+            <div className={`auth-input-wrapper ${focusedField === 'password' ? 'is-focused' : ''}`}>
+              <div className="auth-input-icon">
+                <Lock size={18} />
+              </div>
               <input
-                type="password"
-                className="form-input"
-                style={{ paddingLeft: '2.5rem', width: '100%' }}
-                placeholder="••••••••"
+                id="signup-password"
+                type={showPassword ? 'text' : 'password'}
+                className="auth-input-field"
+                placeholder="At least 6 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setFocusedField('password')}
+                onBlur={() => setFocusedField(null)}
+                autoComplete="new-password"
                 required
               />
+              <button
+                type="button"
+                className="auth-password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                title={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
+          {/* Modeled 3D Tactile Submit Button */}
           <button
             type="submit"
-            className="btn btn-primary"
-            style={{ width: '100%', marginTop: '1rem', padding: '0.75rem' }}
+            className="auth-modelled-btn"
             disabled={loading}
           >
-            {loading ? 'Creating Account...' : 'Register & Start'}
-            {!loading && <ArrowRight size={16} />}
+            {loading ? (
+              <>
+                <div className="auth-spinner" />
+                <span>Creating Workspace...</span>
+              </>
+            ) : (
+              <>
+                <span>Register & Get Started</span>
+                <ArrowRight size={18} strokeWidth={2.4} />
+              </>
+            )}
           </button>
         </form>
 
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-          Already have an account? <Link to="/login" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>Sign In</Link>
+        {/* Modeled Card Footer */}
+        <div className="auth-footer">
+          <div className="auth-switch-text">
+            Already have an account?{' '}
+            <Link to="/login" className="auth-switch-link">
+              Sign In
+            </Link>
+          </div>
+
+          {/* Trust & Capabilities Bar */}
+          <div className="auth-features-bar">
+            <div className="auth-feature-chip">
+              <Radio size={12} color="#10B981" />
+              <span>Voice Automation</span>
+            </div>
+            <div className="auth-feature-chip">
+              <Zap size={12} color="#0284C7" />
+              <span>Zero Latency</span>
+            </div>
+            <div className="auth-feature-chip">
+              <ShieldCheck size={12} color="#059669" />
+              <span>Enterprise Ready</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
