@@ -1,11 +1,12 @@
 import React from 'react';
 import { FileText, Download, X, Eye } from 'lucide-react';
+import { SERVER_BASE_URL } from '../services/api';
 import '../styles/history.css';
 
 const DocumentPreview = ({ document: docItem, onClose }) => {
   if (!docItem) return null;
 
-  const pdfUrl = docItem.pdfPath ? `http://localhost:5000${docItem.pdfPath}` : null;
+  const pdfUrl = docItem.pdfPath ? `${SERVER_BASE_URL}${docItem.pdfPath}` : null;
 
   return (
     <div className="modal-backdrop" onClick={onClose}>

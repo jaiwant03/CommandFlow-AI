@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchDocuments, generateDocument } from '../services/automationService';
+import { SERVER_BASE_URL } from '../services/api';
 import DocumentPreview from '../components/DocumentPreview';
 import HandwrittenHeading from '../components/HandwrittenHeading';
 import { FileText, Plus, Download, Eye, Sparkles } from 'lucide-react';
@@ -97,7 +98,7 @@ const Documents = () => {
                 </button>
                 {doc.pdfPath && (
                   <a
-                    href={`http://localhost:5000${doc.pdfPath}`}
+                    href={`${SERVER_BASE_URL}${doc.pdfPath}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-primary"
