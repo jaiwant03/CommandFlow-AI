@@ -2112,8 +2112,7 @@ path:not(.chart-fill) {
   }
 
   .cf-voice-btn {
-
-    align-self: flex-start;
+    display: none !important;
   }
 
   .cf-stats-grid {
