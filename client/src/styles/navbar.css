@@ -8,18 +8,20 @@
    ============================================================ */
 
 .navbar {
-  height: 64px;
+  min-height: 58px;
+  height: auto;
   background: #FFFFFF;
   border-bottom: 1px solid #E8EEF5;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.75rem;
+  padding: max(env(safe-area-inset-top, 0px), 8px) 1.25rem 8px 1.25rem;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.025);
   font-family: var(--font-body);
+  box-sizing: border-box;
 }
 
 .navbar-left {
@@ -332,8 +334,39 @@
 }
 
 @media (max-width: 1024px) {
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: min(300px, 85vw) !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    z-index: 2500 !important;
+    transform: translateX(-105%) !important;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 10px 0 35px rgba(15, 23, 42, 0.18) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: #FFFFFF !important;
+  }
+
+  .sidebar.open {
+    transform: translateX(0) !important;
+  }
+
   .sidebar-mobile-close-btn {
     display: flex !important;
+  }
+
+  .sidebar-rocket-card {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-right .btn-secondary {
+    display: none !important;
   }
 }
 

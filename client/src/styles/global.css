@@ -1593,17 +1593,6 @@ code, pre, kbd, samp {
     padding:
       1.5rem;
   }
-  
-  .sidebar {
-    position: fixed;
-    left: -260px;
-    transition: left 0.3s ease;
-    z-index: 200;
-  }
-  
-  .sidebar.open {
-    left: 0;
-  }
 }
 
 
