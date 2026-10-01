@@ -1,0 +1,99 @@
+/* ============================================================
+   COMMANDFLOW AI — MOBILE BOTTOM NAVIGATION
+   Optimized for Android Capacitor & Mobile Viewports
+   ============================================================ */
+
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.06);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .bottom-nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 60px;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 0 0.5rem;
+  }
+
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    min-width: 44px;
+    color: #64748B;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    padding: 0.35rem 0.2rem;
+    gap: 0.2rem;
+    border-radius: 10px;
+    transition: all 0.18s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .bottom-nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    transition: transform 0.18s ease;
+  }
+
+  .bottom-nav-label {
+    font-size: 0.685rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    font-family: var(--font-body, system-ui, sans-serif);
+    transition: color 0.18s ease;
+  }
+
+  .bottom-nav-item.active {
+    color: var(--primary, #10B981);
+  }
+
+  .bottom-nav-item.active .bottom-nav-icon {
+    transform: translateY(-2px);
+    color: var(--primary, #10B981);
+  }
+
+  .bottom-nav-item:active {
+    transform: scale(0.94);
+  }
+
+  .bottom-nav-menu-btn {
+    color: #475569;
+  }
+
+  /* Add space at bottom of pages so bottom nav doesn't cover content */
+  .page-container,
+  .cf-dashboard-inner,
+  .automations-page,
+  .contacts-page,
+  .history-page,
+  .settings-page {
+    padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
