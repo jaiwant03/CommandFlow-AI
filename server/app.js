@@ -24,9 +24,32 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
-// CORS Configuration
+// CORS Configuration (Supports local web, deployed web, and Capacitor mobile origins)
+const allowedOrigins = [
+  config.clientUrl,
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'capacitor://localhost',
+  'http://localhost',
+  'https://localhost'
+].filter(Boolean);
+
 app.use(cors({
-  origin: config.clientUrl || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow non-browser requests (mobile apps, Postman, server-to-server)
+    if (!origin) return callback(null, true);
+
+    const clientUrls = (config.clientUrl || '').split(',').map((u) => u.trim());
+    if (allowedOrigins.includes(origin) || clientUrls.includes(origin)) {
+      return callback(null, true);
+    }
+
+    if (config.env === 'development' && origin.startsWith('http://localhost')) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true
 }));
 
@@ -36,7 +59,12 @@ app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Health Check Endpoints
-app.get('/health', getHealthStatus);
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    service: 'commandflow-backend'
+  });
+});
 app.get('/api/health', getHealthStatus);
 
 // Apply rate limiter to API routes

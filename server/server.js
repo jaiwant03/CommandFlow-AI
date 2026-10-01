@@ -51,10 +51,10 @@ const startServer = async () => {
 
     const PORT = config.port;
 
-    server.listen(PORT, () => {
+    server.listen(PORT, '0.0.0.0', () => {
       console.log(`====================================================`);
       console.log(`[CommandFlow AI] Modular Monolith Server Online`);
-      console.log(`[CommandFlow AI] URL: http://localhost:${PORT}`);
+      console.log(`[CommandFlow AI] URL: http://0.0.0.0:${PORT}`);
       console.log(`[CommandFlow AI] Realtime: Socket.IO initialized`);
       console.log(`[CommandFlow AI] Queue: BullMQ commandQueue active`);
       console.log(`[CommandFlow AI] Environment: ${config.env}`);
