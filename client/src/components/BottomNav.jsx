@@ -6,7 +6,7 @@ import '../styles/bottomNav.css';
 const BottomNav = ({ onOpenMenu }) => {
   const navTabs = [
     { label: 'Command', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-    { label: 'Automations', path: '/automations', icon: <Zap size={20} /> },
+    { label: 'Automate', path: '/automations', icon: <Zap size={20} /> },
     { label: 'Schedules', path: '/schedules', icon: <Calendar size={20} /> },
     { label: 'History', path: '/history', icon: <History size={20} /> }
   ];
@@ -29,7 +29,7 @@ const BottomNav = ({ onOpenMenu }) => {
           type="button"
           className="bottom-nav-item bottom-nav-menu-btn"
           onClick={onOpenMenu}
-          title="More Options"
+          title="Open Navigation Menu"
         >
           <div className="bottom-nav-icon">
             <Menu size={20} />
