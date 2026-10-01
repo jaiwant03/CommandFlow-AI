@@ -96,7 +96,7 @@ const LanguageSelector = ({ selectedLanguage = 'auto', onSelectLanguage }) => {
         </div>
 
         <div className="lang-trigger-content">
-          <span className="lang-flag">{activeOption.flag}</span>
+          {activeOption.id !== 'auto' && <span className="lang-flag">{activeOption.flag}</span>}
           <span className="lang-label">{activeOption.label}</span>
           <span className="lang-badge-pill">{activeOption.badge}</span>
         </div>
