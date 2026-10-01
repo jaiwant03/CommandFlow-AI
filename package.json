@@ -8,6 +8,10 @@
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
     "worker": "npm run worker --prefix server",
-    "test": "npm test --prefix server"
+    "test": "npm test --prefix server",
+    "build:client": "npm run build --prefix client",
+    "cap:sync": "npm run cap:sync --prefix client",
+    "cap:open": "npm run cap:open --prefix client",
+    "cap:build": "npm run cap:build --prefix client"
   }
 }
