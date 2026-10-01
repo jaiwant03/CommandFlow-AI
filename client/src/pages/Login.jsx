@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../services/authService';
 import { Bot, ArrowRight, Lock, Mail, Sparkles, Eye, EyeOff, AlertCircle, ShieldCheck, Zap, Radio } from 'lucide-react';
-import HandwrittenIntro from '../components/HandwrittenIntro';
 import '../styles/global.css';
 import '../styles/auth.css';
 
 const Login = () => {
-  const [showIntro, setShowIntro] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -34,15 +32,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-
-  if (showIntro) {
-    return (
-      <HandwrittenIntro
-        duration={5000}
-        onComplete={() => setShowIntro(false)}
-      />
-    );
-  }
 
   return (
     <div className="auth-page-container">
@@ -151,7 +140,11 @@ const Login = () => {
               />
               <span>Remember me</span>
             </label>
-            <span className="auth-forgot-link" style={{ opacity: 0.85, cursor: 'pointer' }} onClick={() => setError('Contact your workspace administrator to reset your credentials.')}>
+            <span
+              className="auth-forgot-link"
+              style={{ opacity: 0.85, cursor: 'pointer' }}
+              onClick={() => setError('Contact your workspace administrator to reset your credentials.')}
+            >
               Forgot password?
             </span>
           </div>
@@ -184,16 +177,6 @@ const Login = () => {
               Create Account
             </Link>
           </div>
-
-          <button
-            type="button"
-            onClick={() => setShowIntro(true)}
-            className="auth-replay-pill"
-            title="Replay the 5-second handwritten CommandFlow AI signature animation"
-          >
-            <Sparkles size={14} color="#10B981" />
-            <span>Replay Handwritten Intro (5s)</span>
-          </button>
 
           {/* Trust & Capabilities Bar */}
           <div className="auth-features-bar">
