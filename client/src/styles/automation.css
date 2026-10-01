@@ -725,12 +725,6 @@
   .cf-recent-meta {
     font-size: 0.725rem;
   }
-    font-size: 0.85rem;
-  }
-
-  .cf-recent-meta {
-    font-size: 0.75rem;
-  }
 
   .cf-services-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
