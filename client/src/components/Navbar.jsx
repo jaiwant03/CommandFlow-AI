@@ -20,9 +20,9 @@ const Navbar = ({ toggleSidebar, currentLanguage, setLanguage }) => {
     <header className="navbar">
       <div className="navbar-left">
         <button
-          className="btn btn-secondary"
+          className="navbar-toggle-btn"
           onClick={toggleSidebar}
-          style={{ padding: '0.4rem', display: 'flex', alignItems: 'center' }}
+          aria-label="Toggle Navigation"
           title="Toggle Navigation"
         >
           <Menu size={20} />
@@ -49,9 +49,8 @@ const Navbar = ({ toggleSidebar, currentLanguage, setLanguage }) => {
         </button>
 
         <button
-          className="btn btn-secondary"
+          className="navbar-logout-btn"
           onClick={handleLogout}
-          style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
           title="Sign Out"
         >
           <LogOut size={16} />

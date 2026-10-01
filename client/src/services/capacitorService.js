@@ -20,8 +20,8 @@ export const initCapacitor = async () => {
   }
 
   try {
-    // Configure Status Bar for Android
-    await StatusBar.setStyle({ style: Style.Dark });
+    // Configure Status Bar for Android (Dark icons on white background)
+    await StatusBar.setStyle({ style: Style.Light });
     await StatusBar.setBackgroundColor({ color: '#FFFFFF' });
     await StatusBar.setOverlaysWebView({ overlay: false });
   } catch (e) {
