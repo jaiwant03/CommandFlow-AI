@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Sparkles, Loader, Image as ImageIcon, X, Mic, MicOff } from 'lucide-react';
-import '../styles/automation.css';
+import '../styles/commandInput.css';
 
 const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
   const [attachments, setAttachments] = useState([]);
@@ -13,7 +13,7 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
   const toggleSpeechToText = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      setErrorMsg('Speech recognition is not supported in your browser. Please type your command.');
+      setErrorMsg('Speech recognition is not supported in this browser. Please type your command.');
       return;
     }
 
@@ -35,7 +35,7 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
 
       rec.onstart = () => {
         setIsListening(true);
-        setSpeechStatus('🔴 Listening... Speak now and text will appear live in the box below!');
+        setSpeechStatus('Listening... Speak now');
       };
 
       rec.onresult = (event) => {
@@ -54,7 +54,7 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
         const combined = (finalText + interimText).trim();
         if (combined) {
           onChange(combined);
-          setSpeechStatus('✨ Speech converted to text live in input box!');
+          setSpeechStatus('Speech converted to text!');
         }
       };
 
@@ -62,11 +62,11 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
         console.warn('Speech recognition event:', event.error);
         if (event.error !== 'no-speech' && event.error !== 'aborted') {
           if (event.error === 'not-allowed') {
-            setErrorMsg('Microphone access denied. Please allow microphone permissions in your browser settings.');
+            setErrorMsg('Microphone access denied. Please allow microphone permissions.');
           } else if (event.error === 'audio-capture') {
-            setErrorMsg('No microphone detected. Please connect a microphone and try again.');
+            setErrorMsg('No microphone detected. Please check microphone.');
           } else {
-            setErrorMsg(`Voice input notice (${event.error}). You can type or try speaking again.`);
+            setErrorMsg(`Voice input notice (${event.error}).`);
           }
         }
         setIsListening(false);
@@ -96,7 +96,7 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
     const invalidFile = files.find(f => !allowedTypes.includes(f.type.toLowerCase()) && !f.type.startsWith('image/'));
 
     if (invalidFile) {
-      setErrorMsg('Please upload a valid image file.');
+      setErrorMsg('Please upload a valid image file (PNG, JPG, WebP).');
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
@@ -106,7 +106,7 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
         const reader = new FileReader();
         reader.onload = () => {
           resolve({
-            file, // Preserve raw JavaScript File object for FormData upload
+            file,
             filename: file.name,
             contentType: file.type || 'image/png',
             data: reader.result
@@ -139,257 +139,138 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
   };
 
   const sampleCommands = [
-    "Send my bonafide letter to admin@example.com through Gmail",
-    "Send a Telegram message saying I will be late",
-    "Send hello to admin@example.com through Gmail tomorrow at 9 AM"
+    "Send bonafide letter to admin@example.com through Gmail",
+    "Send Telegram message saying I will be late",
+    "Send greetings to team through Gmail tomorrow at 9 AM"
   ];
 
   return (
-    <div className="command-input-container" style={{ width: '100%' }}>
-      <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', width: '100%', flexWrap: 'wrap' }}>
-          <div style={{ flex: '1 1 300px', position: 'relative', minWidth: '240px' }}>
-            <input
-              type="text"
-              className="command-input-box"
-              placeholder="Tell CommandFlow what you want to do..."
-              value={value}
-              onChange={(e) => onChange(e.target.value)}
-              disabled={isLoading}
-              style={{
-                width: '100%',
-                padding: '1rem 1.35rem',
-                fontSize: '1.05rem',
-                fontWeight: 500,
-                letterSpacing: '-0.015em',
-                borderRadius: 'var(--radius-lg)',
-                border: isListening ? '2px solid #10B981' : '2px solid var(--border-color)',
-                outline: 'none',
-                fontFamily: 'var(--font-body)',
-                backgroundColor: '#FFFFFF',
-                boxShadow: isListening ? '0 0 0 4px rgba(16, 185, 129, 0.15)' : 'var(--shadow-sm)',
-                transition: 'all 0.2s ease'
-              }}
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={toggleSpeechToText}
+    <div className="unified-cmd-container">
+      <form onSubmit={handleSubmit} className="unified-cmd-form">
+        {/* Main Card Surface */}
+        <div className={`unified-cmd-card ${isListening ? 'listening-active' : ''}`}>
+          <textarea
+            rows={2}
+            className="unified-cmd-textarea"
+            placeholder="Tell CommandFlow what you want to automate..."
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
             disabled={isLoading}
-            title={isListening ? "Stop Listening" : "Speak Command (Voice to Text)"}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.45rem',
-              padding: '0.95rem 1.3rem',
-              fontFamily: 'var(--font-body)',
-              fontSize: '0.925rem',
-              fontWeight: 650,
-              letterSpacing: '-0.01em',
-              borderRadius: 'var(--radius-lg)',
-              backgroundColor: isListening ? '#FEF2F2' : '#F8FAFC',
-              color: isListening ? '#EF4444' : '#0F172A',
-              border: isListening ? '2px solid #EF4444' : '2px solid #CBD5E1',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.15s ease',
-              boxShadow: 'var(--shadow-sm)',
-              height: '50px'
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e);
+              }
             }}
-          >
-            {isListening ? (
-              <>
-                <MicOff size={19} color="#EF4444" />
-                <span>Stop Listening</span>
-              </>
-            ) : (
-              <>
-                <Mic size={19} color="#10B981" />
-                <span>Speak</span>
-              </>
-            )}
-          </button>
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/png, image/jpeg, image/jpg, image/webp"
-            multiple
-            style={{ display: 'none' }}
-            id="cmd-image-upload-input"
           />
 
-          <button
-            type="button"
-            onClick={() => fileInputRef.current && fileInputRef.current.click()}
-            disabled={isLoading}
-            title="Upload Image Attachment"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.45rem',
-              padding: '0.95rem 1.3rem',
-              fontFamily: 'var(--font-body)',
-              fontSize: '0.925rem',
-              fontWeight: 650,
-              letterSpacing: '-0.01em',
-              borderRadius: 'var(--radius-lg)',
-              backgroundColor: '#F1F5F9',
-              color: '#0F172A',
-              border: '2px solid #CBD5E1',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.15s ease',
-              boxShadow: 'var(--shadow-sm)',
-              height: '50px'
-            }}
-          >
-            <ImageIcon size={19} color="#2563EB" />
-            <span>Upload Image</span>
-          </button>
+          {/* Attachment Preview Chips */}
+          {attachments.length > 0 && (
+            <div className="unified-cmd-attachments">
+              {attachments.map((att, idx) => (
+                <div key={idx} className="unified-cmd-chip">
+                  <ImageIcon size={14} />
+                  <span className="unified-cmd-chip-name">{att.filename}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeAttachment(idx)}
+                    className="unified-cmd-chip-remove"
+                    title="Remove attachment"
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
-          <button
-            type="submit"
-            className="btn btn-primary command-execute-btn"
-            disabled={!value || !value.trim() || isLoading}
-            style={{
-              position: 'static',
-              transform: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.45rem',
-              padding: '0.95rem 1.45rem',
-              fontFamily: 'var(--font-body)',
-              fontSize: '0.925rem',
-              fontWeight: 700,
-              letterSpacing: '-0.01em',
-              borderRadius: 'var(--radius-lg)',
-              backgroundColor: 'var(--primary)',
-              color: '#FFFFFF',
-              border: 'none',
-              cursor: (!value || !value.trim() || isLoading) ? 'not-allowed' : 'pointer',
-              whiteSpace: 'nowrap',
-              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
-              height: '50px'
-            }}
-          >
-            {isLoading ? (
-              <>
-                <Loader size={19} className="spin" />
-                <span>Analyzing...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles size={19} />
-                <span>Analyze & Run</span>
-              </>
-            )}
-          </button>
+          {/* Integrated Action Bar */}
+          <div className="unified-cmd-actions">
+            <div className="unified-cmd-left-actions">
+              <button
+                type="button"
+                className={`unified-cmd-btn btn-mic ${isListening ? 'active-pulse' : ''}`}
+                onClick={toggleSpeechToText}
+                disabled={isLoading}
+                title={isListening ? "Stop Listening" : "Voice Input (Speech to Text)"}
+              >
+                {isListening ? <MicOff size={17} color="#EF4444" /> : <Mic size={17} color="#10B981" />}
+                <span>{isListening ? 'Stop' : 'Speak'}</span>
+              </button>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/png, image/jpeg, image/jpg, image/webp"
+                multiple
+                style={{ display: 'none' }}
+                id="cmd-image-upload-input"
+              />
+
+              <button
+                type="button"
+                className="unified-cmd-btn btn-attach"
+                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                disabled={isLoading}
+                title="Upload Image Attachment"
+              >
+                <ImageIcon size={17} color="#2563EB" />
+                <span>Image</span>
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              className="unified-cmd-submit-btn"
+              disabled={!value || !value.trim() || isLoading}
+              title="Run Automation Command"
+            >
+              {isLoading ? (
+                <>
+                  <Loader size={17} className="spin" />
+                  <span className="submit-btn-text">Running...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles size={17} />
+                  <span className="submit-btn-text">Run</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </form>
 
+      {/* Speech or error status pills */}
       {speechStatus && (
-        <div style={{
-          marginTop: '0.5rem',
-          fontSize: '0.85rem',
-          color: isListening ? '#10B981' : '#2563EB',
-          fontWeight: 600,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.35rem'
-        }}>
-          <span>🎤</span>
+        <div className="unified-cmd-status-pill status-speech">
+          <span className="status-dot-pulse"></span>
           <span>{speechStatus}</span>
         </div>
       )}
 
       {errorMsg && (
-        <div style={{
-          marginTop: '0.5rem',
-          fontSize: '0.825rem',
-          color: '#EF4444',
-          fontWeight: 600
-        }}>
-          {errorMsg}
+        <div className="unified-cmd-status-pill status-error">
+          <span>⚠️ {errorMsg}</span>
         </div>
       )}
 
-      {attachments.length > 0 && (
-        <div style={{
-          marginTop: '0.6rem',
-          display: 'flex',
-          gap: '0.5rem',
-          flexWrap: 'wrap',
-          alignItems: 'center'
-        }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Attachments:</span>
-          {attachments.map((att, idx) => (
-            <div
+      {/* Quick Example Suggestions */}
+      <div className="unified-cmd-examples">
+        <span className="examples-heading">Try:</span>
+        <div className="examples-scroll-track">
+          {sampleCommands.map((cmd, idx) => (
+            <button
               key={idx}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                backgroundColor: '#EFF6FF',
-                color: '#1D4ED8',
-                border: '1px solid #BFDBFE',
-                borderRadius: 'var(--radius-md)',
-                padding: '0.2rem 0.6rem',
-                fontSize: '0.8rem',
-                fontWeight: 600
-              }}
+              type="button"
+              className="example-pill-btn"
+              onClick={() => onChange(cmd)}
             >
-              <ImageIcon size={14} />
-              <span style={{ maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {att.filename}
-              </span>
-              <button
-                type="button"
-                onClick={() => removeAttachment(idx)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#64748B',
-                  cursor: 'pointer',
-                  padding: 0,
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <X size={14} />
-              </button>
-            </div>
+              "{cmd}"
+            </button>
           ))}
         </div>
-      )}
-
-      <div style={{ marginTop: '0.85rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Try examples:</span>
-        {sampleCommands.map((cmd, idx) => (
-          <button
-            key={idx}
-            type="button"
-            onClick={() => onChange(cmd)}
-            style={{
-              background: 'var(--bg-surface-elevated)',
-              border: '1px solid var(--border-subtle)',
-              color: 'var(--primary-dark)',
-              borderRadius: 'var(--radius-full)',
-              padding: '0.25rem 0.75rem',
-              fontSize: '0.775rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.15s ease'
-            }}
-          >
-            "{cmd}"
-          </button>
-        ))}
       </div>
     </div>
   );
