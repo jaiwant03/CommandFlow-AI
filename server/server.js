@@ -23,19 +23,34 @@ const ensureRedis = async () => {
     const isHealthy = await checkRedisConnection();
     if (isHealthy) return;
 
+    // Only attempt local Redis spawn on Windows local development
+    if (process.platform !== 'win32') {
+      console.log('[Redis Notice]: Running in resilient in-process queue mode on cloud environment.');
+      return;
+    }
+
     const wingetRedisPath = path.join(
       process.env.LOCALAPPDATA || '',
       'Microsoft/WinGet/Packages/taizod1024.redis-windows-fork_Microsoft.Winget.Source_8wekyb3d8bbwe/Redis-8.10.1-Windows-x64-msys2/redis-server.exe'
     );
 
-    const redisBin = fs.existsSync(wingetRedisPath) ? wingetRedisPath : 'redis-server';
-    const child = spawn(redisBin, ['--daemonize', 'no'], {
+    if (!fs.existsSync(wingetRedisPath)) {
+      return;
+    }
+
+    const child = spawn(wingetRedisPath, ['--daemonize', 'no'], {
       detached: true,
       stdio: 'ignore'
     });
+
+    // Attach error listener to prevent Node unhandled 'error' crash
+    child.on('error', (err) => {
+      console.warn(`[Redis Auto-Start Notice]: ${err.message}. Running in direct fallback mode.`);
+    });
+
     child.unref();
-    console.log('[Redis Auto-Start] Spawned redis-server process.');
-    await new Promise(r => setTimeout(r, 1200));
+    console.log('[Redis Auto-Start] Spawned local redis-server process.');
+    await new Promise((r) => setTimeout(r, 1200));
   } catch (err) {
     console.warn('[Redis Auto-Start Notice]: Running in direct fallback mode.');
   }
