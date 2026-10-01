@@ -21,6 +21,7 @@ import Settings from './pages/Settings';
 
 // Styles
 import './styles/global.css';
+import './styles/responsive.css';
 
 const ProtectedLayout = ({ children, currentLanguage, setLanguage, sidebarOpen, setSidebarOpen }) => {
   const user = getCurrentUser();
