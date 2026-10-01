@@ -338,3 +338,34 @@
   color: #10B981;
   flex-shrink: 0;
 }
+
+/* ============================================================
+   MOBILE RESPONSIVENESS
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .lang-trigger-btn {
+    padding: 0.35rem 0.55rem;
+    gap: 0.35rem;
+  }
+
+  .lang-badge {
+    display: none !important;
+  }
+
+  .lang-trigger-icon-wrap {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 420px) {
+  .lang-label {
+    display: none;
+  }
+
+  .lang-trigger-btn {
+    padding: 0.3rem 0.5rem;
+  }
+}
+
