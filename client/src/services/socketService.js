@@ -8,6 +8,21 @@ class SocketService {
   constructor() {
     this.socket = null;
     this.listeners = new Set();
+    this.connectionListeners = new Set();
+    this.isReconnecting = false;
+
+    // Auto-reconnect when app returns from background / sleep / network restore
+    if (typeof window !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          this.ensureConnected();
+        }
+      });
+
+      window.addEventListener('online', () => {
+        this.ensureConnected();
+      });
+    }
   }
 
   connect() {
@@ -15,15 +30,22 @@ class SocketService {
       return this.socket;
     }
 
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+
     this.socket = io(SOCKET_SERVER_URL, {
       transports: ['websocket', 'polling'],
       reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000
+      reconnectionAttempts: 25,
+      reconnectionDelay: 1500,
+      reconnectionDelayMax: 5000,
+      timeout: 20000
     });
 
     this.socket.on('connect', () => {
-      console.log('[SocketService] Connected to CommandFlow real-time server:', this.socket.id);
+      this.isReconnecting = false;
+      this.notifyConnectionState(true);
       const user = getCurrentUser();
       if (user && user._id) {
         this.socket.emit('join_user', user._id);
@@ -31,7 +53,6 @@ class SocketService {
     });
 
     this.socket.on('automation_status', (data) => {
-      console.log('[SocketService] Real-time status event:', data.automationId, data.status);
       this.listeners.forEach((callback) => {
         try {
           callback(data);
@@ -42,10 +63,42 @@ class SocketService {
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log('[SocketService] Disconnected:', reason);
+      this.notifyConnectionState(false, reason);
+      if (reason === 'io server disconnect' || reason === 'transport close') {
+        // the server forcefully disconnected or network dropped, retry
+        setTimeout(() => this.ensureConnected(), 2000);
+      }
+    });
+
+    this.socket.on('connect_error', (err) => {
+      this.notifyConnectionState(false, err.message);
     });
 
     return this.socket;
+  }
+
+  ensureConnected() {
+    if (!this.socket || !this.socket.connected) {
+      this.connect();
+    }
+  }
+
+  notifyConnectionState(isConnected, error = null) {
+    this.connectionListeners.forEach((listener) => {
+      try {
+        listener({ isConnected, error });
+      } catch (e) {}
+    });
+  }
+
+  subscribeConnection(callback) {
+    this.connectionListeners.add(callback);
+    if (this.socket) {
+      callback({ isConnected: this.socket.connected });
+    }
+    return () => {
+      this.connectionListeners.delete(callback);
+    };
   }
 
   subscribeStatus(callback) {
