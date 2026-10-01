@@ -47,7 +47,7 @@ const Login = () => {
           <div className="auth-logo-pedestal">
             <div className="auth-logo-halo" />
             <div className="auth-logo-box">
-              <Bot size={34} strokeWidth={2.2} />
+              <Bot size={28} strokeWidth={2.2} />
             </div>
           </div>
 
@@ -57,7 +57,7 @@ const Login = () => {
           </h1>
 
           <div className="auth-subtitle-pill">
-            <Sparkles size={13} color="#059669" />
+            <Sparkles size={12} color="#059669" />
             <span>Voice-to-Action Automation Platform</span>
           </div>
         </div>
@@ -65,7 +65,7 @@ const Login = () => {
         {/* Error Notification */}
         {error && (
           <div className="auth-alert-error" role="alert">
-            <AlertCircle size={18} style={{ flexShrink: 0 }} />
+            <AlertCircle size={16} style={{ flexShrink: 0 }} />
             <span>{error}</span>
           </div>
         )}
@@ -79,7 +79,7 @@ const Login = () => {
             </label>
             <div className={`auth-input-wrapper ${focusedField === 'email' ? 'is-focused' : ''}`}>
               <div className="auth-input-icon">
-                <Mail size={18} />
+                <Mail size={16} />
               </div>
               <input
                 id="auth-email"
@@ -103,7 +103,7 @@ const Login = () => {
             </label>
             <div className={`auth-input-wrapper ${focusedField === 'password' ? 'is-focused' : ''}`}>
               <div className="auth-input-icon">
-                <Lock size={18} />
+                <Lock size={16} />
               </div>
               <input
                 id="auth-password"
@@ -124,7 +124,7 @@ const Login = () => {
                 title={showPassword ? 'Hide password' : 'Show password'}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
@@ -163,7 +163,7 @@ const Login = () => {
             ) : (
               <>
                 <span>Sign In to Workspace</span>
-                <ArrowRight size={18} strokeWidth={2.4} />
+                <ArrowRight size={16} strokeWidth={2.4} />
               </>
             )}
           </button>
@@ -181,15 +181,15 @@ const Login = () => {
           {/* Trust & Capabilities Bar */}
           <div className="auth-features-bar">
             <div className="auth-feature-chip">
-              <Radio size={12} color="#10B981" />
+              <Radio size={11} color="#10B981" />
               <span>Voice Automation</span>
             </div>
             <div className="auth-feature-chip">
-              <Zap size={12} color="#0284C7" />
+              <Zap size={11} color="#0284C7" />
               <span>Zero Latency</span>
             </div>
             <div className="auth-feature-chip">
-              <ShieldCheck size={12} color="#059669" />
+              <ShieldCheck size={11} color="#059669" />
               <span>Enterprise Ready</span>
             </div>
           </div>
