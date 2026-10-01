@@ -340,12 +340,6 @@
   gap: 16px;
   flex-shrink: 0;
 }
-  gap: 12px !important;
-  min-width: 0 !important;
-  width: 100% !important;
-  flex: 1 1 0% !important;
-  overflow: hidden !important;
-}
 
 .cf-recent-icon {
   display: flex !important;
@@ -662,43 +656,75 @@
   }
 
   .cf-services-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .cf-recent-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 8px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 12px 14px !important;
+    min-height: auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-recent-left {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  .cf-recent-bottom-meta {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    padding-top: 8px !important;
+    border-top: 1px solid #F1F5F9 !important;
+    gap: 8px !important;
+  }
+
+  .cf-recent-middle {
+    display: flex !important;
+    align-items: center !important;
   }
 
   .cf-recent-right {
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
   }
 
   .cf-recent-time {
     text-align: right;
     min-width: auto;
+    font-size: 0.75rem;
   }
 }
 
 @media (max-width: 480px) {
   .cf-section-card {
-    padding: 16px;
-  }
-
-  .cf-recent-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 8px;
+    padding: 14px 12px;
   }
 
   .cf-recent-icon {
     width: 36px;
     height: 36px;
     font-size: 0.85rem;
+    flex-shrink: 0;
   }
 
   .cf-recent-title {
+    font-size: 0.85rem;
+  }
+
+  .cf-recent-meta {
+    font-size: 0.725rem;
+  }
     font-size: 0.85rem;
   }
 
