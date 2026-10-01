@@ -304,19 +304,19 @@
 
 /* Recent Automations Row — Clean List View */
 .cf-recent-row {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 120px 160px !important;
-  gap: 16px !important;
-  align-items: center !important;
-  padding: 12px 16px !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
   background: #FFFFFF;
   border: 1px solid #DCE6F0;
   border-radius: 11px;
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 72px;
-  width: 100% !important;
-  box-sizing: border-box !important;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .cf-recent-row:hover {
@@ -326,8 +326,20 @@
 }
 
 .cf-recent-left {
-  display: flex !important;
-  align-items: center !important;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1 1 0%;
+  overflow: hidden;
+}
+
+.cf-recent-bottom-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
   gap: 12px !important;
   min-width: 0 !important;
   width: 100% !important;
