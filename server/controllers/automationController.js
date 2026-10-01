@@ -11,6 +11,7 @@ const AppError = require('../utils/appError');
 const createAutomationFromCommand = async (req, res, next) => {
   try {
     let { command, inputType = 'text', attachments: rawAttachments, idempotencyKey } = req.body;
+    idempotencyKey = idempotencyKey || req.headers['x-idempotency-key'] || req.headers['idempotency-key'];
 
     if (!command || !command.trim()) {
       return sendError(res, 'Please provide a valid command.', 400, 'EMPTY_COMMAND');
