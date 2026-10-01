@@ -268,36 +268,29 @@
      ---------------------------------------------------------- */
 
   .cf-dashboard-header {
-
-    flex-direction:
-      column;
-
-    align-items:
-      stretch;
-
-    gap:
-      14px;
-
-    margin-bottom:
-      16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
   }
 
   .cf-page-title {
-
-    font-size:
-      25px;
+    font-size: 22px;
   }
 
   .cf-page-subtitle {
-
-    font-size:
-      12px;
+    font-size: 0.775rem;
+    color: #64748B;
   }
 
   .cf-sync-btn {
-
-    align-self:
-      flex-start;
+    min-height: 38px;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.775rem;
+    border-radius: 9999px;
+    flex-shrink: 0;
   }
 
 
@@ -314,7 +307,7 @@
   .cf-command-card-inner {
 
     padding:
-      18px 15px;
+      16px 12px;
   }
 
   .cf-command-header {
@@ -326,20 +319,21 @@
       flex-start;
 
     gap:
-      12px;
+      8px;
   }
 
   .cf-command-title {
 
     font-size:
-      19px;
+      18px;
   }
 
   .cf-voice-btn {
 
-    align-self:
-      flex-start;
+    display:
+      none !important;
   }
+
 
 
   /* ----------------------------------------------------------
@@ -1087,39 +1081,16 @@
 @media (max-width: 420px) {
   .cf-dashboard-inner {
     width: 100%;
-    padding: 12px 10px 24px;
+    padding: 8px 6px 20px;
   }
 
   .cf-stats-grid {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 8px;
   }
 
   .cf-command-card-inner {
-    padding: 14px 12px;
-  }
-
-  /* Command input row: allow clean stacking on narrow mobile */
-  .command-input-container form > div {
-    flex-direction: column !important;
-    align-items: stretch !important;
-  }
-
-  .command-input-container input.command-input-box {
-    width: 100% !important;
-    min-height: 48px;
-    font-size: 0.95rem !important;
-  }
-
-  .command-input-container button {
-    width: 100% !important;
-    min-height: 46px !important;
-    justify-content: center !important;
-  }
-
-  .navbar {
-    padding: 0 0.75rem;
-    height: 56px;
+    padding: 12px 10px;
   }
 
   .navbar-right .user-name {
@@ -1131,6 +1102,6 @@
   }
 
   .cf-page-title {
-    font-size: 20px;
+    font-size: 19px;
   }
 }
