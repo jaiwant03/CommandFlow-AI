@@ -1078,3 +1078,59 @@
       none;
   }
 }
+
+/* ============================================================
+   ULTRA-COMPACT MOBILE — 320px to 420px
+   Touch targets >= 44px, safe area padding, clean vertical stacking
+   ============================================================ */
+
+@media (max-width: 420px) {
+  .cf-dashboard-inner {
+    width: 100%;
+    padding: 12px 10px 24px;
+  }
+
+  .cf-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .cf-command-card-inner {
+    padding: 14px 12px;
+  }
+
+  /* Command input row: allow clean stacking on narrow mobile */
+  .command-input-container form > div {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .command-input-container input.command-input-box {
+    width: 100% !important;
+    min-height: 48px;
+    font-size: 0.95rem !important;
+  }
+
+  .command-input-container button {
+    width: 100% !important;
+    min-height: 46px !important;
+    justify-content: center !important;
+  }
+
+  .navbar {
+    padding: 0 0.75rem;
+    height: 56px;
+  }
+
+  .navbar-right .user-name {
+    display: none;
+  }
+
+  .system-status {
+    display: none;
+  }
+
+  .cf-page-title {
+    font-size: 20px;
+  }
+}
