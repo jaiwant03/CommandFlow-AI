@@ -161,11 +161,10 @@
      ---------------------------------------------------------- */
 
   .navbar {
-
     width: 100%;
-
-    padding:
-      0 1.25rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    box-sizing: border-box;
   }
 }
 
