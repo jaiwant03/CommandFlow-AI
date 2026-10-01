@@ -48,22 +48,22 @@ const Schedules = () => {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {schedules.map((item) => (
-          <div key={item._id} className="glass-card" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '42px', height: '42px', background: 'var(--warning-bg)', color: 'var(--warning)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div key={item._id} className="glass-card" style={{ padding: '1.25rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: '1 1 240px', minWidth: 0 }}>
+              <div style={{ width: '42px', height: '42px', background: 'var(--warning-bg)', color: 'var(--warning)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Clock size={22} />
               </div>
 
-              <div>
-                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.95rem' }}>"{item.command}"</h4>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', gap: '1rem', marginTop: '0.25rem', flexWrap: 'wrap' }}>
+              <div style={{ minWidth: 0 }}>
+                <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.95rem', wordBreak: 'break-word' }}>"{item.command}"</h4>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', gap: '0.75rem', marginTop: '0.25rem', flexWrap: 'wrap' }}>
                   <span>Automation ID: <strong style={{ color: 'var(--primary-dark)', fontFamily: 'var(--font-mono)' }}>{item.automationId}</strong></span>
                   <span>Target Time: <strong>{new Date(item.nextExecution).toLocaleString()}</strong></span>
                 </div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
               <span className={`status-badge status-${(item.status || 'scheduled').toLowerCase()}`}>
                 {item.status}
               </span>
