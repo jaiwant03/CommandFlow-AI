@@ -3,6 +3,7 @@ import { fetchLogs } from '../services/automationService';
 import HandwrittenHeading from '../components/HandwrittenHeading';
 import { Activity, CheckCircle, Clock, Zap, Cpu, BarChart2, ShieldCheck, RefreshCw, Layers } from 'lucide-react';
 import '../styles/global.css';
+import '../styles/history.css';
 
 const History = () => {
   const [logs, setLogs] = useState([]);
