@@ -1,3 +1,11 @@
+const dns = require('dns');
+try {
+  if (dns && typeof dns.setDefaultResultOrder === 'function') {
+    dns.setDefaultResultOrder('ipv4first');
+  }
+} catch (e) {}
+
+require('../config/env');
 const { Worker } = require('bullmq');
 const mongoose = require('mongoose');
 const { redisOptions } = require('../config/redis');

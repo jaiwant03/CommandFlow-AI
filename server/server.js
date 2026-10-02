@@ -1,3 +1,10 @@
+const dns = require('dns');
+try {
+  if (dns && typeof dns.setDefaultResultOrder === 'function') {
+    dns.setDefaultResultOrder('ipv4first');
+  }
+} catch (e) {}
+
 const http = require('http');
 const app = require('./app');
 const config = require('./config/env');
