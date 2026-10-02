@@ -212,12 +212,28 @@ const updateProfile = async (req, res, next) => {
 
     const previousAvatar = user.avatar;
     user.name = name;
-    if (req.file) {
-      user.avatar = `/uploads/profiles/${req.file.filename}`;
+
+    // Persist avatar directly to MongoDB as a data URL to prevent ephemeral disk loss
+    if (req.body.avatarBase64 && typeof req.body.avatarBase64 === 'string' && req.body.avatarBase64.startsWith('data:image/')) {
+      user.avatar = req.body.avatarBase64;
+    } else if (req.file) {
+      if (req.file.buffer) {
+        user.avatar = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+      } else if (req.file.path && fs.existsSync(req.file.path)) {
+        const fileData = fs.readFileSync(req.file.path);
+        user.avatar = `data:${req.file.mimetype};base64,${fileData.toString('base64')}`;
+        fs.promises.unlink(req.file.path).catch(() => {});
+      }
+    } else if (req.body.avatar && typeof req.body.avatar === 'string') {
+      if (req.body.avatar.startsWith('data:image/') || req.body.avatar.startsWith('http://') || req.body.avatar.startsWith('https://')) {
+        user.avatar = req.body.avatar;
+      }
     }
+
     await user.save();
 
-    if (req.file && previousAvatar?.startsWith('/uploads/profiles/')) {
+    // Clean up any old physical disk file if one existed
+    if (previousAvatar?.startsWith('/uploads/profiles/')) {
       const previousFile = path.basename(previousAvatar);
       fs.promises.unlink(path.join(__dirname, '../public/uploads/profiles', previousFile)).catch(() => {});
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getAvatarUrl, getCurrentUser, logoutUser } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Zap, Menu } from 'lucide-react';
@@ -10,6 +10,31 @@ const Navbar = ({ toggleSidebar, currentLanguage, setLanguage }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(() => getCurrentUser() || { name: 'Demo User', email: 'demo@commandflow.ai' });
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    const handleProfileUpdate = (e) => {
+      const updated = e?.detail || getCurrentUser();
+      if (updated) {
+        setUser(updated);
+        setImageError(false);
+      }
+    };
+
+    window.addEventListener('user-profile-updated', handleProfileUpdate);
+    window.addEventListener('storage', handleProfileUpdate);
+
+    const current = getCurrentUser();
+    if (current) {
+      setUser(current);
+      setImageError(false);
+    }
+
+    return () => {
+      window.removeEventListener('user-profile-updated', handleProfileUpdate);
+      window.removeEventListener('storage', handleProfileUpdate);
+    };
+  }, []);
 
   const handleLogout = () => {
     logoutUser();
@@ -39,8 +64,12 @@ const Navbar = ({ toggleSidebar, currentLanguage, setLanguage }) => {
 
         <button className="user-profile" type="button" onClick={() => setIsProfileOpen(true)} title="Edit Profile">
           <div className="avatar">
-            {user.avatar ? (
-              <img src={getAvatarUrl(user.avatar)} alt="" />
+            {user.avatar && !imageError ? (
+              <img
+                src={getAvatarUrl(user.avatar)}
+                alt={user.name || 'User Profile'}
+                onError={() => setImageError(true)}
+              />
             ) : (
               user.name ? user.name.charAt(0).toUpperCase() : 'U'
             )}

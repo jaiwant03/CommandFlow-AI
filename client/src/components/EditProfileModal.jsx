@@ -2,33 +2,74 @@ import React, { useEffect, useState } from 'react';
 import { Camera, Loader, X } from 'lucide-react';
 import { getAvatarUrl, updateProfile } from '../services/authService';
 
+const compressImageToDataUrl = (file, maxWidth = 320, maxHeight = 320, quality = 0.88) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (readerEvent) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = () => reject(new Error('Failed to parse image file'));
+      img.src = readerEvent.target.result;
+    };
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+};
+
 const EditProfileModal = ({ user, onClose, onSave }) => {
   const [name, setName] = useState(user.name || '');
   const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarBase64, setAvatarBase64] = useState('');
   const [previewUrl, setPreviewUrl] = useState(getAvatarUrl(user.avatar));
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (!avatarFile) return undefined;
-    const objectUrl = URL.createObjectURL(avatarFile);
-    setPreviewUrl(objectUrl);
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [avatarFile]);
-
-  const handlePhotoChange = (event) => {
+  const handlePhotoChange = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
       setError('Choose a JPEG, PNG, or WebP image.');
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Profile photos must be smaller than 5 MB.');
+    if (file.size > 8 * 1024 * 1024) {
+      setError('Profile photos must be smaller than 8 MB.');
       return;
     }
     setError('');
     setAvatarFile(file);
+
+    try {
+      const compressedDataUrl = await compressImageToDataUrl(file);
+      setAvatarBase64(compressedDataUrl);
+      setPreviewUrl(compressedDataUrl);
+    } catch (compressionErr) {
+      console.warn('Canvas compression fallback to object URL:', compressionErr);
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -36,7 +77,7 @@ const EditProfileModal = ({ user, onClose, onSave }) => {
     setError('');
     setSaving(true);
     try {
-      const updatedUser = await updateProfile(name, avatarFile);
+      const updatedUser = await updateProfile(name, avatarFile, avatarBase64);
       onSave(updatedUser);
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Could not update your profile.');
@@ -67,7 +108,12 @@ const EditProfileModal = ({ user, onClose, onSave }) => {
         <form onSubmit={handleSubmit}>
           <div className="profile-photo-picker">
             {previewUrl ? (
-              <img className="profile-photo-preview" src={previewUrl} alt="Profile preview" />
+              <img
+                className="profile-photo-preview"
+                src={previewUrl}
+                alt="Profile preview"
+                onError={() => setPreviewUrl('')}
+              />
             ) : (
               <div className="profile-photo-preview profile-photo-fallback">
                 {(name || 'U').charAt(0).toUpperCase()}
