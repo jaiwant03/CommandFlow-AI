@@ -278,7 +278,7 @@ class CommandService {
       message: 'Command re-queued for execution.'
     });
 
-    await addCommandJob({
+    const queueResult = await addCommandJob({
       automationId,
       userId,
       command: automation.originalCommand,
@@ -293,6 +293,32 @@ class CommandService {
       },
       idempotencyKey: `RETRY-${automationId}-${Date.now()}`
     });
+
+    if (queueResult.fallbackRequired) {
+      console.log(`[CommandService] Executing in-process retry fallback for ${automationId}...`);
+      const { processJob } = require('../workers/commandWorker');
+      processJob({
+        id: `fb-${automationId}`,
+        attemptsMade: 0,
+        data: {
+          automationId,
+          userId,
+          command: automation.originalCommand,
+          inputType: automation.inputType,
+          plan: {
+            intent: automation.intent,
+            channel: automation.channel,
+            recipient: automation.recipient,
+            recipients: automation.recipient?.recipients || [automation.recipient?.email],
+            subject: automation.generatedContent?.subject,
+            message: automation.generatedContent?.body
+          },
+          idempotencyKey: `RETRY-${automationId}-${Date.now()}`
+        }
+      }).catch(err => {
+        console.error(`[Fallback Retry Error]: ${err.message}`);
+      });
+    }
 
     return automation;
   }
