@@ -60,6 +60,11 @@ const App = () => {
     // Initialize native device features (Status Bar, Splash Screen)
     initCapacitor();
 
+    // Verify and synchronize authentication / profile data
+    if (getCurrentUser()) {
+      checkAuth();
+    }
+
     // Register Android Hardware Back Button
     const cleanupBackButton = setupHardwareBackButton(() => {
       // 1. If mobile sidebar drawer is open, close it
