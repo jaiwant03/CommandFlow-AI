@@ -2109,10 +2109,35 @@ path:not(.chart-fill) {
   }
 
   .cf-dashboard-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
 
-    flex-direction: column;
+  .cf-header-text {
+    flex: 1;
+    min-width: 0;
+  }
 
-    align-items: stretch;
+  .cf-sync-btn {
+    min-height: 36px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.775rem;
+    border-radius: 10px;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .cf-sync-text-full {
+    display: none;
+  }
+
+  .cf-sync-text-short {
+    display: inline;
   }
 
   .cf-page-title {
