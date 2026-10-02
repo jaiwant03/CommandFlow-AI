@@ -175,3 +175,50 @@
     opacity: 0.95;
   }
 }
+
+/* ============================================================
+   RESPONSIVE SCALING FOR MOBILE / SMALL VIEWPORTS
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .handwritten-heading-title.size-hero {
+    font-size: clamp(1.8rem, 5.2vw, 2.35rem) !important;
+    line-height: 1.25;
+  }
+
+  .handwritten-heading-title.size-normal {
+    font-size: clamp(1.65rem, 4.5vw, 2.05rem) !important;
+  }
+
+  .handwritten-heading-title.size-compact {
+    font-size: clamp(1.45rem, 3.8vw, 1.75rem) !important;
+  }
+
+  .hw-flourish-svg {
+    max-width: 270px;
+    height: 18px;
+    margin-top: -4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .handwritten-heading-title.size-hero {
+    font-size: clamp(1.5rem, 5vw, 1.85rem) !important;
+    line-height: 1.2;
+  }
+
+  .handwritten-heading-title.size-normal {
+    font-size: clamp(1.35rem, 4.2vw, 1.6rem) !important;
+  }
+
+  .handwritten-heading-title.size-compact {
+    font-size: clamp(1.2rem, 3.5vw, 1.4rem) !important;
+  }
+
+  .hw-flourish-svg {
+    max-width: 210px;
+    height: 15px;
+    margin-top: -3px;
+  }
+}
+
