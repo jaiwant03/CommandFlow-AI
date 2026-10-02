@@ -11,28 +11,63 @@ const VoiceRecorder = ({ onTranscriptComplete, selectedLanguage = 'auto', onClos
   const silenceTimerRef = React.useRef(null);
   const latestTranscriptRef = React.useRef('');
 
+  const cleanAndCollapseTranscripts = (event) => {
+    let finalPhrase = '';
+
+    for (let i = 0; i < event.results.length; i++) {
+      const res = event.results[i];
+      const current = (res[0]?.transcript || '').trim();
+      if (!current) continue;
+
+      if (!finalPhrase) {
+        finalPhrase = current;
+        continue;
+      }
+
+      const lowerCur = current.toLowerCase();
+      const lowerFinal = finalPhrase.toLowerCase();
+
+      if (lowerCur.startsWith(lowerFinal)) {
+        finalPhrase = current;
+      } else if (lowerFinal.startsWith(lowerCur)) {
+        // Already contained
+      } else {
+        let merged = false;
+        const wordsFinal = finalPhrase.split(/\s+/);
+        const wordsCur = current.split(/\s+/);
+        const maxOverlap = Math.min(wordsFinal.length, wordsCur.length);
+
+        for (let overlap = maxOverlap; overlap > 0; overlap--) {
+          const endSlice = wordsFinal.slice(-overlap).join(' ').toLowerCase();
+          const startSlice = wordsCur.slice(0, overlap).join(' ').toLowerCase();
+          if (endSlice === startSlice) {
+            finalPhrase = wordsFinal.concat(wordsCur.slice(overlap)).join(' ');
+            merged = true;
+            break;
+          }
+        }
+
+        if (!merged) {
+          finalPhrase += ' ' + current;
+        }
+      }
+    }
+
+    finalPhrase = finalPhrase.replace(/\b(\w+)(?:\s+\1\b)+/gi, '$1').trim();
+    return finalPhrase;
+  };
+
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const rec = new SpeechRecognition();
-      rec.continuous = true;
+      const isMobile = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      rec.continuous = !isMobile;
       rec.interimResults = true;
       rec.lang = selectedLanguage === 'tamil' ? 'ta-IN' : 'en-US';
 
       rec.onresult = (event) => {
-        let finalText = '';
-        let interimText = '';
-
-        for (let i = 0; i < event.results.length; i++) {
-          const res = event.results[i];
-          if (res.isFinal) {
-            finalText += res[0].transcript + ' ';
-          } else {
-            interimText += res[0].transcript;
-          }
-        }
-
-        const combined = (finalText + interimText).trim();
+        const combined = cleanAndCollapseTranscripts(event);
         setTranscript(combined);
         latestTranscriptRef.current = combined;
 

@@ -10,6 +10,55 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
   const fileInputRef = useRef(null);
   const recognitionRef = useRef(null);
 
+  const cleanAndCollapseTranscripts = (event) => {
+    let finalPhrase = '';
+
+    for (let i = 0; i < event.results.length; i++) {
+      const res = event.results[i];
+      const current = (res[0]?.transcript || '').trim();
+      if (!current) continue;
+
+      if (!finalPhrase) {
+        finalPhrase = current;
+        continue;
+      }
+
+      const lowerCur = current.toLowerCase();
+      const lowerFinal = finalPhrase.toLowerCase();
+
+      // If current is an extended version of earlier tokens (standard Android incremental update)
+      if (lowerCur.startsWith(lowerFinal)) {
+        finalPhrase = current;
+      } else if (lowerFinal.startsWith(lowerCur)) {
+        // Already contained
+      } else {
+        // Check for partial boundary overlap
+        let merged = false;
+        const wordsFinal = finalPhrase.split(/\s+/);
+        const wordsCur = current.split(/\s+/);
+        const maxOverlap = Math.min(wordsFinal.length, wordsCur.length);
+
+        for (let overlap = maxOverlap; overlap > 0; overlap--) {
+          const endSlice = wordsFinal.slice(-overlap).join(' ').toLowerCase();
+          const startSlice = wordsCur.slice(0, overlap).join(' ').toLowerCase();
+          if (endSlice === startSlice) {
+            finalPhrase = wordsFinal.concat(wordsCur.slice(overlap)).join(' ');
+            merged = true;
+            break;
+          }
+        }
+
+        if (!merged) {
+          finalPhrase += ' ' + current;
+        }
+      }
+    }
+
+    // Clean any stuttered immediate duplicate words (e.g. "send send" -> "send")
+    finalPhrase = finalPhrase.replace(/\b(\w+)(?:\s+\1\b)+/gi, '$1').trim();
+    return finalPhrase;
+  };
+
   const toggleSpeechToText = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -29,7 +78,9 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
     setErrorMsg('');
     try {
       const rec = new SpeechRecognition();
-      rec.continuous = true;
+      const isMobile = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      // On mobile / Android, continuous mode causes duplicate cumulative hypotheses; use single-phrase mode
+      rec.continuous = !isMobile;
       rec.interimResults = true;
       rec.lang = navigator.language || 'en-US';
 
@@ -39,19 +90,7 @@ const CommandInput = ({ value, onChange, onExecute, isLoading }) => {
       };
 
       rec.onresult = (event) => {
-        let finalText = '';
-        let interimText = '';
-
-        for (let i = 0; i < event.results.length; i++) {
-          const result = event.results[i];
-          if (result.isFinal) {
-            finalText += result[0].transcript + ' ';
-          } else {
-            interimText += result[0].transcript;
-          }
-        }
-
-        const combined = (finalText + interimText).trim();
+        const combined = cleanAndCollapseTranscripts(event);
         if (combined) {
           onChange(combined);
           setSpeechStatus('Speech converted to text!');
