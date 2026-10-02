@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import BottomNav from './components/BottomNav';
 import NetworkStatusBanner from './components/NetworkStatusBanner';
-import { getCurrentUser } from './services/authService';
+import { getCurrentUser, checkAuth } from './services/authService';
 import { initCapacitor, setupHardwareBackButton } from './services/capacitorService';
 
 // Pages
