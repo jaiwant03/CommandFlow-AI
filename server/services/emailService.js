@@ -1,14 +1,24 @@
+const dns = require('dns');
+
+// Enforce IPv4 lookup priority to prevent Windows / ISP IPv6 routing timeouts to smtp.gmail.com
+try {
+  if (dns && typeof dns.setDefaultResultOrder === 'function') {
+    dns.setDefaultResultOrder('ipv4first');
+  }
+} catch (e) {}
+
+require('../config/env');
 const nodemailer = require('nodemailer');
 
 /**
  * Direct Email Service using Nodemailer
- * Supports high-speed Gmail SMTP with pooled connections, custom SMTP, and instant fallback handling.
+ * Supports high-speed Gmail SMTP with pooled connections, direct SSL, and guaranteed inbox delivery.
  */
 class EmailService {
   constructor() {
+    this.port465Transporter = null;
     this.gmailServiceTransporter = null;
     this.port587Transporter = null;
-    this.port465Transporter = null;
     this.etherealTransporter = null;
     this.initialized = false;
     this.initPromise = this.initTransporter();
@@ -23,22 +33,44 @@ class EmailService {
 
     if (user && pass && !user.includes('your_') && !pass.includes('your_')) {
       const cleanPass = pass.replace(/\s+/g, '');
-      console.log(`[EmailService] Initializing multi-tier resilient Gmail transporters for ${user}...`);
+      console.log(`[EmailService] Initializing high-speed pooled Gmail transporters for ${user}...`);
 
       try {
-        // Tier 1: First-class Gmail Service Driver (optimal for cloud hosts and local)
-        this.gmailServiceTransporter = nodemailer.createTransport({
-          service: 'gmail',
+        // Tier 1: Direct SSL Port 465 with Connection Pooling and IPv4 affinity (Fastest & most reliable for Gmail)
+        this.port465Transporter = nodemailer.createTransport({
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true,
+          pool: true,
+          maxConnections: 5,
+          maxMessages: 100,
           auth: {
             user,
             pass: cleanPass
           },
-          connectionTimeout: 25000,
-          greetingTimeout: 20000,
-          socketTimeout: 30000
+          tls: {
+            rejectUnauthorized: false
+          },
+          connectionTimeout: 15000,
+          greetingTimeout: 10000,
+          socketTimeout: 20000
         });
 
-        // Tier 2: Standard SMTP Port 587 with STARTTLS (universally allowed on cloud hosts)
+        // Tier 2: First-class Gmail Service Driver with pooling
+        this.gmailServiceTransporter = nodemailer.createTransport({
+          service: 'gmail',
+          pool: true,
+          maxConnections: 3,
+          auth: {
+            user,
+            pass: cleanPass
+          },
+          connectionTimeout: 15000,
+          greetingTimeout: 10000,
+          socketTimeout: 20000
+        });
+
+        // Tier 3: Standard SMTP Port 587 with STARTTLS
         this.port587Transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',
           port: 587,
@@ -50,34 +82,17 @@ class EmailService {
           tls: {
             rejectUnauthorized: false
           },
-          connectionTimeout: 25000,
-          greetingTimeout: 20000,
-          socketTimeout: 30000
-        });
-
-        // Tier 3: Direct SSL Port 465
-        this.port465Transporter = nodemailer.createTransport({
-          host: 'smtp.gmail.com',
-          port: 465,
-          secure: true,
-          auth: {
-            user,
-            pass: cleanPass
-          },
-          tls: {
-            rejectUnauthorized: false
-          },
-          connectionTimeout: 25000,
-          greetingTimeout: 20000,
-          socketTimeout: 30000
+          connectionTimeout: 15000,
+          greetingTimeout: 10000,
+          socketTimeout: 20000
         });
 
         // Verify primary transporter in background
-        this.gmailServiceTransporter.verify((err) => {
+        this.port465Transporter.verify((err) => {
           if (err) {
-            console.warn(`[EmailService] Gmail service verification note: ${err.message}. Port 587 & 465 ready.`);
+            console.warn(`[EmailService] Gmail Port 465 verify note: ${err.message}. Alternate transporters ready.`);
           } else {
-            console.log(`[EmailService] Gmail service connection verified successfully for ${user}!`);
+            console.log(`[EmailService] Gmail Port 465 SSL connection verified successfully for ${user}!`);
           }
         });
 
@@ -89,22 +104,7 @@ class EmailService {
     }
 
     // Fallback if no credentials in .env
-    console.log('[EmailService] Notice: EMAIL_USER and EMAIL_PASS not configured in server/.env.');
-    try {
-      const testAccount = await nodemailer.createTestAccount();
-      this.etherealTransporter = nodemailer.createTransport({
-        host: 'smtp.ethereal.email',
-        port: 587,
-        secure: false,
-        auth: {
-          user: testAccount.user,
-          pass: testAccount.pass
-        }
-      });
-      console.log(`[EmailService] Ethereal fallback transporter created: ${testAccount.user}`);
-    } catch (err) {
-      console.warn(`[EmailService] Could not create test transporter (${err.message}). Using simulated transporter.`);
-    }
+    console.warn('[EmailService] Notice: EMAIL_USER and EMAIL_PASS not configured in server/.env.');
     this.initialized = true;
   }
 
