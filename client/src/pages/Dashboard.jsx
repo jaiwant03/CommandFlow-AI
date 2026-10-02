@@ -895,9 +895,9 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
 
         <div className="cf-dashboard-header">
 
-          <div>
+          <div className="cf-header-text">
 
-            <div className="cf-title-row" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.2rem' }}>
+            <div className="cf-title-row" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.2rem', flexWrap: 'wrap' }}>
               <HandwrittenHeading text="CommandFlow" size="hero" withFlourish={true} />
               <Sparkles
                 size={22}
@@ -916,11 +916,14 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
           <button
             className="cf-sync-btn"
             onClick={loadData}
+            title="Sync Status"
+            aria-label="Sync Status"
           >
 
-            <RefreshCw size={16} />
+            <RefreshCw size={15} />
 
-            Sync Status
+            <span className="cf-sync-text-full">Sync Status</span>
+            <span className="cf-sync-text-short">Sync</span>
 
           </button>
 
