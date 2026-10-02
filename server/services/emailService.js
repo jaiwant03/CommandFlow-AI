@@ -109,11 +109,11 @@ class EmailService {
   }
 
   /**
-   * Send email using Nodemailer
+   * Send email using Nodemailer with verified real delivery
    */
   async sendEmail({ to, subject, content, htmlContent, attachments = [] }) {
-    if (!this.initialized && this.initPromise) {
-      await this.initPromise;
+    if (!this.initialized || !this.port465Transporter) {
+      await this.initTransporter();
     }
 
     let recipientList = [];
@@ -202,11 +202,14 @@ class EmailService {
     console.log(`[Gmail] Binary field exists: ${binaryFieldExists}`);
 
     const candidates = [
+      { name: 'Gmail SMTP Port 465 (Direct SSL)', transport: this.port465Transporter },
       { name: 'Gmail Service Transporter', transport: this.gmailServiceTransporter },
-      { name: 'Gmail SMTP Port 587 (STARTTLS)', transport: this.port587Transporter },
-      { name: 'Gmail SMTP Port 465 (SSL)', transport: this.port465Transporter },
-      { name: 'Ethereal Test Transporter', transport: this.etherealTransporter }
+      { name: 'Gmail SMTP Port 587 (STARTTLS)', transport: this.port587Transporter }
     ].filter(c => !!c.transport);
+
+    if (candidates.length === 0) {
+      throw new Error(`No active email transporter available to deliver to ${primaryRecipient}. Verify EMAIL_USER and EMAIL_PASS in server/.env.`);
+    }
 
     let lastError = null;
 
@@ -230,22 +233,16 @@ class EmailService {
         };
       } catch (err) {
         lastError = err;
-        console.warn(`[EmailService] ${candidate.name} notice: ${err.message}. Seamlessly attempting next carrier...`);
+        console.warn(`[EmailService] ${candidate.name} notice: ${err.message}. Attempting next carrier...`);
       }
     }
 
     if (lastError) {
-      console.error(`[EmailService] All SMTP live carriers encountered network errors: ${lastError.message}`);
+      console.error(`[EmailService] All SMTP live carriers encountered errors: ${lastError.message}`);
+      throw new Error(`Gmail delivery failed: ${lastError.message}`);
     }
 
-    // Simulated fallback if network is completely offline
-    console.log(`[EmailService] [Resilient Fallback Delivery] Email to "${primaryRecipient}" with subject "${subject}" completed.`);
-    return {
-      success: true,
-      messageId: `sim-msg-${Date.now()}`,
-      provider: 'resilient_simulated',
-      note: `Email queued and formatted for ${primaryRecipient}`
-    };
+    throw new Error(`Delivery to "${primaryRecipient}" could not be confirmed.`);
   }
 }
 
