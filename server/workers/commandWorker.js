@@ -170,6 +170,23 @@ const processJob = async (job) => {
         lastError: errorMsg
       });
 
+      // If job is running via in-process fallback (no BullMQ Redis runner),
+      // schedule an in-process retry after backoff rather than throwing into the void
+      if (typeof job.id === 'string' && job.id.startsWith('fb-')) {
+        const nextAttempt = (job.attemptsMade || 0) + 1;
+        const delay = Math.pow(2, nextAttempt) * 1000;
+        console.log(`[CommandWorker] In-process fallback retry scheduled in ${delay}ms (attempt ${nextAttempt + 1}/${automation.maxRetries})...`);
+        setTimeout(() => {
+          processJob({
+            ...job,
+            attemptsMade: nextAttempt
+          }).catch(retryErr => {
+            console.error(`[CommandWorker] Fallback retry error: ${retryErr.message}`);
+          });
+        }, delay);
+        return { retrying: true, attempt: nextAttempt };
+      }
+
       // Throw error to trigger BullMQ exponential backoff retry
       throw new Error(errorMsg);
     }
