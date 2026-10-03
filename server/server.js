@@ -68,6 +68,7 @@ const ensureRedis = async () => {
 const startServer = async () => {
   try {
     await connectDB();
+    await resetStaleExecutions();
     await ensureRedis();
     initWorker();
     initScheduler();
