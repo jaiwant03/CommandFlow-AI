@@ -239,6 +239,17 @@ const HandwrittenIntro = ({ onComplete, duration = 5000 }) => {
         </div>
       </header>
 
+      {/* Mobile Quick Skip Button */}
+      <button
+        type="button"
+        className="mobile-tap-hint"
+        onClick={handleSkip}
+        aria-label="Skip Intro and Enter Workspace"
+      >
+        <span>Skip</span>
+        <ChevronRight size={12} />
+      </button>
+
       {/* Viewport Robotic Corner Calibration Brackets */}
       <div className="cyber-corner-bracket bracket-tl" />
       <div className="cyber-corner-bracket bracket-tr" />

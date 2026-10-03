@@ -12,110 +12,98 @@ const nodemailer = require('nodemailer');
 
 /**
  * Direct Email Service using Nodemailer
- * Supports high-speed Gmail SMTP with pooled connections, direct SSL, and guaranteed inbox delivery.
+ * Supports high-speed Gmail SMTP with direct SSL, IPv4 resolution enforcement, and guaranteed inbox delivery.
  */
 class EmailService {
   constructor() {
-    this.port465Transporter = null;
-    this.gmailServiceTransporter = null;
-    this.port587Transporter = null;
-    this.etherealTransporter = null;
+    this.user = null;
+    this.pass = null;
     this.initialized = false;
-    this.initPromise = this.initTransporter();
+    this.initTransporter();
   }
 
   /**
-   * Initialize transporters based on environment variables or test account
+   * Initialize transporter credentials from environment variables
    */
-  async initTransporter() {
-    const user = process.env.EMAIL_USER || process.env.GMAIL_USER || process.env.SMTP_USER;
-    const pass = process.env.EMAIL_PASS || process.env.GMAIL_PASS || process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS;
+  initTransporter() {
+    const rawUser = process.env.EMAIL_USER || process.env.GMAIL_USER || process.env.SMTP_USER;
+    const rawPass = process.env.EMAIL_PASS || process.env.GMAIL_PASS || process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS;
 
-    if (user && pass && !user.includes('your_') && !pass.includes('your_')) {
-      const cleanPass = pass.replace(/\s+/g, '');
-      console.log(`[EmailService] Initializing high-speed pooled Gmail transporters for ${user}...`);
+    if (rawUser && rawPass && !rawUser.includes('your_') && !rawPass.includes('your_')) {
+      this.user = rawUser.trim();
+      this.pass = rawPass.replace(/\s+/g, '');
+      console.log(`[EmailService] Initialized Gmail delivery engine for ${this.user} (IPv4 enforced, zero-stale-pool).`);
+      this.initialized = true;
+    } else {
+      console.warn('[EmailService] Notice: EMAIL_USER and EMAIL_PASS not configured in server/.env.');
+      this.initialized = true;
+    }
+  }
 
-      try {
-        // Tier 1: Direct SSL Port 465 with Connection Pooling and IPv4 affinity (Fastest & most reliable for Gmail)
-        this.port465Transporter = nodemailer.createTransport({
-          host: 'smtp.gmail.com',
-          port: 465,
-          secure: true,
-          pool: true,
-          maxConnections: 5,
-          maxMessages: 100,
-          auth: {
-            user,
-            pass: cleanPass
-          },
-          tls: {
-            rejectUnauthorized: false
-          },
-          connectionTimeout: 15000,
-          greetingTimeout: 10000,
-          socketTimeout: 20000
-        });
-
-        // Tier 2: First-class Gmail Service Driver with pooling
-        this.gmailServiceTransporter = nodemailer.createTransport({
-          service: 'gmail',
-          pool: true,
-          maxConnections: 3,
-          auth: {
-            user,
-            pass: cleanPass
-          },
-          connectionTimeout: 15000,
-          greetingTimeout: 10000,
-          socketTimeout: 20000
-        });
-
-        // Tier 3: Standard SMTP Port 587 with STARTTLS
-        this.port587Transporter = nodemailer.createTransport({
-          host: 'smtp.gmail.com',
-          port: 587,
-          secure: false,
-          auth: {
-            user,
-            pass: cleanPass
-          },
-          tls: {
-            rejectUnauthorized: false
-          },
-          connectionTimeout: 15000,
-          greetingTimeout: 10000,
-          socketTimeout: 20000
-        });
-
-        // Verify primary transporter in background
-        this.port465Transporter.verify((err) => {
-          if (err) {
-            console.warn(`[EmailService] Gmail Port 465 verify note: ${err.message}. Alternate transporters ready.`);
-          } else {
-            console.log(`[EmailService] Gmail Port 465 SSL connection verified successfully for ${user}!`);
-          }
-        });
-
-        this.initialized = true;
-        return;
-      } catch (err) {
-        console.error(`[EmailService] Transporter setup error: ${err.message}`);
-      }
+  /**
+   * Create fresh transporters with IPv4 affinity and tight timeouts (prevents stale socket hangs)
+   */
+  getTransporters() {
+    if (!this.user || !this.pass) {
+      this.initTransporter();
+    }
+    if (!this.user || !this.pass) {
+      return [];
     }
 
-    // Fallback if no credentials in .env
-    console.warn('[EmailService] Notice: EMAIL_USER and EMAIL_PASS not configured in server/.env.');
-    this.initialized = true;
+    const { user, pass } = this;
+
+    // Carrier 1: Direct SSL Port 465 (Fastest & most reliable for Gmail with IPv4 enforcement)
+    const port465 = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      family: 4, // Force IPv4 to prevent IPv6 routing blackholes
+      pool: false, // Fresh socket per dispatch to prevent stale idle socket drops
+      auth: { user, pass },
+      tls: { rejectUnauthorized: false },
+      connectionTimeout: 6000,
+      greetingTimeout: 5000,
+      socketTimeout: 10000
+    });
+
+    // Carrier 2: Standard SMTP Port 587 with STARTTLS (Fallback if Port 465 is filtered by ISP)
+    const port587 = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      family: 4,
+      pool: false,
+      auth: { user, pass },
+      tls: { rejectUnauthorized: false },
+      connectionTimeout: 6000,
+      greetingTimeout: 5000,
+      socketTimeout: 10000
+    });
+
+    // Carrier 3: First-class Gmail Service Driver
+    const gmailService = nodemailer.createTransport({
+      service: 'gmail',
+      family: 4,
+      pool: false,
+      auth: { user, pass },
+      tls: { rejectUnauthorized: false },
+      connectionTimeout: 6000,
+      greetingTimeout: 5000,
+      socketTimeout: 10000
+    });
+
+    return [
+      { name: 'Gmail SMTP Port 465 (Direct SSL)', transport: port465 },
+      { name: 'Gmail SMTP Port 587 (STARTTLS)', transport: port587 },
+      { name: 'Gmail Service Transporter', transport: gmailService }
+    ];
   }
 
   /**
    * Send email using Nodemailer with verified real delivery
    */
   async sendEmail({ to, subject, content, htmlContent, attachments = [] }) {
-    if (!this.initialized || !this.port465Transporter) {
-      await this.initTransporter();
-    }
-
     let recipientList = [];
     if (Array.isArray(to)) {
       recipientList = to.map(r => (typeof r === 'object' && r !== null ? (r.email || r.address || '') : String(r || ''))).filter(Boolean);
@@ -130,7 +118,7 @@ class EmailService {
       recipientList = [fallback];
     }
 
-    const senderEmail = process.env.EMAIL_USER || process.env.GMAIL_USER || 'admin.jaiwant@gmail.com';
+    const senderEmail = this.user || process.env.EMAIL_USER || process.env.GMAIL_USER || 'admin.jaiwant@gmail.com';
     const primaryRecipient = recipientList.join(', ');
 
     // Format attachments for Nodemailer with CID inline embedding
@@ -174,7 +162,6 @@ class EmailService {
     });
 
     const plainText = formatted.plainText;
-    // If htmlContent is already a full HTML document, preserve it; otherwise use formatted HTML
     const cleanHtml = (htmlContent && htmlContent.includes('<html') && htmlContent.includes('<body'))
       ? htmlContent
       : formatted.html;
@@ -201,14 +188,10 @@ class EmailService {
     console.log(`[Gmail] Has image: ${hasImage}`);
     console.log(`[Gmail] Binary field exists: ${binaryFieldExists}`);
 
-    const candidates = [
-      { name: 'Gmail SMTP Port 465 (Direct SSL)', transport: this.port465Transporter },
-      { name: 'Gmail Service Transporter', transport: this.gmailServiceTransporter },
-      { name: 'Gmail SMTP Port 587 (STARTTLS)', transport: this.port587Transporter }
-    ].filter(c => !!c.transport);
+    const candidates = this.getTransporters();
 
     if (candidates.length === 0) {
-      throw new Error(`No active email transporter available to deliver to ${primaryRecipient}. Verify EMAIL_USER and EMAIL_PASS in server/.env.`);
+      throw new Error(`No active email credentials configured. Verify EMAIL_USER and EMAIL_PASS in server/.env.`);
     }
 
     let lastError = null;
@@ -233,13 +216,13 @@ class EmailService {
         };
       } catch (err) {
         lastError = err;
-        console.warn(`[EmailService] ${candidate.name} notice: ${err.message}. Attempting next carrier...`);
+        console.warn(`[EmailService] ${candidate.name} error: ${err.message}. Failing over immediately...`);
       }
     }
 
     if (lastError) {
       console.error(`[EmailService] All SMTP live carriers encountered errors: ${lastError.message}`);
-      throw new Error(`Gmail delivery failed: ${lastError.message}`);
+      throw new Error(lastError.message);
     }
 
     throw new Error(`Delivery to "${primaryRecipient}" could not be confirmed.`);

@@ -170,9 +170,12 @@ class N8nService {
         };
       } catch (emailErr) {
         console.error(`[SMTP Engine Error]: ${emailErr.message}`);
+        const errMsg = emailErr.message.startsWith('Gmail delivery failed:')
+          ? emailErr.message
+          : `Gmail delivery failed: ${emailErr.message}`;
         return {
           success: false,
-          error: `Gmail delivery failed: ${emailErr.message}`
+          error: errMsg
         };
       }
     }

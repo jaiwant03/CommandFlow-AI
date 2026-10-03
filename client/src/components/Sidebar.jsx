@@ -11,7 +11,8 @@ import {
   Bot,
   X,
   LogOut,
-  User
+  User,
+  Sparkles
 } from 'lucide-react';
 import { getCurrentUser, logoutUser } from '../services/authService';
 import '../styles/navbar.css';
@@ -26,7 +27,8 @@ const Sidebar = ({ isOpen, onClose }) => {
     { label: 'Schedules', icon: <Calendar size={20} />, path: '/schedules' },
     { label: 'History', icon: <History size={20} />, path: '/history' },
     { label: 'Integrations', icon: <Layers size={20} />, path: '/integrations' },
-    { label: 'Settings', icon: <Settings size={20} />, path: '/settings' }
+    { label: 'Settings', icon: <Settings size={20} />, path: '/settings' },
+    { label: 'Watch Intro', icon: <Sparkles size={20} style={{ color: '#00D29E' }} />, path: '/intro' }
   ];
 
   const handleLogout = () => {

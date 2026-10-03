@@ -18,6 +18,7 @@ import Schedules from './pages/Schedules';
 import History from './pages/History';
 import Integrations from './pages/Integrations';
 import Settings from './pages/Settings';
+import HandwrittenIntro from './components/HandwrittenIntro';
 
 // Styles
 import './styles/global.css';
@@ -53,8 +54,27 @@ const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Show HandwrittenIntro on mobile app launch or fresh session launch
+  const [showIntro, setShowIntro] = useState(() => {
+    if (window.location.pathname === '/intro') return true;
+    const hasSeen = sessionStorage.getItem('cf_intro_seen');
+    if (!hasSeen) return true;
+    return false;
+  });
+
   const sidebarOpenRef = useRef(sidebarOpen);
   sidebarOpenRef.current = sidebarOpen;
+  const showIntroRef = useRef(showIntro);
+  showIntroRef.current = showIntro;
+
+  const handleIntroComplete = () => {
+    sessionStorage.setItem('cf_intro_seen', 'true');
+    setShowIntro(false);
+    const user = getCurrentUser();
+    if (location.pathname === '/' || location.pathname === '/intro') {
+      navigate(user ? '/dashboard' : '/login', { replace: true });
+    }
+  };
 
   useEffect(() => {
     // Initialize native device features (Status Bar, Splash Screen)
@@ -67,6 +87,12 @@ const App = () => {
 
     // Register Android Hardware Back Button
     const cleanupBackButton = setupHardwareBackButton(() => {
+      // 0. If intro animation is currently playing, dismiss it
+      if (showIntroRef.current) {
+        handleIntroComplete();
+        return true;
+      }
+
       // 1. If mobile sidebar drawer is open, close it
       if (sidebarOpenRef.current) {
         setSidebarOpen(false);
@@ -96,14 +122,19 @@ const App = () => {
     return () => cleanupBackButton();
   }, [location.pathname, navigate]);
 
+  if (showIntro || location.pathname === '/intro') {
+    return <HandwrittenIntro onComplete={handleIntroComplete} />;
+  }
+
   return (
     <>
       <NetworkStatusBanner />
       <Routes>
+        <Route path="/intro" element={<HandwrittenIntro onComplete={handleIntroComplete} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Navigate to={getCurrentUser() ? "/dashboard" : "/login"} replace />} />
 
         <Route
           path="/dashboard"
