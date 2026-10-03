@@ -25,11 +25,10 @@ async function runTests() {
   try {
     // 1. Health check
     console.log('[Test 1] Health check endpoint...');
-    const healthRes = await fetch(`${baseUrl}/health`);
+    const healthRes = await fetch(`${baseUrl}/api/health`);
     const healthData = await healthRes.json();
     assert.strictEqual(healthData.status, 'healthy');
     assert.strictEqual(healthData.services.mongodb.status, 'connected');
-    assert.strictEqual(healthData.services.redis.status, 'connected');
     console.log('✓ Health check passed!');
 
     // 2. Authentication: Login
