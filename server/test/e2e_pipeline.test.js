@@ -18,8 +18,8 @@ async function runTests() {
   initSocket(server);
   const worker = initWorker();
 
-  const TEST_PORT = 5097;
-  await new Promise(resolve => server.listen(TEST_PORT, resolve));
+  await new Promise(resolve => server.listen(0, resolve));
+  const TEST_PORT = server.address().port;
   const baseUrl = `http://localhost:${TEST_PORT}`;
 
   try {
