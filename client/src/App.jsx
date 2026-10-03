@@ -71,7 +71,7 @@ const App = () => {
     sessionStorage.setItem('cf_intro_seen', 'true');
     setShowIntro(false);
     const user = getCurrentUser();
-    if (location.pathname === '/' || location.pathname === '/intro') {
+    if (location.pathname === '/' || location.pathname === '/intro' || location.pathname === '/index.html') {
       navigate(user ? '/dashboard' : '/login', { replace: true });
     }
   };
