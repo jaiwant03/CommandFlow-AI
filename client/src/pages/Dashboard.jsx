@@ -80,24 +80,61 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
     const unsubscribe = socketService.subscribeStatus((event) => {
       loadData();
       if (event.automationId && (event.automationId === activeAutomationId || isExecuting)) {
-        if (event.status === 'PROCESSING' || event.status === 'SENDING') {
+        if (event.status === 'QUEUED') {
           setExecutionStep(6);
+          setExecutionResult(prev => ({
+            type: 'immediate',
+            status: 'QUEUED',
+            channel: prev?.channel,
+            recipient: prev?.recipient,
+            recipients: prev?.recipients,
+            intent: prev?.intent,
+            content: prev?.content,
+            subject: prev?.subject,
+            message: event.message || 'Another command is currently running. Queued in BullMQ...'
+          }));
+        } else if (event.status === 'PROCESSING' || event.status === 'SENDING') {
+          setExecutionStep(6);
+          setExecutionResult(prev => ({
+            type: 'immediate',
+            status: event.status,
+            channel: prev?.channel,
+            recipient: prev?.recipient,
+            recipients: prev?.recipients,
+            intent: prev?.intent,
+            content: prev?.content,
+            subject: prev?.subject,
+            message: event.message || 'Executing command pipeline...'
+          }));
         } else if (event.status === 'SUCCESS' || event.status === 'SENT') {
           setExecutionStep(7);
           setIsExecuting(false);
-          setExecutionResult({
+          setExecutionResult(prev => ({
             type: 'immediate',
             status: 'SUCCESS',
-            message: event.message || 'Automation executed successfully!'
-          });
+            channel: prev?.channel,
+            recipient: prev?.recipient,
+            recipients: prev?.recipients,
+            intent: prev?.intent,
+            content: prev?.content,
+            subject: prev?.subject,
+            message: event.message || '✓ Automation executed successfully!'
+          }));
         } else if (event.status === 'FAILED') {
           setExecutionStep(7);
           setIsExecuting(false);
-          setExecutionResult({
+          setExecutionResult(prev => ({
             type: 'immediate',
             status: 'FAILED',
+            channel: prev?.channel,
+            recipient: prev?.recipient,
+            recipients: prev?.recipients,
+            intent: prev?.intent,
+            content: prev?.content,
+            subject: prev?.subject,
+            error: event.error || event.message || 'Automation execution failed.',
             message: event.error || event.message || 'Automation execution failed.'
-          });
+          }));
         }
       }
     });
