@@ -6,6 +6,14 @@ const contactService = require('./contactService');
 const { validateCommandPlan } = require('../validators/commandValidator');
 const { addCommandJob } = require('../queues/commandQueue');
 const { emitStatusUpdate } = require('../sockets/socketManager');
+const {
+  isExecutionBusy,
+  getQueuePosition,
+  startExecution,
+  endExecution,
+  enqueueFallbackJob,
+  executeAutomation
+} = require('./executionManager');
 const AppError = require('../utils/appError');
 
 const generateAutomationId = () => {
@@ -100,7 +108,9 @@ class CommandService {
       ? new Date(validatedPlan.schedule.nextExecution)
       : null;
 
-    const initialStatus = isScheduled ? 'SCHEDULED' : 'QUEUED';
+    // Check if system is busy with another command before assigning initial status
+    const isBusy = !isScheduled && (await isExecutionBusy());
+    const initialStatus = isScheduled ? 'SCHEDULED' : (isBusy ? 'QUEUED' : 'PROCESSING');
 
     // 5. Persist Command in MongoDB
     const automation = await Automation.create({
@@ -189,60 +199,91 @@ class CommandService {
       };
     }
 
-    // 7. Immediate Command -> Enqueue into BullMQ Command Queue
-    await ActivityLog.create({
-      userId,
-      automationId,
-      action: `COMMAND_QUEUED_${validatedPlan.channel.toUpperCase()}`,
-      channel: validatedPlan.channel,
-      status: 'QUEUED',
-      message: `Command validated and enqueued into BullMQ command queue`
-    });
+    // 7. Execution: Immediate Execution (if idle) OR Queue in BullMQ (if busy with active command)
+    if (!isBusy) {
+      // --- IMMEDIATE EXECUTION PATH ---
+      // No active command running -> execute and send immediately without queueing delay!
+      console.log(`[CommandService] System is idle. Executing ${automationId} IMMEDIATELY (no BullMQ queuing)...`);
+      startExecution(automationId);
 
-    emitStatusUpdate(automationId, {
-      userId,
-      status: 'QUEUED',
-      step: 'queued',
-      message: 'Command accepted and enqueued in worker queue.'
-    });
-
-    const queueResult = await addCommandJob({
-      automationId,
-      userId,
-      command,
-      inputType,
-      plan: validatedPlan,
-      idempotencyKey: automation.idempotencyKey
-    });
-
-    if (queueResult.success) {
-      automation.jobId = queueResult.jobId;
-      await automation.save();
-    } else if (queueResult.fallbackRequired) {
-      // In-process fallback execution if Redis was temporarily unreachable
-      console.log(`[CommandService] Executing in-process fallback for ${automationId}...`);
-      const { processJob } = require('../workers/commandWorker');
-      processJob({
-        id: `fb-${automationId}`,
-        attemptsMade: 0,
-        data: {
+      try {
+        const execResult = await executeAutomation({
           automationId,
           userId,
           command,
           inputType,
           plan: validatedPlan,
           idempotencyKey: automation.idempotencyKey
-        }
-      }).catch(err => {
-        console.error(`[Fallback Execution Error]: ${err.message}`);
-      });
-    }
+        }, {
+          isImmediate: true,
+          jobId: 'immediate'
+        });
 
-    return {
-      automation,
-      isScheduled: false,
-      status: 'QUEUED'
-    };
+        return {
+          automation: execResult.automation || automation,
+          isScheduled: false,
+          isImmediate: true,
+          status: execResult.automation ? execResult.automation.status : 'SUCCESS'
+        };
+      } finally {
+        endExecution(automationId);
+      }
+    } else {
+      // --- QUEUED IN BULLMQ PATH ---
+      // Active command in progress -> queue 2nd, 3rd, etc. into BullMQ!
+      const queuePos = await getQueuePosition();
+      console.log(`[CommandService] System busy with active command. Enqueueing ${automationId} into BullMQ (Position #${queuePos})...`);
+
+      await ActivityLog.create({
+        userId,
+        automationId,
+        action: `COMMAND_QUEUED_${validatedPlan.channel.toUpperCase()}`,
+        channel: validatedPlan.channel,
+        status: 'QUEUED',
+        message: `Another command is currently executing. Command queued in BullMQ (Position #${queuePos})`
+      });
+
+      emitStatusUpdate(automationId, {
+        userId,
+        status: 'QUEUED',
+        step: 'queued',
+        queuePosition: queuePos,
+        message: `Another command is currently executing. Command queued in BullMQ (Position #${queuePos}).`
+      });
+
+      const queueResult = await addCommandJob({
+        automationId,
+        userId,
+        command,
+        inputType,
+        plan: validatedPlan,
+        idempotencyKey: automation.idempotencyKey
+      });
+
+      if (queueResult.success) {
+        automation.jobId = queueResult.jobId;
+        await automation.save();
+      } else if (queueResult.fallbackRequired) {
+        // Enqueue into in-process sequential queue
+        enqueueFallbackJob({
+          automationId,
+          userId,
+          command,
+          inputType,
+          plan: validatedPlan,
+          idempotencyKey: automation.idempotencyKey
+        });
+      }
+
+      return {
+        automation,
+        isScheduled: false,
+        isImmediate: false,
+        isQueued: true,
+        queuePosition: queuePos,
+        status: 'QUEUED'
+      };
+    }
   }
 
   /**
@@ -258,49 +299,14 @@ class CommandService {
       throw new AppError('Command is already being processed.', 400, 'ALREADY_PROCESSING');
     }
 
-    automation.status = 'QUEUED';
-    automation.attempts = 0;
-    automation.error = null;
-    await automation.save();
+    const busy = await isExecutionBusy();
 
-    await ActivityLog.create({
-      userId,
-      automationId,
-      action: 'COMMAND_MANUAL_RETRY',
-      channel: automation.channel,
-      status: 'QUEUED',
-      message: 'Command manually re-queued for execution'
-    });
-
-    emitStatusUpdate(automationId, {
-      userId,
-      status: 'QUEUED',
-      message: 'Command re-queued for execution.'
-    });
-
-    const queueResult = await addCommandJob({
-      automationId,
-      userId,
-      command: automation.originalCommand,
-      inputType: automation.inputType,
-      plan: {
-        intent: automation.intent,
-        channel: automation.channel,
-        recipient: automation.recipient,
-        recipients: automation.recipient?.recipients || [automation.recipient?.email],
-        subject: automation.generatedContent?.subject,
-        message: automation.generatedContent?.body
-      },
-      idempotencyKey: `RETRY-${automationId}-${Date.now()}`
-    });
-
-    if (queueResult.fallbackRequired) {
-      console.log(`[CommandService] Executing in-process retry fallback for ${automationId}...`);
-      const { processJob } = require('../workers/commandWorker');
-      processJob({
-        id: `fb-${automationId}`,
-        attemptsMade: 0,
-        data: {
+    if (!busy) {
+      automation.status = 'PROCESSING';
+      await automation.save();
+      startExecution(automationId);
+      try {
+        const execResult = await executeAutomation({
           automationId,
           userId,
           command: automation.originalCommand,
@@ -314,13 +320,68 @@ class CommandService {
             message: automation.generatedContent?.body
           },
           idempotencyKey: `RETRY-${automationId}-${Date.now()}`
-        }
-      }).catch(err => {
-        console.error(`[Fallback Retry Error]: ${err.message}`);
-      });
-    }
+        }, { isImmediate: true, jobId: 'immediate-retry' });
+        return execResult.automation || automation;
+      } finally {
+        endExecution(automationId);
+      }
+    } else {
+      automation.status = 'QUEUED';
+      automation.attempts = 0;
+      automation.error = null;
+      await automation.save();
 
-    return automation;
+      await ActivityLog.create({
+        userId,
+        automationId,
+        action: 'COMMAND_MANUAL_RETRY',
+        channel: automation.channel,
+        status: 'QUEUED',
+        message: 'Command manually re-queued for execution'
+      });
+
+      emitStatusUpdate(automationId, {
+        userId,
+        status: 'QUEUED',
+        message: 'Command re-queued in BullMQ for execution.'
+      });
+
+      const queueResult = await addCommandJob({
+        automationId,
+        userId,
+        command: automation.originalCommand,
+        inputType: automation.inputType,
+        plan: {
+          intent: automation.intent,
+          channel: automation.channel,
+          recipient: automation.recipient,
+          recipients: automation.recipient?.recipients || [automation.recipient?.email],
+          subject: automation.generatedContent?.subject,
+          message: automation.generatedContent?.body
+        },
+        idempotencyKey: `RETRY-${automationId}-${Date.now()}`
+      });
+
+      if (queueResult.fallbackRequired) {
+        enqueueFallbackJob({
+          automationId,
+          userId,
+          command: automation.originalCommand,
+          inputType: automation.inputType,
+          plan: {
+            intent: automation.intent,
+            channel: automation.channel,
+            recipient: automation.recipient,
+            recipients: automation.recipient?.recipients || [automation.recipient?.email],
+            subject: automation.generatedContent?.subject,
+            message: automation.generatedContent?.body
+          },
+          idempotencyKey: `RETRY-${automationId}-${Date.now()}`
+        });
+      }
+
+      return automation;
+    }
   }
 
   /**
