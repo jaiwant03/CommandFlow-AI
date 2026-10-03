@@ -363,6 +363,8 @@ const executeAutomation = async (
       throw new Error(errorMsg);
     }
   }
+};
+
 /**
  * Synchronously attempt to claim the single immediate execution slot.
  * Returns true if claimed (system was idle), false if busy (must queue).
