@@ -93,7 +93,31 @@ const addCommandJob = async ({ automationId, userId, command, inputType = 'text'
   }
 };
 
+/**
+ * Get active, waiting and delayed counts from BullMQ queue
+ */
+const getQueueCounts = async () => {
+  const isHealthy = await checkRedisConnection();
+  if (!isHealthy) {
+    return { active: 0, waiting: 0, delayed: 0, isHealthy: false };
+  }
+
+  try {
+    const queue = getCommandQueue();
+    const [active, waiting, delayed] = await Promise.all([
+      queue.getActiveCount(),
+      queue.getWaitingCount(),
+      queue.getDelayedCount()
+    ]);
+    return { active, waiting, delayed, isHealthy: true };
+  } catch (err) {
+    return { active: 0, waiting: 0, delayed: 0, isHealthy: false };
+  }
+};
+
 module.exports = {
   getCommandQueue,
-  addCommandJob
+  addCommandJob,
+  getQueueCounts
 };
+
