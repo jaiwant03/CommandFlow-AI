@@ -12,6 +12,7 @@ const connectDB = require('./config/db');
 const { initSocket } = require('./sockets/socketManager');
 const { initWorker } = require('./workers/commandWorker');
 const { initScheduler } = require('./services/schedulerService');
+const { resetStaleExecutions } = require('./services/executionManager');
 
 // Create HTTP Server
 const server = http.createServer(app);
