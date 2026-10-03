@@ -323,21 +323,24 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
             intent: parsedData.intent,
             content: parsedData.message || parsedData.content,
             subject: parsedData.subject,
-            message: `✓ Successfully executed via ${(execRes.data?.channel || parsedData.channel)?.toUpperCase()} engine!`
+            message: execRes.message || `✓ Successfully executed via ${(execRes.data?.channel || parsedData.channel)?.toUpperCase()} engine!`
           });
         } else if (execRes.success && (execRes.data?.status === 'QUEUED' || execRes.data?.status === 'PROCESSING')) {
-          // Worker is currently executing in background, Socket.IO will trigger step 6 -> 7
+          // Worker is executing in background or waiting in queue, Socket.IO will trigger step 6 -> 7
           setExecutionStep(6);
+          const isQueued = execRes.data?.status === 'QUEUED';
           setExecutionResult({
             type: 'immediate',
-            status: 'PROCESSING',
+            status: execRes.data?.status || 'PROCESSING',
             channel: execRes.data?.channel || parsedData.channel,
             recipient: verifiedRecipient,
             recipients: verifiedRecipients,
             intent: parsedData.intent,
             content: parsedData.message || parsedData.content,
             subject: parsedData.subject,
-            message: 'Queued in BullMQ worker. Processing and dispatching...'
+            message: execRes.message || (isQueued
+              ? 'Another command is currently executing. Queued in BullMQ worker...'
+              : 'Processing and dispatching payload...')
           });
         } else if (execRes.success && execRes.data?.status !== 'FAILED') {
           setExecutionStep(7);
