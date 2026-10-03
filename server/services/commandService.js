@@ -109,8 +109,9 @@ class CommandService {
       ? new Date(validatedPlan.schedule.nextExecution)
       : null;
 
-    // Check if system is busy with another command before assigning initial status
-    const isBusy = !isScheduled && (await isExecutionBusy());
+    // Atomically claim the immediate execution slot if system is currently idle
+    const isImmediateClaimed = !isScheduled && claimImmediateSlot(automationId);
+    const isBusy = !isScheduled && !isImmediateClaimed;
     const initialStatus = isScheduled ? 'SCHEDULED' : (isBusy ? 'QUEUED' : 'PROCESSING');
 
     // 5. Persist Command in MongoDB
