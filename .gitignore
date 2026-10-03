@@ -50,6 +50,9 @@ temp/
 cache/
 *.pid
 *.seed
+__pycache__/
+*.pyc
+*.pyo
 
 # ------------------------------
 # Server uploads
