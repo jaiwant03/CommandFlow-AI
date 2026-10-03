@@ -363,10 +363,30 @@ const executeAutomation = async (
       throw new Error(errorMsg);
     }
   }
+/**
+ * Synchronously attempt to claim the single immediate execution slot.
+ * Returns true if claimed (system was idle), false if busy (must queue).
+ */
+const claimImmediateSlot = (automationId) => {
+  const now = Date.now();
+  for (const [id, startTime] of activeExecutions.entries()) {
+    if (now - startTime > 45000) {
+      activeExecutions.delete(id);
+    }
+  }
+
+  if (activeExecutions.size > 0 || fallbackQueue.length > 0) {
+    return false;
+  }
+
+  activeExecutions.set(automationId, now);
+  console.log(`[ExecutionManager] Claimed immediate execution slot for ${automationId} (Active count: ${activeExecutions.size})`);
+  return true;
 };
 
 module.exports = {
   isExecutionBusy,
+  claimImmediateSlot,
   getQueuePosition,
   startExecution,
   endExecution,
