@@ -18,9 +18,8 @@ async function runTests() {
   initSocket(server);
   const worker = initWorker();
 
-  const TEST_PORT = 5092;
-  await new Promise(resolve => server.listen(TEST_PORT, '127.0.0.1', resolve));
-  const baseUrl = `http://127.0.0.1:${TEST_PORT}`;
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const baseUrl = `http://127.0.0.1:${server.address().port}`;
 
   try {
     // 1. Health check
