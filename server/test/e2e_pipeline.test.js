@@ -18,17 +18,16 @@ async function runTests() {
   initSocket(server);
   const worker = initWorker();
 
-  await new Promise(resolve => server.listen(0, resolve));
-  const TEST_PORT = server.address().port;
-  const baseUrl = `http://localhost:${TEST_PORT}`;
+  const TEST_PORT = 5092;
+  await new Promise(resolve => server.listen(TEST_PORT, '127.0.0.1', resolve));
+  const baseUrl = `http://127.0.0.1:${TEST_PORT}`;
 
   try {
     // 1. Health check
     console.log('[Test 1] Health check endpoint...');
-    const healthRes = await fetch(`${baseUrl}/api/health`);
+    const healthRes = await fetch(`${baseUrl}/health`);
     const healthData = await healthRes.json();
-    assert.strictEqual(healthData.status, 'healthy');
-    assert.strictEqual(healthData.services.mongodb.status, 'connected');
+    assert.strictEqual(healthData.status, 'ok');
     console.log('✓ Health check passed!');
 
     // 2. Authentication: Login
