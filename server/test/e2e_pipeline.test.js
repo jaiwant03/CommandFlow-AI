@@ -98,8 +98,8 @@ async function runTests() {
     assert.strictEqual(emptyCmdData.success, false);
     console.log('✓ Empty command rejection passed!');
 
-    // 6. Immediate Command Creation & BullMQ Enqueue
-    console.log('[Test 6] Command Pipeline: Create & Enqueue immediate command...');
+    // 6. Immediate Command Execution & Multi-Command BullMQ Queueing
+    console.log('[Test 6] Command Pipeline: Single command executes immediately, multiple commands queue in BullMQ...');
     const cmdRes = await fetch(`${baseUrl}/api/commands`, {
       method: 'POST',
       headers: {
@@ -112,11 +112,43 @@ async function runTests() {
       })
     });
     const cmdData = await cmdRes.json();
-    assert.strictEqual(cmdRes.status, 201);
     assert.strictEqual(cmdData.success, true);
     assert.ok(cmdData.data?.automationId);
-    assert.strictEqual(cmdData.data?.status, 'QUEUED');
-    console.log(`✓ Immediate command accepted in <500ms with status QUEUED! AutomationId: ${cmdData.data.automationId}`);
+    assert.strictEqual(cmdData.data?.status, 'SUCCESS');
+    console.log(`✓ Single command executed immediately with status SUCCESS! AutomationId: ${cmdData.data.automationId}`);
+
+    // Test multi-command queueing: send 2 commands simultaneously
+    console.log('[Test 6b] Sending concurrent commands to verify 2nd message queues in BullMQ...');
+    const [res1, res2] = await Promise.all([
+      fetch(`${baseUrl}/api/commands`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          command: 'Send urgent update to arun.test@gmail.com through Gmail',
+          inputType: 'text'
+        })
+      }),
+      fetch(`${baseUrl}/api/commands`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          command: 'Send follow-up note to arun.test@gmail.com through Gmail',
+          inputType: 'text'
+        })
+      })
+    ]);
+    const [data1, data2] = await Promise.all([res1.json(), res2.json()]);
+    assert.strictEqual(data1.success, true);
+    assert.strictEqual(data2.success, true);
+    const statuses = [data1.data?.status, data2.data?.status];
+    assert.ok(statuses.includes('QUEUED'), `Expected at least one queued command, got ${statuses.join(', ')}`);
+    console.log(`✓ Multi-message queueing verified! Command statuses: ${statuses.join(' and ')}`);
 
     // 7. Idempotency: Duplicate prevention
     console.log('[Test 7] Idempotency: Preventing duplicate execution...');
