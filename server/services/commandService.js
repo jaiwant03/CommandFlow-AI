@@ -202,12 +202,10 @@ class CommandService {
     }
 
     // 7. Execution: Immediate Execution (if idle) OR Queue in BullMQ (if busy with active command)
-    if (!isBusy) {
+    if (isImmediateClaimed) {
       // --- IMMEDIATE EXECUTION PATH ---
       // No active command running -> execute and send immediately without queueing delay!
       console.log(`[CommandService] System is idle. Executing ${automationId} IMMEDIATELY (no BullMQ queuing)...`);
-      startExecution(automationId);
-
       try {
         const execResult = await executeAutomation({
           automationId,
