@@ -115,53 +115,61 @@ class CommandService {
     const initialStatus = isScheduled ? 'SCHEDULED' : (isBusy ? 'QUEUED' : 'PROCESSING');
 
     // 5. Persist Command in MongoDB
-    const automation = await Automation.create({
-      automationId,
-      idempotencyKey: idempotencyKey || `IDEM-${automationId}`,
-      userId,
-      originalCommand: command,
-      language: validatedPlan.language || 'english',
-      inputType,
-      intent: validatedPlan.intent,
-      channel: validatedPlan.channel,
-      recipient: {
-        name: validatedPlan.recipient?.name || 'Recipient',
-        email: validatedPlan.recipients[0] || validatedPlan.recipient?.email || '',
-        recipients: validatedPlan.recipients,
-        telegramId: validatedPlan.recipient?.chatId || validatedPlan.recipient?.telegramId || '',
-        contactId: resolvedContact?.contactId || null
-      },
-      generatedContent: (() => {
-        const { formatEmailContent } = require('../utils/emailFormatter');
-        if (validatedPlan.channel === 'gmail') {
-          const formatted = formatEmailContent({
-            subject: validatedPlan.subject,
-            content: validatedPlan.message,
-            htmlContent: validatedPlan.htmlBody || aiParsed.htmlBody
-          });
+    let automation;
+    try {
+      automation = await Automation.create({
+        automationId,
+        idempotencyKey: idempotencyKey || `IDEM-${automationId}`,
+        userId,
+        originalCommand: command,
+        language: validatedPlan.language || 'english',
+        inputType,
+        intent: validatedPlan.intent,
+        channel: validatedPlan.channel,
+        recipient: {
+          name: validatedPlan.recipient?.name || 'Recipient',
+          email: validatedPlan.recipients[0] || validatedPlan.recipient?.email || '',
+          recipients: validatedPlan.recipients,
+          telegramId: validatedPlan.recipient?.chatId || validatedPlan.recipient?.telegramId || '',
+          contactId: resolvedContact?.contactId || null
+        },
+        generatedContent: (() => {
+          const { formatEmailContent } = require('../utils/emailFormatter');
+          if (validatedPlan.channel === 'gmail') {
+            const formatted = formatEmailContent({
+              subject: validatedPlan.subject,
+              content: validatedPlan.message,
+              htmlContent: validatedPlan.htmlBody || aiParsed.htmlBody
+            });
+            return {
+              subject: validatedPlan.subject || '',
+              body: formatted.plainText || validatedPlan.message,
+              htmlBody: formatted.html
+            };
+          }
           return {
             subject: validatedPlan.subject || '',
-            body: formatted.plainText || validatedPlan.message,
-            htmlBody: formatted.html
+            body: validatedPlan.message,
+            htmlBody: validatedPlan.htmlBody || ''
           };
-        }
-        return {
-          subject: validatedPlan.subject || '',
-          body: validatedPlan.message,
-          htmlBody: validatedPlan.htmlBody || ''
-        };
-      })(),
-      attachments,
-      schedule: {
-        date: validatedPlan.schedule?.date || null,
-        time: validatedPlan.schedule?.time || null,
-        cron: null,
-        nextExecution: scheduledTime
-      },
-      aiTokenUsage,
-      responseTimeMs: 0,
-      status: initialStatus
-    });
+        })(),
+        attachments,
+        schedule: {
+          date: validatedPlan.schedule?.date || null,
+          time: validatedPlan.schedule?.time || null,
+          cron: null,
+          nextExecution: scheduledTime
+        },
+        aiTokenUsage,
+        responseTimeMs: 0,
+        status: initialStatus
+      });
+    } catch (err) {
+      if (isImmediateClaimed) {
+        endExecution(automationId);
+      }
+      throw err;
+    }
 
     // 6. Handle Scheduling
     if (isScheduled) {
