@@ -68,9 +68,14 @@ const createAutomationFromCommand = async (req, res, next) => {
 
     const statusMessage = result.isScheduled
       ? 'Automation scheduled successfully.'
-      : 'Command accepted and queued for execution.';
+      : (result.isImmediate
+          ? (result.status === 'SUCCESS'
+              ? 'Command executed and sent immediately.'
+              : 'Command executed immediately.')
+          : `Another command is currently executing. Command queued in BullMQ (Position #${result.queuePosition || 1}).`);
 
-    return sendSuccess(res, statusMessage, result.automation, 201);
+    const statusCode = result.isImmediate && result.status === 'SUCCESS' ? 200 : 201;
+    return sendSuccess(res, statusMessage, result.automation, statusCode);
   } catch (err) {
     next(err);
   }
