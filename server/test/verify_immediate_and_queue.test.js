@@ -22,9 +22,9 @@ async function testImmediateAndQueue() {
   initSocket(server);
   const worker = initWorker();
 
-  const TEST_PORT = 5099;
-  await new Promise(resolve => server.listen(TEST_PORT, resolve));
-  const baseUrl = `http://localhost:${TEST_PORT}`;
+  const TEST_PORT = 5088;
+  await new Promise(resolve => server.listen(TEST_PORT, '127.0.0.1', resolve));
+  const baseUrl = `http://127.0.0.1:${TEST_PORT}`;
 
   try {
     // 1. Authenticate Demo User
