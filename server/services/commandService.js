@@ -8,6 +8,7 @@ const { addCommandJob } = require('../queues/commandQueue');
 const { emitStatusUpdate } = require('../sockets/socketManager');
 const {
   isExecutionBusy,
+  claimImmediateSlot,
   getQueuePosition,
   startExecution,
   endExecution,
