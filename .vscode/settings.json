@@ -3,11 +3,28 @@
     "java.jdt.ls.java.home": "C:\\Users\\JAIWANT KARRUN.S.A\\.jdks\\jbr-21.0.11",
     "gradle.java.home": "C:\\Users\\JAIWANT KARRUN.S.A\\.jdks\\jbr-21.0.11",
     "java.import.gradle.java.home": "C:\\Users\\JAIWANT KARRUN.S.A\\.jdks\\jbr-21.0.11",
+    "java.import.gradle.enabled": false,
+    "java.import.exclusions": [
+        "**/node_modules/**",
+        "**/.metadata/**",
+        "**/archetype-resources/**",
+        "**/META-INF/maven/**",
+        "**/bin/**",
+        "**/build/**"
+    ],
     "java.configuration.runtimes": [
         {
             "name": "JavaSE-21",
             "path": "C:\\Users\\JAIWANT KARRUN.S.A\\.jdks\\jbr-21.0.11",
             "default": true
         }
-    ]
+    ],
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/client/android/.gradle/**": true,
+        "**/client/android/build/**": true,
+        "**/client/android/app/build/**": true
+    }
 }
