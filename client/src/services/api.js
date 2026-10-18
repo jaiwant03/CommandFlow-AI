@@ -11,10 +11,25 @@ const isLocalBrowser = typeof window !== 'undefined' &&
 const PRODUCTION_API_URL = 'https://commandflow-ai.onrender.com';
 const LOCAL_API_URL = 'http://localhost:5000';
 
+const getCustomServerUrl = () => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const saved = localStorage.getItem('commandflow_custom_api_url');
+      if (saved && saved.trim()) {
+        return saved.trim();
+      }
+    }
+  } catch (e) {}
+  return null;
+};
+
+const customServerUrl = getCustomServerUrl();
+
 export const SERVER_BASE_URL = (
-  isNativeApp
+  customServerUrl ||
+  (isNativeApp
     ? (import.meta.env.VITE_API_URL || PRODUCTION_API_URL)
-    : (isLocalBrowser ? LOCAL_API_URL : (import.meta.env.VITE_API_URL || PRODUCTION_API_URL))
+    : (isLocalBrowser ? LOCAL_API_URL : (import.meta.env.VITE_API_URL || PRODUCTION_API_URL)))
 ).replace(/\/+$/, '');
 
 // Network status listeners for Render sleep / cold-start awareness

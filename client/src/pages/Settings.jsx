@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { getCurrentUser } from '../services/authService';
 import HandwrittenHeading from '../components/HandwrittenHeading';
-import { Save, Globe, Clock, Bell, User, ShieldCheck } from 'lucide-react';
+import { Save, Globe, Clock, Bell, User, ShieldCheck, Server, RefreshCw } from 'lucide-react';
+import { SERVER_BASE_URL } from '../services/api';
 import '../styles/global.css';
 
 const Settings = () => {
@@ -9,10 +10,18 @@ const Settings = () => {
   const [language, setLanguage] = useState('english');
   const [timezone, setTimezone] = useState('Asia/Kolkata');
   const [notifications, setNotifications] = useState(true);
+  const [customServerUrl, setCustomServerUrl] = useState(() => {
+    return localStorage.getItem('commandflow_custom_api_url') || '';
+  });
   const [saved, setSaved] = useState(false);
 
   const handleSave = (e) => {
     e.preventDefault();
+    if (customServerUrl.trim()) {
+      localStorage.setItem('commandflow_custom_api_url', customServerUrl.trim().replace(/\/+$/, ''));
+    } else {
+      localStorage.removeItem('commandflow_custom_api_url');
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
