@@ -33,7 +33,7 @@ import '../styles/handwrittenIntro.css';
  * 3. Docked Stage (3.7s+):
  *    - The Login page is fully interactive and ready for credentials input.
  */
-const HandwrittenIntro = ({ onComplete, duration = 2600 }) => {
+const HandwrittenIntro = ({ onComplete, duration = 2800 }) => {
   // dockStage: 'intro' | 'docking' | 'docked'
   const [dockStage, setDockStage] = useState('intro');
   const [dockOffset, setDockOffset] = useState(210);
