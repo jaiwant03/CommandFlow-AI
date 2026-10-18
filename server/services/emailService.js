@@ -52,7 +52,7 @@ class EmailService {
   /**
    * Create fresh transporters with IPv4 affinity and tight timeouts (prevents stale socket hangs)
    */
-  getTransporters() {
+  async getTransporters() {
     if (!this.user || !this.pass) {
       this.initTransporter();
     }
@@ -62,50 +62,67 @@ class EmailService {
 
     const { user, pass } = this;
 
-    // Carrier 1: Direct SSL Port 465 (Fastest & most reliable for Gmail with IPv4 enforcement)
+    // Actively resolve IPv4 addresses to permanently eliminate Linux ENETUNREACH IPv6 routing errors on cloud/Render
+    let ipv4Host = 'smtp.gmail.com';
+    try {
+      const ips = await dns.promises.resolve4('smtp.gmail.com');
+      if (ips && ips.length > 0) {
+        ipv4Host = ips[0];
+        console.log(`[EmailService] Enforcing IPv4 address for smtp.gmail.com: ${ipv4Host}`);
+      }
+    } catch (dnsErr) {
+      console.warn(`[EmailService] DNS IPv4 resolution note: ${dnsErr.message}`);
+    }
+
+    // Carrier 1: Direct SSL Port 465 via IPv4 with SNI
     const port465 = nodemailer.createTransport({
+      host: ipv4Host,
+      port: 465,
+      secure: true,
+      tls: {
+        rejectUnauthorized: false,
+        servername: 'smtp.gmail.com'
+      },
+      pool: false, // Fresh socket per dispatch to prevent stale idle socket drops
+      auth: { user, pass },
+      connectionTimeout: 5000,
+      greetingTimeout: 4000,
+      socketTimeout: 8000
+    });
+
+    // Carrier 2: Standard SMTP Port 587 with STARTTLS via IPv4 with SNI
+    const port587 = nodemailer.createTransport({
+      host: ipv4Host,
+      port: 587,
+      secure: false,
+      tls: {
+        rejectUnauthorized: false,
+        servername: 'smtp.gmail.com'
+      },
+      pool: false,
+      auth: { user, pass },
+      connectionTimeout: 5000,
+      greetingTimeout: 4000,
+      socketTimeout: 8000
+    });
+
+    // Carrier 3: Standard hostname fallback (in case IP was rotated)
+    const hostnameCarrier = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 465,
       secure: true,
-      lookup: customIpv4Lookup,
-      pool: false, // Fresh socket per dispatch to prevent stale idle socket drops
-      auth: { user, pass },
       tls: { rejectUnauthorized: false },
-      connectionTimeout: 4000,
-      greetingTimeout: 3500,
-      socketTimeout: 7000
-    });
-
-    // Carrier 2: Standard SMTP Port 587 with STARTTLS (Fallback if Port 465 is filtered by ISP)
-    const port587 = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      lookup: customIpv4Lookup,
       pool: false,
       auth: { user, pass },
-      tls: { rejectUnauthorized: false },
-      connectionTimeout: 4000,
-      greetingTimeout: 3500,
-      socketTimeout: 7000
-    });
-
-    // Carrier 3: First-class Gmail Service Driver
-    const gmailService = nodemailer.createTransport({
-      service: 'gmail',
-      lookup: customIpv4Lookup,
-      pool: false,
-      auth: { user, pass },
-      tls: { rejectUnauthorized: false },
-      connectionTimeout: 4000,
-      greetingTimeout: 3500,
-      socketTimeout: 7000
+      connectionTimeout: 5000,
+      greetingTimeout: 4000,
+      socketTimeout: 8000
     });
 
     return [
-      { name: 'Gmail SMTP Port 465 (Direct SSL)', transport: port465 },
-      { name: 'Gmail SMTP Port 587 (STARTTLS)', transport: port587 },
-      { name: 'Gmail Service Transporter', transport: gmailService }
+      { name: 'Gmail SMTP Port 465 (IPv4 Direct SSL)', transport: port465 },
+      { name: 'Gmail SMTP Port 587 (IPv4 STARTTLS)', transport: port587 },
+      { name: 'Gmail SMTP Hostname Fallback', transport: hostnameCarrier }
     ];
   }
 
@@ -270,7 +287,7 @@ class EmailService {
       }
     }
 
-    const candidates = this.getTransporters();
+    const candidates = await this.getTransporters();
 
     if (candidates.length === 0) {
       throw new Error(`No active email credentials configured. Verify EMAIL_USER and EMAIL_PASS in server/.env.`);
