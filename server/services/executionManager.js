@@ -57,10 +57,10 @@ const endExecution = (automationId) => {
  * Returns true if an active command is currently running or commands are waiting in the queue.
  */
 const isExecutionBusy = async () => {
-  // 1. Clean stale in-memory executions (> 45s)
+  // 1. Clean stale in-memory executions (> 30s)
   const now = Date.now();
   for (const [id, startTime] of activeExecutions.entries()) {
-    if (now - startTime > 45000) {
+    if (now - startTime > 30000) {
       activeExecutions.delete(id);
     }
   }
@@ -70,32 +70,14 @@ const isExecutionBusy = async () => {
     return true;
   }
 
-  // 3. Fallback queue in memory
-  if (fallbackQueue.length > 0) {
-    return true;
-  }
-
-  // 4. BullMQ active or waiting jobs
+  // 3. BullMQ active jobs
   try {
     const counts = await getQueueCounts();
-    if (counts.isHealthy && (counts.active > 0 || counts.waiting > 0)) {
+    if (counts.isHealthy && counts.active > 0) {
       return true;
     }
   } catch (err) {
     // Ignore Redis errors
-  }
-
-  // 5. MongoDB active records in the last 30 seconds
-  try {
-    const activeInDb = await Automation.countDocuments({
-      status: { $in: ['PROCESSING', 'SENDING'] },
-      updatedAt: { $gte: new Date(Date.now() - 30000) }
-    });
-    if (activeInDb > 0) {
-      return true;
-    }
-  } catch (err) {
-    // Ignore DB errors
   }
 
   return false;
