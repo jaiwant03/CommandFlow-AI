@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, Mail, Send, Calendar, CheckCircle, Clock, AlertTriangle, Eye } from 'lucide-react';
+import { Zap, Mail, Send, Calendar, CheckCircle, Clock, AlertTriangle, Eye, RefreshCw } from 'lucide-react';
 import '../styles/automation.css';
 
 const AutomationCard = ({ automation, onViewDetails }) => {
@@ -15,12 +15,20 @@ const AutomationCard = ({ automation, onViewDetails }) => {
     const statusUpper = (st || '').toUpperCase();
     switch (statusUpper) {
       case 'SUCCESS':
+      case 'SENT':
         return <span className="status-badge status-success"><CheckCircle size={12} /> SUCCESS</span>;
       case 'SCHEDULED':
         return <span className="status-badge status-scheduled"><Clock size={12} /> SCHEDULED</span>;
       case 'PROCESSING':
       case 'RUNNING':
         return <span className="status-badge status-processing"><Zap size={12} className="spin" /> PROCESSING</span>;
+      case 'SENDING':
+        return <span className="status-badge status-sending"><Send size={12} className="spin" /> SENDING</span>;
+      case 'QUEUED':
+      case 'WAITING':
+        return <span className="status-badge status-queued"><Clock size={12} /> QUEUED</span>;
+      case 'RETRYING':
+        return <span className="status-badge status-retrying"><RefreshCw size={12} className="spin" /> RETRYING</span>;
       default:
         return <span className="status-badge status-failed"><AlertTriangle size={12} /> FAILED</span>;
     }
