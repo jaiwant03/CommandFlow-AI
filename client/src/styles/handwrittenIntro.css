@@ -671,8 +671,8 @@
 .cf-dock-form,
 .cf-dock-footer {
   transition: 
-    opacity 0.75s ease 0.35s,
-    transform 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) 0.35s;
+    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.3s,
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
   will-change: opacity, transform;
 }
 
@@ -680,6 +680,7 @@
 .form-hidden,
 .footer-hidden {
   opacity: 0 !important;
+  visibility: hidden !important;
   transform: translateY(22px) !important;
   pointer-events: none !important;
 }
@@ -688,6 +689,7 @@
 .form-visible,
 .footer-visible {
   opacity: 1 !important;
+  visibility: visible !important;
   transform: translateY(0px) !important;
   pointer-events: auto !important;
 }
