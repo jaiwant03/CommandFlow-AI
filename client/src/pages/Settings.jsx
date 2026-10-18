@@ -106,17 +106,24 @@ const Settings = () => {
               <div className="settings-preset-chips">
                 <button
                   type="button"
+                  className={`settings-preset-btn ${customServerUrl === 'http://192.168.1.33:5000' ? 'active' : ''}`}
+                  onClick={() => setCustomServerUrl('http://192.168.1.33:5000')}
+                >
+                  Wi-Fi PC (192.168.1.33:5000)
+                </button>
+                <button
+                  type="button"
+                  className={`settings-preset-btn ${customServerUrl === 'http://10.0.2.2:5000' ? 'active' : ''}`}
+                  onClick={() => setCustomServerUrl('http://10.0.2.2:5000')}
+                >
+                  Emulator (10.0.2.2:5000)
+                </button>
+                <button
+                  type="button"
                   className={`settings-preset-btn ${customServerUrl === 'https://commandflow-ai.onrender.com' || (!customServerUrl && SERVER_BASE_URL.includes('onrender.com')) ? 'active' : ''}`}
                   onClick={() => setCustomServerUrl('https://commandflow-ai.onrender.com')}
                 >
                   Cloud (Render)
-                </button>
-                <button
-                  type="button"
-                  className={`settings-preset-btn ${customServerUrl === 'http://localhost:5000' || (!customServerUrl && SERVER_BASE_URL.includes('localhost:5000')) ? 'active' : ''}`}
-                  onClick={() => setCustomServerUrl('http://localhost:5000')}
-                >
-                  Localhost:5000
                 </button>
                 {customServerUrl && (
                   <button
