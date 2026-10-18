@@ -4,6 +4,7 @@ import HandwrittenHeading from '../components/HandwrittenHeading';
 import { Save, Globe, Clock, Bell, User, ShieldCheck, Server, RefreshCw } from 'lucide-react';
 import { SERVER_BASE_URL } from '../services/api';
 import '../styles/global.css';
+import '../styles/settings.css';
 
 const Settings = () => {
   const user = getCurrentUser() || { name: 'CommandFlow User', email: 'user@commandflow.ai' };
@@ -27,25 +28,28 @@ const Settings = () => {
   };
 
   return (
-    <div className="page-container">
-      <div style={{ marginBottom: '1.5rem' }}>
+    <div className="page-container settings-page">
+      <div className="settings-header-area">
         <HandwrittenHeading text="Settings" size="normal" withFlourish={true} />
-        <p className="page-subtitle">Configure application language, timezone, notification preferences, and account info.</p>
+        <p className="settings-subtitle">Configure application language, timezone, notification preferences, and account info.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem' }}>
-        <div className="glass-card" style={{ padding: '2rem' }}>
-          <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <div className="settings-grid-layout">
+        {/* Main Application Preferences Card */}
+        <div className="glass-card settings-card settings-main-card">
+          <h3 className="settings-card-title">
             <Globe size={20} color="var(--primary)" />
-            Application Preferences
+            <span>Application Preferences</span>
           </h3>
 
           <form onSubmit={handleSave}>
-            <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-              <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.35rem', display: 'block' }}>Default Language</label>
+            <div className="settings-form-group">
+              <label className="settings-form-label">
+                <Globe size={15} color="#059669" />
+                <span>Default Language</span>
+              </label>
               <select
-                className="form-input"
-                style={{ width: '100%' }}
+                className="settings-form-select"
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
               >
@@ -56,11 +60,13 @@ const Settings = () => {
               </select>
             </div>
 
-            <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-              <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.35rem', display: 'block' }}>Default Timezone</label>
+            <div className="settings-form-group">
+              <label className="settings-form-label">
+                <Clock size={15} color="#0284C7" />
+                <span>Default Timezone</span>
+              </label>
               <select
-                className="form-input"
-                style={{ width: '100%' }}
+                className="settings-form-select"
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
               >
@@ -69,37 +75,45 @@ const Settings = () => {
                 <option value="America/New_York">America/New_York (EST)</option>
                 <option value="Europe/London">Europe/London (GMT)</option>
               </select>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
+              <span className="settings-form-help">
                 Used for scheduling natural language time commands.
               </span>
             </div>
 
-            <div className="form-group" style={{ marginBottom: '1.5rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem' }}>
-              <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Server size={16} color="var(--primary)" />
+            <div className="settings-form-group">
+              <label className="settings-toggle-row">
+                <input
+                  type="checkbox"
+                  checked={notifications}
+                  onChange={(e) => setNotifications(e.target.checked)}
+                />
+                <span>Enable Execution Email & Telegram Notifications</span>
+              </label>
+            </div>
+
+            <div className="settings-server-section">
+              <label className="settings-form-label">
+                <Server size={15} color="#7C3AED" />
                 <span>Backend API Server Endpoint</span>
               </label>
               <input
                 type="text"
-                className="form-input"
-                style={{ width: '100%', fontFamily: 'monospace', fontSize: '0.85rem' }}
+                className="settings-form-input settings-server-input"
                 placeholder="https://commandflow-ai.onrender.com (or http://192.168.1.x:5000)"
                 value={customServerUrl}
                 onChange={(e) => setCustomServerUrl(e.target.value)}
               />
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+              <div className="settings-preset-chips">
                 <button
                   type="button"
-                  className="btn btn-secondary"
-                  style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+                  className={`settings-preset-btn ${customServerUrl === 'https://commandflow-ai.onrender.com' || (!customServerUrl && SERVER_BASE_URL.includes('onrender.com')) ? 'active' : ''}`}
                   onClick={() => setCustomServerUrl('https://commandflow-ai.onrender.com')}
                 >
                   Cloud (Render)
                 </button>
                 <button
                   type="button"
-                  className="btn btn-secondary"
-                  style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+                  className={`settings-preset-btn ${customServerUrl === 'http://localhost:5000' || (!customServerUrl && SERVER_BASE_URL.includes('localhost:5000')) ? 'active' : ''}`}
                   onClick={() => setCustomServerUrl('http://localhost:5000')}
                 >
                   Localhost:5000
@@ -107,49 +121,55 @@ const Settings = () => {
                 {customServerUrl && (
                   <button
                     type="button"
-                    className="btn btn-secondary"
-                    style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem', color: 'var(--text-muted)' }}
+                    className="settings-preset-btn"
+                    style={{ color: '#64748B' }}
                     onClick={() => setCustomServerUrl('')}
                   >
                     Reset to Default
                   </button>
                 )}
               </div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.4rem', display: 'block' }}>
-                Active Connection: <strong style={{ color: 'var(--text-primary)' }}>{SERVER_BASE_URL}</strong>
-              </span>
+              <div className="settings-active-badge">
+                <span>Active Connection:</span>
+                <strong>{SERVER_BASE_URL}</strong>
+              </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
-              <button type="submit" className="btn btn-primary">
+            <div className="settings-actions-bar">
+              <button type="submit" className="settings-save-btn">
                 <Save size={16} />
                 <span>Save Preferences</span>
               </button>
-              {saved && <span style={{ color: 'var(--success)', fontSize: '0.85rem', fontWeight: 600 }}>✓ Preferences Saved Successfully!</span>}
+              {saved && (
+                <span className="settings-saved-badge">
+                  ✓ Preferences Saved Successfully!
+                </span>
+              )}
             </div>
           </form>
         </div>
 
-        <div className="glass-card" style={{ padding: '1.75rem' }}>
-          <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        {/* Account Details Card */}
+        <div className="glass-card settings-card settings-side-card">
+          <h3 className="settings-card-title">
             <User size={20} color="var(--primary)" />
-            Account Details
+            <span>Account Details</span>
           </h3>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.85rem' }}>
-            <div>
-              <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Name:</span><br />
-              <strong style={{ color: 'var(--text-primary)', fontSize: '0.95rem' }}>{user.name}</strong>
+          <div className="settings-account-list">
+            <div className="settings-account-item">
+              <span className="settings-account-label">Full Name</span>
+              <strong className="settings-account-value">{user.name}</strong>
             </div>
 
-            <div>
-              <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Email:</span><br />
-              <strong style={{ color: 'var(--text-primary)', fontSize: '0.95rem' }}>{user.email}</strong>
+            <div className="settings-account-item">
+              <span className="settings-account-label">Email Address</span>
+              <strong className="settings-account-value">{user.email}</strong>
             </div>
 
-            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.85rem' }}>
-              <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>System Status:</span><br />
-              <strong style={{ color: 'var(--primary-dark)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.25rem' }}>
+            <div className="settings-status-box">
+              <span className="settings-account-label">System Authentication</span>
+              <strong>
                 <ShieldCheck size={16} /> JWT Authentication Active
               </strong>
             </div>
