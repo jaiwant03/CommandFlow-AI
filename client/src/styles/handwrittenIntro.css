@@ -266,7 +266,7 @@
 
 /* Intro position: Translated to exact screen center and enlarged 2.15x */
 .cf-dock-pedestal.pedestal-intro {
-  transform: translateY(var(--pedestal-offset-y, var(--target-offset-y, 180px))) scale(2.15);
+  transform: translateY(var(--pedestal-offset-y, var(--target-offset-y, 165px))) scale(2.15);
   transition: none;
 }
 

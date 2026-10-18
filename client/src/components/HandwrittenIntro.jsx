@@ -39,9 +39,9 @@ const HandwrittenIntro = ({ onComplete, duration = 2800 }) => {
   const [dockOffset, setDockOffset] = useState(() => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480;
     const isSmall = typeof window !== 'undefined' && window.innerWidth <= 360;
-    if (isSmall) return { pedestal: 85, title: 98 };
-    if (isMobile) return { pedestal: 100, title: 114 };
-    return { pedestal: 180, title: 198 };
+    if (isSmall) return { pedestal: 80, title: 126 };
+    if (isMobile) return { pedestal: 90, title: 138 };
+    return { pedestal: 165, title: 228 };
   });
 
   // Login Form States
@@ -64,18 +64,18 @@ const HandwrittenIntro = ({ onComplete, duration = 2800 }) => {
       const isSmallMobile = window.innerWidth <= 360;
       const vh = window.innerHeight;
 
-      let pOffset = 180;
-      let tOffset = 198;
+      let pOffset = 165;
+      let tOffset = 228;
 
       if (isSmallMobile) {
-        pOffset = Math.min(85, Math.max(50, Math.round(vh * 0.11)));
-        tOffset = pOffset + 12;
+        pOffset = Math.min(85, Math.max(50, Math.round(vh * 0.10)));
+        tOffset = pOffset + 46;
       } else if (isMobile) {
-        pOffset = Math.min(100, Math.max(65, Math.round(vh * 0.13)));
-        tOffset = pOffset + 14;
+        pOffset = Math.min(100, Math.max(65, Math.round(vh * 0.12)));
+        tOffset = pOffset + 48;
       } else {
-        pOffset = Math.min(210, Math.max(140, Math.round(vh * 0.22)));
-        tOffset = pOffset + 18;
+        pOffset = Math.min(195, Math.max(130, Math.round(vh * 0.20)));
+        tOffset = pOffset + 62;
       }
 
       setDockOffset({ pedestal: pOffset, title: tOffset });
