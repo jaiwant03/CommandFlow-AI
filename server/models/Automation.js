@@ -95,7 +95,7 @@ const automationSchema = new mongoose.Schema({
       // Legacy case compatibility
       'Pending', 'Processing', 'Scheduled', 'Running', 'Success', 'Failed', 'Waiting', 'Cancelled'
     ],
-    default: 'QUEUED',
+    default: 'PROCESSING',
     index: true
   },
   attempts: {
