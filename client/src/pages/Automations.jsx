@@ -90,9 +90,12 @@ const Automations = () => {
 
   const getStatusClass = (status) => {
     const upper = String(status || '').toUpperCase();
-    if (upper === 'SUCCESS') return 'status-success';
+    if (upper === 'SUCCESS' || upper === 'SENT') return 'status-success';
     if (upper === 'SCHEDULED') return 'status-scheduled';
     if (upper === 'PROCESSING' || upper === 'RUNNING') return 'status-processing';
+    if (upper === 'SENDING') return 'status-sending';
+    if (upper === 'QUEUED' || upper === 'WAITING') return 'status-queued';
+    if (upper === 'RETRYING') return 'status-retrying';
     return 'status-failed';
   };
 
