@@ -366,14 +366,15 @@ const HandwrittenIntro = ({ onComplete, duration = 2800 }) => {
         <div className={`auth-footer cf-dock-footer ${isIntro ? 'footer-hidden' : 'footer-visible'}`}>
           <div className="auth-switch-text">
             Don't have an account?{' '}
-            <Link
-              to="/signup"
+            <button
+              type="button"
               className="auth-switch-link"
-              onClick={() => sessionStorage.setItem('cf_intro_seen', 'true')}
+              onClick={handleCreateAccount}
+              style={{ background: 'none', border: 'none', padding: 0, font: 'inherit', cursor: 'pointer' }}
               tabIndex={isDocked ? 0 : -1}
             >
               Create Account
-            </Link>
+            </button>
           </div>
 
           {/* Trust & Capabilities Bar */}
