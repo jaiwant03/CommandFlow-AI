@@ -70,9 +70,9 @@ class EmailService {
       pool: false, // Fresh socket per dispatch to prevent stale idle socket drops
       auth: { user, pass },
       tls: { rejectUnauthorized: false },
-      connectionTimeout: 15000,
-      greetingTimeout: 10000,
-      socketTimeout: 20000
+      connectionTimeout: 4000,
+      greetingTimeout: 3500,
+      socketTimeout: 7000
     });
 
     // Carrier 2: Standard SMTP Port 587 with STARTTLS (Fallback if Port 465 is filtered by ISP)
@@ -84,9 +84,9 @@ class EmailService {
       pool: false,
       auth: { user, pass },
       tls: { rejectUnauthorized: false },
-      connectionTimeout: 15000,
-      greetingTimeout: 10000,
-      socketTimeout: 20000
+      connectionTimeout: 4000,
+      greetingTimeout: 3500,
+      socketTimeout: 7000
     });
 
     // Carrier 3: First-class Gmail Service Driver
@@ -96,9 +96,9 @@ class EmailService {
       pool: false,
       auth: { user, pass },
       tls: { rejectUnauthorized: false },
-      connectionTimeout: 15000,
-      greetingTimeout: 10000,
-      socketTimeout: 20000
+      connectionTimeout: 4000,
+      greetingTimeout: 3500,
+      socketTimeout: 7000
     });
 
     return [
