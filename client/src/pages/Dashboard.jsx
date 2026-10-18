@@ -106,6 +106,19 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
             subject: prev?.subject,
             message: event.message || 'Executing command pipeline...'
           }));
+        } else if (event.status === 'RETRYING') {
+          setExecutionStep(6);
+          setExecutionResult(prev => ({
+            type: 'immediate',
+            status: 'RETRYING',
+            channel: prev?.channel,
+            recipient: prev?.recipient,
+            recipients: prev?.recipients,
+            intent: prev?.intent,
+            content: prev?.content,
+            subject: prev?.subject,
+            message: event.message || 'Encountered temporary error. Retrying...'
+          }));
         } else if (event.status === 'SUCCESS' || event.status === 'SENT') {
           setExecutionStep(7);
           setIsExecuting(false);
