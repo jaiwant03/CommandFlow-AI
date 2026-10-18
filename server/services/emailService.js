@@ -197,6 +197,79 @@ class EmailService {
     console.log(`[Gmail] Has image: ${hasImage}`);
     console.log(`[Gmail] Binary field exists: ${binaryFieldExists}`);
 
+    // 0. HTTPS Carrier: Brevo (Sendinblue) via Port 443 (Zero SMTP Port Block on Render / Cloud)
+    const brevoKey = process.env.BREVO_API_KEY || process.env.SENDINBLUE_API_KEY;
+    if (brevoKey) {
+      try {
+        console.log(`[EmailService] Attempting delivery via Brevo HTTPS API (Port 443)...`);
+        const startTime = Date.now();
+        const brevoRes = await axios.post('https://api.brevo.com/v3/smtp/email', {
+          sender: { name: 'CommandFlow AI', email: senderEmail },
+          to: recipientList.map(r => ({ email: r })),
+          subject: subject || 'CommandFlow AI Notification',
+          htmlContent: cleanHtml,
+          textContent: plainText
+        }, {
+          headers: {
+            'api-key': brevoKey,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          timeout: 8000
+        });
+
+        if (brevoRes.data && (brevoRes.data.messageId || brevoRes.status === 201 || brevoRes.status === 200)) {
+          const durationMs = Date.now() - startTime;
+          const msgId = brevoRes.data.messageId || `brevo-${Date.now()}`;
+          console.log(`[EmailService] Email dispatched via Brevo HTTPS API in ${durationMs}ms! MessageId: ${msgId}`);
+          return {
+            success: true,
+            messageId: msgId,
+            provider: 'Brevo HTTPS API (Port 443)',
+            durationMs
+          };
+        }
+      } catch (brevoErr) {
+        console.warn(`[EmailService] Brevo HTTPS API error: ${brevoErr.response?.data?.message || brevoErr.message}. Failing over to SMTP...`);
+      }
+    }
+
+    // 0b. HTTPS Carrier: Resend via Port 443 (Zero SMTP Port Block on Render / Cloud)
+    const resendKey = process.env.RESEND_API_KEY;
+    if (resendKey) {
+      try {
+        console.log(`[EmailService] Attempting delivery via Resend HTTPS API (Port 443)...`);
+        const startTime = Date.now();
+        const resendRes = await axios.post('https://api.resend.com/emails', {
+          from: process.env.RESEND_FROM || `CommandFlow AI <onboarding@resend.dev>`,
+          to: recipientList,
+          subject: subject || 'CommandFlow AI Notification',
+          html: cleanHtml,
+          text: plainText
+        }, {
+          headers: {
+            'Authorization': `Bearer ${resendKey}`,
+            'Content-Type': 'application/json'
+          },
+          timeout: 8000
+        });
+
+        if (resendRes.data && (resendRes.data.id || resendRes.status === 200 || resendRes.status === 201)) {
+          const durationMs = Date.now() - startTime;
+          const msgId = resendRes.data.id || `resend-${Date.now()}`;
+          console.log(`[EmailService] Email dispatched via Resend HTTPS API in ${durationMs}ms! MessageId: ${msgId}`);
+          return {
+            success: true,
+            messageId: msgId,
+            provider: 'Resend HTTPS API (Port 443)',
+            durationMs
+          };
+        }
+      } catch (resendErr) {
+        console.warn(`[EmailService] Resend HTTPS API error: ${resendErr.response?.data?.message || resendErr.message}. Failing over to SMTP...`);
+      }
+    }
+
     const candidates = this.getTransporters();
 
     if (candidates.length === 0) {
