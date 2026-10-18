@@ -173,18 +173,23 @@ class N8nService {
 
         // Failover attempt to n8n webhook if direct SMTP had an issue
         try {
-          console.log(`[n8n Engine] Attempting n8n webhook failover for Gmail...`);
-          const n8nRes = await axios.post(`${this.baseUrl}/webhook/commandflow`, requestPayload, {
-            headers: requestHeaders,
-            timeout: 5000
-          });
-          if (n8nRes.data && (n8nRes.status === 200 || n8nRes.status === 201)) {
-            return {
-              success: true,
-              n8nExecutionId: n8nRes.data?.executionId || `n8n-smtp-${Date.now()}`,
-              responseData: n8nRes.data,
-              via: 'n8n'
-            };
+          const isLocalhostOnCloud = (process.env.RENDER === 'true' || config.env === 'production') && this.baseUrl.includes('localhost:5678');
+          if (isLocalhostOnCloud) {
+            console.warn(`[n8n Engine] Notice: N8N_BASE_URL is set to localhost:5678 on Render. Set N8N_BASE_URL to your Render n8n service URL (e.g. https://<your-n8n>.onrender.com) in Render Dashboard.`);
+          } else {
+            console.log(`[n8n Engine] Attempting n8n webhook failover for Gmail (${this.baseUrl}/webhook/commandflow)...`);
+            const n8nRes = await axios.post(`${this.baseUrl}/webhook/commandflow`, requestPayload, {
+              headers: requestHeaders,
+              timeout: 12000
+            });
+            if (n8nRes.data && (n8nRes.status === 200 || n8nRes.status === 201)) {
+              return {
+                success: true,
+                n8nExecutionId: n8nRes.data?.executionId || `n8n-smtp-${Date.now()}`,
+                responseData: n8nRes.data,
+                via: 'n8n'
+              };
+            }
           }
         } catch (n8nErr) {
           console.warn(`[n8n Engine] n8n failover note: ${n8nErr.message}`);
@@ -195,7 +200,9 @@ class N8nService {
           : `Gmail delivery failed: ${emailErr.message}`;
 
         if (errMsg.includes('Connection timeout') || errMsg.includes('ETIMEDOUT')) {
-          errMsg = `Gmail delivery timed out: Outbound SMTP ports 465/587 are blocked by cloud firewall. Use local server (e.g. http://localhost:5000) or add BREVO_API_KEY/RESEND_API_KEY for Port 443 HTTPS.`;
+          errMsg = `Gmail delivery timed out: Render Free tier blocks outbound SMTP ports 465/587. Add BREVO_API_KEY / RESEND_API_KEY (Port 443 HTTPS) in Render Dashboard or point mobile app to local server in Settings.`;
+        } else if (errMsg.includes('ENETUNREACH')) {
+          errMsg = `Gmail network unreachable (ENETUNREACH): Cloud provider lacks IPv6 routing or blocks outbound SMTP ports. Resolving via IPv4 or adding BREVO_API_KEY / RESEND_API_KEY (Port 443 HTTPS) ensures instant cloud delivery.`;
         }
 
         return {

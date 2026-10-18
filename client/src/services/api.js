@@ -57,9 +57,16 @@ const API = axios.create({
   }
 });
 
-// Request interceptor to attach JWT token and handle FormData boundary
+// Request interceptor to attach dynamic server URL, JWT token, and handle FormData boundary
 API.interceptors.request.use(
   (config) => {
+    try {
+      const dynamicCustom = localStorage.getItem('commandflow_custom_api_url');
+      if (dynamicCustom && dynamicCustom.trim()) {
+        config.baseURL = `${dynamicCustom.trim().replace(/\/+$/, '')}/api`;
+      }
+    } catch (e) {}
+
     const user = JSON.parse(localStorage.getItem('commandflow_user') || 'null');
     if (user && user.token) {
       config.headers.Authorization = `Bearer ${user.token}`;
