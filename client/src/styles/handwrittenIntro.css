@@ -640,8 +640,8 @@
   filter: drop-shadow(0 1px 0px rgba(255, 255, 255, 0.9));
 }
 
-/* Shimmer across text */
-.cf-dock-title::after {
+/* Shimmer across text ONLY during the HandwrittenIntro page phase */
+.cf-dock-title.title-intro::after {
   content: '';
   position: absolute;
   inset: -10px -20px;
@@ -654,7 +654,32 @@
   );
   pointer-events: none;
   opacity: 0;
-  animation: textShimmerBeam 2.2s ease-in-out 2.5s infinite;
+  animation: textShimmerBeam 2.2s ease-in-out 1.2s 1 forwards;
+}
+
+/* On the Login page (docking and docked): Completely remove the green motion shimmer */
+.cf-dock-title.title-docking::after,
+.cf-dock-title.title-docked::after {
+  content: none !important;
+  display: none !important;
+  animation: none !important;
+  opacity: 0 !important;
+}
+
+/* When docked on Login page: clean, static, crisp typography with zero motion */
+.cf-dock-title.title-docked .cf-text-commandflow {
+  color: #0F172A;
+  background: none;
+  -webkit-text-fill-color: #0F172A;
+  filter: none;
+}
+
+.cf-dock-title.title-docked .cf-text-ai {
+  background: linear-gradient(135deg, #10B981 0%, #06B6D4 55%, #3B82F6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: none;
 }
 
 @keyframes textShimmerBeam {
