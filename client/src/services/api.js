@@ -1,9 +1,20 @@
 import axios from 'axios';
 
-// Ensure production/mobile builds NEVER fallback to localhost
+// Detect runtime environment: Native Capacitor Android app vs Local Browser vs Production Web
+const isNativeApp = typeof window !== 'undefined' && 
+  (Boolean(window.Capacitor?.isNativePlatform?.()) || window.location.protocol === 'capacitor:');
+
+const isLocalBrowser = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
+  !isNativeApp;
+
 const PRODUCTION_API_URL = 'https://commandflow-ai.onrender.com';
+const LOCAL_API_URL = 'http://localhost:5000';
+
 export const SERVER_BASE_URL = (
-  import.meta.env.VITE_API_URL || PRODUCTION_API_URL
+  isNativeApp
+    ? (import.meta.env.VITE_API_URL || PRODUCTION_API_URL)
+    : (isLocalBrowser ? LOCAL_API_URL : (import.meta.env.VITE_API_URL || PRODUCTION_API_URL))
 ).replace(/\/+$/, '');
 
 // Network status listeners for Render sleep / cold-start awareness
