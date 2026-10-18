@@ -140,6 +140,14 @@ const HandwrittenIntro = ({ onComplete, duration = 2800 }) => {
     }
   };
 
+  // Immediate navigation to signup
+  const handleCreateAccount = (e) => {
+    e.preventDefault();
+    sessionStorage.setItem('cf_intro_seen', 'true');
+    if (onComplete) onComplete('/signup');
+    navigate('/signup');
+  };
+
   const isIntro = dockStage === 'intro';
   const isDocking = dockStage === 'docking';
   const isDocked = dockStage === 'docked';
