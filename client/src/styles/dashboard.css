@@ -1486,10 +1486,29 @@ path:not(.chart-fill) {
   border: 1px solid #fde68a;
 }
 
-.cf-status-pill.running {
-  color: #64748b;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+.cf-status-pill.running,
+.cf-status-pill.processing {
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.cf-status-pill.queued {
+  color: #d97706;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.cf-status-pill.sending {
+  color: #0d9488;
+  background: #f0fdfa;
+  border: 1px solid #99f6e4;
+}
+
+.cf-status-pill.retrying {
+  color: #ea580c;
+  background: #fff7ed;
+  border: 1px solid #ffedd5;
 }
 
 .cf-recent-right {
