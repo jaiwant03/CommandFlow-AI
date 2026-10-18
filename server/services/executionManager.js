@@ -288,7 +288,7 @@ const executeAutomation = async (
 
     console.error(`[ExecutionManager] Automation ${automationId} execution error: ${errorMsg}`);
 
-    if (isFinalAttempt) {
+    if (isFinalAttempt || isImmediate) {
       automation.status = 'FAILED';
       automation.error = errorMsg;
       automation.completedAt = new Date();
@@ -302,7 +302,7 @@ const executeAutomation = async (
         action: `WORKFLOW_FAILED_${automation.channel.toUpperCase()}`,
         channel: automation.channel,
         status: 'FAILED',
-        message: `Execution failed after ${automation.attempts} attempts: ${errorMsg}`
+        message: `Execution failed: ${errorMsg}`
       });
 
       emitStatusUpdate(automationId, {
@@ -327,21 +327,6 @@ const executeAutomation = async (
         lastError: errorMsg
       });
 
-      if (isImmediate) {
-        // Immediate failure: schedule in-process retry
-        const nextAttempt = attemptsMade + 1;
-        const delay = Math.pow(2, nextAttempt) * 1000;
-        setTimeout(() => {
-          executeAutomation(
-            { automationId, userId, command, inputType, plan, idempotencyKey },
-            { jobId: `retry-${automationId}`, attemptsMade: nextAttempt, isImmediate: true }
-          ).catch(retryErr => {
-            console.error(`[ExecutionManager] Immediate retry error: ${retryErr.message}`);
-          });
-        }, delay);
-        return { success: false, automation, retrying: true, attempt: nextAttempt };
-      }
-
       throw new Error(errorMsg);
     }
   }
@@ -354,12 +339,15 @@ const executeAutomation = async (
 const claimImmediateSlot = (automationId) => {
   const now = Date.now();
   for (const [id, startTime] of activeExecutions.entries()) {
-    if (now - startTime > 45000) {
+    if (now - startTime > 30000) {
+      console.warn(`[ExecutionManager] Clearing stale execution lock for ${id}`);
       activeExecutions.delete(id);
     }
   }
 
-  if (activeExecutions.size > 0 || fallbackQueue.length > 0) {
+  // Only check if another command is currently actively executing
+  if (activeExecutions.size > 0) {
+    console.log(`[ExecutionManager] System busy with active execution (${Array.from(activeExecutions.keys()).join(', ')}). Queuing ${automationId}.`);
     return false;
   }
 
