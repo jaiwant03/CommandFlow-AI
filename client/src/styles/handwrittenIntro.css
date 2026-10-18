@@ -202,6 +202,7 @@
 .cf-dockable-card {
   position: relative;
   z-index: 10;
+  overflow: visible;
   transition: 
     background-color 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
     border-color 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -218,6 +219,7 @@
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   animation: none !important;
+  overflow: visible !important;
 }
 
 .cf-dockable-card.card-intro::before {
@@ -262,9 +264,9 @@
   will-change: transform;
 }
 
-/* Intro position: Translated to exact screen center and enlarged 2.25x */
+/* Intro position: Translated to exact screen center and enlarged 2.15x */
 .cf-dock-pedestal.pedestal-intro {
-  transform: translateY(var(--target-offset-y, 210px)) scale(2.25);
+  transform: translateY(var(--pedestal-offset-y, var(--target-offset-y, 180px))) scale(2.15);
   transition: none;
 }
 
@@ -585,12 +587,17 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  white-space: nowrap;
+  z-index: 25;
 }
 
-/* Intro position: Translated directly below the large logo and scaled 1.6x */
+/* Intro position: Translated directly below the large logo and scaled */
 .cf-dock-title.title-intro {
-  transform: translateY(var(--target-offset-y, 258px)) scale(1.65);
-  animation: textIntroReveal 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) 1.25s backwards;
+  transform: translateY(var(--title-offset-y, var(--target-offset-y, 198px))) scale(var(--title-scale, 1.55));
+  animation: textIntroReveal 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s backwards;
+  white-space: nowrap;
+  max-width: 95vw;
+  z-index: 25;
 }
 
 /* Docking: Glides into the card header title spot */
@@ -606,12 +613,12 @@
 @keyframes textIntroReveal {
   0% {
     opacity: 0;
-    transform: translateY(calc(var(--target-offset-y, 258px) + 26px)) scale(1.5);
-    filter: blur(6px);
+    transform: translateY(calc(var(--title-offset-y, var(--target-offset-y, 198px)) + 14px)) scale(calc(var(--title-scale, 1.55) * 0.92));
+    filter: blur(5px);
   }
   100% {
     opacity: 1;
-    transform: translateY(var(--target-offset-y, 258px)) scale(1.65);
+    transform: translateY(var(--title-offset-y, var(--target-offset-y, 198px))) scale(var(--title-scale, 1.55));
     filter: blur(0px);
   }
 }
@@ -654,7 +661,7 @@
   );
   pointer-events: none;
   opacity: 0;
-  animation: textShimmerBeam 2.2s ease-in-out 1.2s 1 forwards;
+  animation: textShimmerBeam 2.2s ease-in-out 0.7s 1 forwards;
 }
 
 /* On the Login page (docking and docked): Completely remove the green motion shimmer */
@@ -722,19 +729,27 @@
 /* Mobile Responsiveness */
 @media (max-width: 480px) {
   .cf-dock-pedestal.pedestal-intro {
-    transform: translateY(var(--target-offset-y, 185px)) scale(2.05);
+    transform: translateY(var(--pedestal-offset-y, var(--target-offset-y, 100px))) scale(1.95);
   }
   .cf-dock-title.title-intro {
-    transform: translateY(calc(var(--target-offset-y, 185px) + 42px)) scale(1.45);
+    transform: translateY(var(--title-offset-y, var(--target-offset-y, 114px))) scale(var(--title-scale, 1.25));
+    font-size: clamp(1.22rem, 5.2vw, 1.45rem);
+    white-space: nowrap;
+    max-width: 92vw;
+    z-index: 25;
   }
 }
 
 @media (max-width: 360px) {
   .cf-dock-pedestal.pedestal-intro {
-    transform: translateY(var(--target-offset-y, 165px)) scale(1.9);
+    transform: translateY(var(--pedestal-offset-y, var(--target-offset-y, 85px))) scale(1.8);
   }
   .cf-dock-title.title-intro {
-    transform: translateY(calc(var(--target-offset-y, 165px) + 38px)) scale(1.35);
+    transform: translateY(var(--title-offset-y, var(--target-offset-y, 96px))) scale(var(--title-scale, 1.15));
+    font-size: clamp(1.1rem, 5vw, 1.3rem);
+    white-space: nowrap;
+    max-width: 90vw;
+    z-index: 25;
   }
 }
 
