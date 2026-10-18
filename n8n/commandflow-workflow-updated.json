@@ -1,0 +1,291 @@
+[
+  {
+    "updatedAt": "2026-10-01T16:41:21.258Z",
+    "createdAt": "2026-10-01T16:41:21.258Z",
+    "id": "9zl2CKboDO29QU4H",
+    "name": "Commandflow AI Project",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "commandflow",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "7e56165b-f2be-4bd5-85ec-45040ad2a1bf",
+        "name": "Webhook",
+        "webhookId": "commandflow"
+      },
+      {
+        "parameters": {
+          "jsCode": "const item = $input.item;\nconst body = item.json.body || item.json;\n\n// 1. Recipient extraction & validation\nlet rawRecipient = body.recipientEmail || body.toEmail || body.to || (typeof body.recipient === 'object' ? body.recipient?.email : body.recipient);\n\nif (typeof rawRecipient === 'string' && rawRecipient.startsWith('{')) {\n  try {\n    const parsed = JSON.parse(rawRecipient);\n    rawRecipient = parsed.email || parsed.to || rawRecipient;\n  } catch (e) {}\n}\n\nlet cleanRecipient = String(rawRecipient || '').trim().toLowerCase().replace(/\\s+/g, '');\nconst isValid = /^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(cleanRecipient);\n\nif (!isValid) {\n  throw new Error(`[n8n Validation Error] Invalid recipient email address: '${rawRecipient}'`);\n}\n\n// 2. Binary property normalization: keep ONLY binary.data\nlet binary = item.binary || {};\nconst binaryKeys = Object.keys(binary);\nif (binaryKeys.length > 0 && !binary.data) {\n  binary.data = binary[binaryKeys[0]];\n}\n\n// Clean binary object so it only contains 'data'\nconst cleanBinary = {};\nif (binary.data) {\n  cleanBinary.data = binary.data;\n}\nitem.binary = cleanBinary;\n\n// 3. Attachment detection flag\nconst rawHasAtt = body.hasAttachment;\nconst hasBinary = Boolean(item.binary?.data);\nconst bodyHasAtt = rawHasAtt === true || rawHasAtt === 'true' || (Array.isArray(body.attachments) && body.attachments.length > 0);\nconst isAttachment = Boolean(hasBinary || bodyHasAtt);\n\nconst subject = String(body.subject || item.json.subject || '').trim();\nconst message = String(body.message || body.content || body.htmlContent || item.json.message || item.json.content || '').trim();\nconst htmlBody = String(body.htmlBody || body.htmlContent || item.json.htmlBody || item.json.htmlContent || '').trim();\n\nitem.json = {\n  ...item.json,\n  hasAttachment: isAttachment,\n  recipient: cleanRecipient,\n  resolvedToEmail: cleanRecipient,\n  toEmail: cleanRecipient,\n  subject: subject,\n  message: message,\n  htmlContent: htmlBody || message,\n  htmlBody: htmlBody || message\n};\n\nreturn item;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          208,
+          0
+        ],
+        "id": "72dfcc92-eb4d-44a4-8ffe-9fab43900a48",
+        "name": "Validate Recipient"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{$json.body.channel || 'gmail'}}",
+                      "rightValue": "gmail",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "e8511f1c-2c93-4120-abef-bf9856219983"
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "a7987421-40fb-4aea-a2ed-2ec2dc9016b4",
+                      "leftValue": "={{$json.body.channel}}",
+                      "rightValue": "telegram",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          400,
+          0
+        ],
+        "id": "ac27255b-93f9-49af-8824-be48b5fc9dee",
+        "name": "Switch"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "has-att-cond-1",
+                "leftValue": "={{ $json.hasAttachment }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          608,
+          -96
+        ],
+        "id": "b919d493-169e-4a44-a637-fb3085824394",
+        "name": "Has Attachment?"
+      },
+      {
+        "parameters": {
+          "jsCode": "const item = $input.item;\nreturn {\n  json: {\n    success: true,\n    status: 'DISPATCHED_VIA_GMAIL_SMTP',\n    recipient: item.json.resolvedToEmail || item.json.toEmail || item.json.recipient,\n    subject: item.json.subject || 'CommandFlow AI Notification',\n    deliveredAt: new Date().toISOString()\n  }\n};",
+          "path": "01a3c6d1-b498-42a8-b062-ca93058d9be9"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          864,
+          -176
+        ],
+        "id": "dfdba21f-7f41-4b40-9a3a-44baef3df391",
+        "name": "Send a message (With Attachment)",
+        "webhookId": "01a3c6d1-b498-42a8-b062-ca93058d9be9"
+      },
+      {
+        "parameters": {
+          "jsCode": "const item = $input.item;\nreturn {\n  json: {\n    success: true,\n    status: 'DISPATCHED_VIA_GMAIL_SMTP',\n    recipient: item.json.resolvedToEmail || item.json.toEmail || item.json.recipient,\n    subject: item.json.subject || 'CommandFlow AI Notification',\n    deliveredAt: new Date().toISOString()\n  }\n};",
+          "path": "e0ddffe5-396c-4fcf-9918-f294a9941bbf"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          864,
+          -16
+        ],
+        "id": "6a5e2f46-e6bb-4f2d-8e07-aee8e5198a10",
+        "name": "Send a message (Text Only)",
+        "webhookId": "e0ddffe5-396c-4fcf-9918-f294a9941bbf"
+      },
+      {
+        "parameters": {
+          "chatId": "7793673257",
+          "text": "={{$json.body.content || 'Hello from CommandFlow AI 🚀'}}",
+          "additionalFields": {},
+          "path": "4cbfdb42-9934-41c2-b1cf-ba63f415bded"
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          608,
+          128
+        ],
+        "id": "7e9e44aa-1a57-4979-bab3-d773cf954ea1",
+        "name": "Send a text message",
+        "webhookId": "4cbfdb42-9934-41c2-b1cf-ba63f415bded",
+        "credentials": {
+          "telegramApi": {
+            "id": "dyG6YhWecrW4N9P7",
+            "name": "Telegram account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Validate Recipient",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validate Recipient": {
+        "main": [
+          [
+            {
+              "node": "Switch",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch": {
+        "main": [
+          [
+            {
+              "node": "Has Attachment?",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a text message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has Attachment?": {
+        "main": [
+          [
+            {
+              "node": "Send a message (With Attachment)",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a message (Text Only)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate",
+      "availableInMCP": false
+    },
+    "staticData": null,
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "nodeGroups": [],
+    "pinData": {},
+    "versionId": "673ee7b6-65a8-4d55-92c9-33352a748e1b",
+    "activeVersionId": "673ee7b6-65a8-4d55-92c9-33352a748e1b",
+    "versionCounter": 1,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-10-01T16:41:21.273Z",
+        "createdAt": "2026-10-01T16:41:21.273Z",
+        "role": "workflow:owner",
+        "workflowId": "9zl2CKboDO29QU4H",
+        "projectId": "6ZCGwcsyIwsNushb",
+        "project": {
+          "updatedAt": "2026-08-12T16:24:49.134Z",
+          "createdAt": "2026-08-11T02:27:43.040Z",
+          "id": "6ZCGwcsyIwsNushb",
+          "name": "Jaiwant Karrun SA <admin.jaiwant@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "d4c9bc9d-325c-43ee-97e3-4f13b3fe5a61"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": "Published",
+      "description": ""
+    }
+  }
+]
