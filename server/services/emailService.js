@@ -17,6 +17,7 @@ const customIpv4Lookup = (hostname, options, callback) => {
 
 require('../config/env');
 const nodemailer = require('nodemailer');
+const axios = require('axios');
 
 /**
  * Direct Email Service using Nodemailer
