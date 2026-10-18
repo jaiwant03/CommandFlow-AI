@@ -67,11 +67,13 @@ const App = () => {
   const showIntroRef = useRef(showIntro);
   showIntroRef.current = showIntro;
 
-  const handleIntroComplete = () => {
+  const handleIntroComplete = (targetPath) => {
     sessionStorage.setItem('cf_intro_seen', 'true');
     setShowIntro(false);
     const user = getCurrentUser();
-    if (location.pathname === '/' || location.pathname === '/intro' || location.pathname === '/index.html') {
+    if (typeof targetPath === 'string' && targetPath.length > 0) {
+      navigate(targetPath);
+    } else if (location.pathname === '/' || location.pathname === '/intro' || location.pathname === '/index.html') {
       navigate(user ? '/dashboard' : '/login', { replace: true });
     }
   };
@@ -122,7 +124,7 @@ const App = () => {
     return () => cleanupBackButton();
   }, [location.pathname, navigate]);
 
-  if (showIntro || location.pathname === '/intro') {
+  if ((showIntro || location.pathname === '/intro') && location.pathname !== '/signup') {
     return <HandwrittenIntro onComplete={handleIntroComplete} />;
   }
 
