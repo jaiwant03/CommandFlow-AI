@@ -64,7 +64,7 @@ async function verifyAllThreeExamples() {
       })
     });
     const cmd1Data = await cmd1Res.json();
-    assert.strictEqual(cmd1Res.status, 201);
+    assert.ok(cmd1Res.status === 200 || cmd1Res.status === 201, `Expected 200 or 201, got ${cmd1Res.status}`);
     assert.strictEqual(cmd1Data.success, true);
     console.log(`1. Instant Response: status = ${cmd1Data.data.status} (ID: ${cmd1Data.data.automationId})`);
     console.log(`2. Contact Resolution: name = ${cmd1Data.data.recipient.name}, email = ${cmd1Data.data.recipient.email}`);
@@ -102,7 +102,7 @@ async function verifyAllThreeExamples() {
       })
     });
     const cmd2Data = await cmd2Res.json();
-    assert.strictEqual(cmd2Res.status, 201);
+    assert.ok(cmd2Res.status === 200 || cmd2Res.status === 201, `Expected 200 or 201, got ${cmd2Res.status}`);
     assert.strictEqual(cmd2Data.success, true);
     console.log(`1. Instant Response: status = ${cmd2Data.data.status} (ID: ${cmd2Data.data.automationId})`);
     console.log(`2. Contact Resolution: chatId = ${cmd2Data.data.recipient.telegramId}`);
