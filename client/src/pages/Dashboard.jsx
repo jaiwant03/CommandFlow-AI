@@ -136,6 +136,7 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
         } else if (event.status === 'FAILED') {
           setExecutionStep(7);
           setIsExecuting(false);
+          const rawError = event.error || event.message || 'Automation execution failed.';
           setExecutionResult(prev => ({
             type: 'immediate',
             status: 'FAILED',
@@ -145,8 +146,8 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
             intent: prev?.intent,
             content: prev?.content,
             subject: prev?.subject,
-            error: event.error || event.message || 'Automation execution failed.',
-            message: event.error || event.message || 'Automation execution failed.'
+            error: rawError,
+            message: 'Automation execution failed. See details below.'
           }));
         }
       }
@@ -370,6 +371,7 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
           });
         } else {
           setExecutionStep(7);
+          const rawError = execRes.error?.message || execRes.data?.error || execRes.message || 'Automation execution failed';
           setExecutionResult({
             type: 'immediate',
             status: 'FAILED',
@@ -377,8 +379,8 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
             recipient: verifiedRecipient,
             recipients: verifiedRecipients,
             intent: parsedData.intent,
-            error: execRes.message || execRes.error?.message || execRes.data?.error || 'Automation execution failed',
-            message: execRes.message || 'Execution failed.'
+            error: rawError,
+            message: 'Automation execution failed. See details below.'
           });
         }
       }
@@ -394,15 +396,16 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
 
       setExecutionStep(7);
 
+      const rawError =
+        err.response?.data?.message ||
+        err.message ||
+        'Execution error encountered';
+
       setExecutionResult({
         type: 'immediate',
         status: 'FAILED',
-        error:
-          err.response?.data?.message ||
-          err.message ||
-          'Execution error encountered',
-        message:
-          'Command execution failed.'
+        error: rawError,
+        message: 'Command execution failed. See details below.'
       });
 
     } finally {
@@ -1244,9 +1247,13 @@ const Dashboard = ({ currentLanguage = 'auto' }) => {
                 </div>
 
 
-                <div className="cf-result-message">
-                  {executionResult.message}
-                </div>
+                {executionResult.message &&
+                  executionResult.message !== executionResult.error &&
+                  !executionResult.error?.includes(executionResult.message) && (
+                    <div className="cf-result-message">
+                      {executionResult.message}
+                    </div>
+                )}
 
 
                 {executionResult.scheduledDate && (

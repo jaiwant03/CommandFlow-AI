@@ -195,7 +195,7 @@ class N8nService {
           : `Gmail delivery failed: ${emailErr.message}`;
 
         if (errMsg.includes('Connection timeout') || errMsg.includes('ETIMEDOUT')) {
-          errMsg = `${errMsg} (Outbound SMTP ports 465/587 may be blocked by cloud firewall. Use local server on http://localhost:5000 or add BREVO_API_KEY/RESEND_API_KEY for Port 443 HTTPS).`;
+          errMsg = `Gmail delivery timed out: Outbound SMTP ports 465/587 are blocked by cloud firewall. Use local server (e.g. http://localhost:5000) or add BREVO_API_KEY/RESEND_API_KEY for Port 443 HTTPS.`;
         }
 
         return {
