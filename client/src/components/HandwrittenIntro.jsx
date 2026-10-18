@@ -202,7 +202,8 @@ const HandwrittenIntro = ({ onComplete, duration = 2800 }) => {
             ref={pedestalRef}
             className={`auth-logo-pedestal cf-dock-pedestal ${isDocked ? 'pedestal-docked' : isDocking ? 'pedestal-docking' : 'pedestal-intro'}`}
             style={{
-              '--target-offset-y': `${dockOffset}px`
+              '--target-offset-y': `${dockOffset.pedestal}px`,
+              '--pedestal-offset-y': `${dockOffset.pedestal}px`
             }}
           >
             {/* Halo pulse ring on login card */}
@@ -246,7 +247,8 @@ const HandwrittenIntro = ({ onComplete, duration = 2800 }) => {
           <h1
             className={`auth-brand-title cf-dock-title ${isDocked ? 'title-docked' : isDocking ? 'title-docking' : 'title-intro'}`}
             style={{
-              '--target-offset-y': `${dockOffset + 48}px`
+              '--target-offset-y': `${dockOffset.title}px`,
+              '--title-offset-y': `${dockOffset.title}px`
             }}
           >
             <span className="cf-text-commandflow">CommandFlow</span>
