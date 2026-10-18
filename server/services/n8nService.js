@@ -170,6 +170,26 @@ class N8nService {
         };
       } catch (emailErr) {
         console.error(`[SMTP Engine Error]: ${emailErr.message}`);
+
+        // Failover attempt to n8n webhook if direct SMTP had an issue
+        try {
+          console.log(`[n8n Engine] Attempting n8n webhook failover for Gmail...`);
+          const n8nRes = await axios.post(`${this.baseUrl}/webhook/commandflow`, requestPayload, {
+            headers: requestHeaders,
+            timeout: 5000
+          });
+          if (n8nRes.data && (n8nRes.status === 200 || n8nRes.status === 201)) {
+            return {
+              success: true,
+              n8nExecutionId: n8nRes.data?.executionId || `n8n-smtp-${Date.now()}`,
+              responseData: n8nRes.data,
+              via: 'n8n'
+            };
+          }
+        } catch (n8nErr) {
+          console.warn(`[n8n Engine] n8n failover note: ${n8nErr.message}`);
+        }
+
         const errMsg = emailErr.message.startsWith('Gmail delivery failed:')
           ? emailErr.message
           : `Gmail delivery failed: ${emailErr.message}`;

@@ -277,12 +277,17 @@ Return ONLY a valid JSON object with the following schema:
 
   /**
    * Calculate exact scheduled execution timestamp
+  /**
+   * Calculate exact scheduled execution timestamp.
+   * STRICT RULE: Only schedule if time or date is explicitly mentioned in the command text.
+   * If time or date is NOT mentioned, always return isScheduled: false (send immediately).
    */
   calculateScheduledExecutionTime(command, aiSchedule = {}) {
     const lowerCmd = (command || '').toLowerCase();
     const now = new Date();
 
-    const relativeMatch = lowerCmd.match(/\b(?:after|in)\s+(\d+)\s*(seconds?|secs?|minutes?|mins?|hours?|hrs?|days?)\b/i);
+    // Check for relative time: "in 10 minutes", "after 2 hours", "in 3 days"
+    const relativeMatch = lowerCmd.match(/\b(?:after|in)\s+(\d+)\s*(seconds?|secs?|minutes?|mins?|hours?|hrs?|days?|weeks?)\b/i);
 
     if (relativeMatch) {
       const amount = parseInt(relativeMatch[1], 10);
@@ -297,6 +302,8 @@ Return ONLY a valid JSON object with the following schema:
         scheduledDate.setHours(scheduledDate.getHours() + amount);
       } else if (unit.startsWith('day')) {
         scheduledDate.setDate(scheduledDate.getDate() + amount);
+      } else if (unit.startsWith('week')) {
+        scheduledDate.setDate(scheduledDate.getDate() + amount * 7);
       }
 
       return {
@@ -307,6 +314,7 @@ Return ONLY a valid JSON object with the following schema:
       };
     }
 
+    // Check for explicit clock time: "at 5pm", "at 10:30 am", "at 4 o'clock", "4:30 pm"
     const explicitClockMatch = lowerCmd.match(/\b(?:at\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?|(\d{1,2}):(\d{2})\s*(am|pm)?|(\d{1,2})\s*(am|pm))\b/i);
     
     let targetHours = null;
@@ -332,53 +340,59 @@ Return ONLY a valid JSON object with the following schema:
       }
     }
 
+    // Check for calendar days or relative day words
     const isTomorrow = lowerCmd.includes('tomorrow') ||
                        lowerCmd.includes('naalaikku') ||
-                       /\b(?:next\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday))\b/i.test(lowerCmd) ||
+                       lowerCmd.includes('day after tomorrow') ||
+                       lowerCmd.includes('tonight') ||
+                       /\b(?:next\s+(?:week|month|monday|tuesday|wednesday|thursday|friday|saturday|sunday))\b/i.test(lowerCmd) ||
                        /\b(?:on\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday))\b/i.test(lowerCmd);
 
-    const hasExplicitScheduleKeyword = lowerCmd.includes('schedule') || lowerCmd.includes('scheduled for');
-    const isScheduled = !!(hasExplicitClockTime || isTomorrow || (aiSchedule.isScheduled && (hasExplicitScheduleKeyword || aiSchedule.time || aiSchedule.date)));
+    // Check for specific date format (e.g. "on 25th oct", "on october 25", "2026-10-25")
+    const hasSpecificDate = /\b(?:on\s+)?(?:\d{1,2}(?:st|nd|rd|th)?\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{1,2}(?:st|nd|rd|th)?|\d{4}-\d{2}-\d{2})\b/i.test(lowerCmd);
 
-    if (isScheduled) {
-      const scheduledDate = new Date(now.getTime());
+    const hasExplicitScheduleKeyword = /\b(?:schedule|scheduled)\s+(?:for|at|on|to)\b/i.test(lowerCmd);
 
-      if (isTomorrow) {
-        scheduledDate.setDate(scheduledDate.getDate() + 1);
-      }
+    // ONLY schedule if time, date, or schedule is mentioned in the command text
+    const isCommandScheduled = hasExplicitClockTime || isTomorrow || hasSpecificDate || hasExplicitScheduleKeyword;
 
-      if (hasExplicitClockTime) {
-        scheduledDate.setHours(targetHours, targetMinutes, 0, 0);
-        if (!isTomorrow && scheduledDate <= now) {
-          scheduledDate.setDate(scheduledDate.getDate() + 1);
-        }
-      }
-
+    if (!isCommandScheduled) {
+      // User did NOT mention any time or date -> MUST send immediately!
       return {
-        isScheduled: true,
-        nextExecution: scheduledDate,
-        date: scheduledDate.toLocaleDateString('en-IN'),
-        time: scheduledDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+        isScheduled: false,
+        nextExecution: null,
+        date: null,
+        time: null
       };
     }
 
-    if (aiSchedule && (aiSchedule.isScheduled || aiSchedule.nextExecution || aiSchedule.time)) {
-      const parsedTime = aiSchedule.nextExecution ? new Date(aiSchedule.nextExecution) : null;
-      if (parsedTime && !isNaN(parsedTime.getTime()) && parsedTime > now) {
-        return {
-          isScheduled: true,
-          nextExecution: parsedTime,
-          date: parsedTime.toLocaleDateString('en-IN'),
-          time: parsedTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-        };
+    // Command specified scheduling -> compute target timestamp
+    const scheduledDate = new Date(now.getTime());
+
+    if (isTomorrow) {
+      if (lowerCmd.includes('day after tomorrow')) {
+        scheduledDate.setDate(scheduledDate.getDate() + 2);
+      } else {
+        scheduledDate.setDate(scheduledDate.getDate() + 1);
       }
     }
 
+    if (hasExplicitClockTime) {
+      scheduledDate.setHours(targetHours, targetMinutes, 0, 0);
+      if (!isTomorrow && scheduledDate <= now) {
+        // If time already passed today, schedule for tomorrow at the same time
+        scheduledDate.setDate(scheduledDate.getDate() + 1);
+      }
+    } else {
+      // Default to 9:00 AM on the scheduled day if only date/tomorrow was specified
+      scheduledDate.setHours(9, 0, 0, 0);
+    }
+
     return {
-      isScheduled: false,
-      nextExecution: null,
-      date: null,
-      time: null
+      isScheduled: true,
+      nextExecution: scheduledDate,
+      date: scheduledDate.toLocaleDateString('en-IN'),
+      time: scheduledDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
     };
   }
 

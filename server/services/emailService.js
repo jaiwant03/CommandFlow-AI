@@ -1,11 +1,19 @@
 const dns = require('dns');
 
-// Enforce IPv4 lookup priority to prevent Windows / ISP IPv6 routing timeouts to smtp.gmail.com
+// Enforce IPv4 lookup priority to prevent Windows / ISP / Cloud IPv6 routing timeouts to smtp.gmail.com
 try {
   if (dns && typeof dns.setDefaultResultOrder === 'function') {
     dns.setDefaultResultOrder('ipv4first');
   }
 } catch (e) {}
+
+// Bulletproof custom IPv4 lookup callback - completely prevents ENETUNREACH IPv6 routing errors on Linux/Render
+const customIpv4Lookup = (hostname, options, callback) => {
+  return dns.lookup(hostname, { family: 4, all: false }, (err, address, family) => {
+    if (err) return callback(err);
+    callback(null, address, 4);
+  });
+};
 
 require('../config/env');
 const nodemailer = require('nodemailer');
@@ -58,13 +66,13 @@ class EmailService {
       host: 'smtp.gmail.com',
       port: 465,
       secure: true,
-      family: 4, // Force IPv4 to prevent IPv6 routing blackholes
+      lookup: customIpv4Lookup,
       pool: false, // Fresh socket per dispatch to prevent stale idle socket drops
       auth: { user, pass },
       tls: { rejectUnauthorized: false },
-      connectionTimeout: 6000,
-      greetingTimeout: 5000,
-      socketTimeout: 10000
+      connectionTimeout: 15000,
+      greetingTimeout: 10000,
+      socketTimeout: 20000
     });
 
     // Carrier 2: Standard SMTP Port 587 with STARTTLS (Fallback if Port 465 is filtered by ISP)
@@ -72,25 +80,25 @@ class EmailService {
       host: 'smtp.gmail.com',
       port: 587,
       secure: false,
-      family: 4,
+      lookup: customIpv4Lookup,
       pool: false,
       auth: { user, pass },
       tls: { rejectUnauthorized: false },
-      connectionTimeout: 6000,
-      greetingTimeout: 5000,
-      socketTimeout: 10000
+      connectionTimeout: 15000,
+      greetingTimeout: 10000,
+      socketTimeout: 20000
     });
 
     // Carrier 3: First-class Gmail Service Driver
     const gmailService = nodemailer.createTransport({
       service: 'gmail',
-      family: 4,
+      lookup: customIpv4Lookup,
       pool: false,
       auth: { user, pass },
       tls: { rejectUnauthorized: false },
-      connectionTimeout: 6000,
-      greetingTimeout: 5000,
-      socketTimeout: 10000
+      connectionTimeout: 15000,
+      greetingTimeout: 10000,
+      socketTimeout: 20000
     });
 
     return [
