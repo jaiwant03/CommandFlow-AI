@@ -36,7 +36,13 @@ import '../styles/handwrittenIntro.css';
 const HandwrittenIntro = ({ onComplete, duration = 2800 }) => {
   // dockStage: 'intro' | 'docking' | 'docked'
   const [dockStage, setDockStage] = useState('intro');
-  const [dockOffset, setDockOffset] = useState(210);
+  const [dockOffset, setDockOffset] = useState(() => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480;
+    const isSmall = typeof window !== 'undefined' && window.innerWidth <= 360;
+    if (isSmall) return { pedestal: 85, title: 98 };
+    if (isMobile) return { pedestal: 100, title: 114 };
+    return { pedestal: 180, title: 198 };
+  });
 
   // Login Form States
   const [email, setEmail] = useState('');
@@ -54,15 +60,25 @@ const HandwrittenIntro = ({ onComplete, duration = 2800 }) => {
   // Calculate dynamic pixel-perfect offset from viewport center to card logo pedestal
   useEffect(() => {
     const calculateOffset = () => {
-      if (pedestalRef.current) {
-        const pedestalRect = pedestalRef.current.getBoundingClientRect();
-        const viewportCenterY = window.innerHeight / 2;
-        const pedestalCenterY = pedestalRect.top + pedestalRect.height / 2;
-        const offset = viewportCenterY - pedestalCenterY;
-        if (offset > 40) {
-          setDockOffset(offset);
-        }
+      const isMobile = window.innerWidth <= 480;
+      const isSmallMobile = window.innerWidth <= 360;
+      const vh = window.innerHeight;
+
+      let pOffset = 180;
+      let tOffset = 198;
+
+      if (isSmallMobile) {
+        pOffset = Math.min(85, Math.max(50, Math.round(vh * 0.11)));
+        tOffset = pOffset + 12;
+      } else if (isMobile) {
+        pOffset = Math.min(100, Math.max(65, Math.round(vh * 0.13)));
+        tOffset = pOffset + 14;
+      } else {
+        pOffset = Math.min(210, Math.max(140, Math.round(vh * 0.22)));
+        tOffset = pOffset + 18;
       }
+
+      setDockOffset({ pedestal: pOffset, title: tOffset });
     };
 
     calculateOffset();
