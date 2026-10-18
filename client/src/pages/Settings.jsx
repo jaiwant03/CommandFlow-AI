@@ -74,15 +74,50 @@ const Settings = () => {
               </span>
             </div>
 
-            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600 }}>
-                <input
-                  type="checkbox"
-                  checked={notifications}
-                  onChange={(e) => setNotifications(e.target.checked)}
-                />
-                <span>Enable Execution Email & Telegram Notifications</span>
+            <div className="form-group" style={{ marginBottom: '1.5rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem' }}>
+              <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Server size={16} color="var(--primary)" />
+                <span>Backend API Server Endpoint</span>
               </label>
+              <input
+                type="text"
+                className="form-input"
+                style={{ width: '100%', fontFamily: 'monospace', fontSize: '0.85rem' }}
+                placeholder="https://commandflow-ai.onrender.com (or http://192.168.1.x:5000)"
+                value={customServerUrl}
+                onChange={(e) => setCustomServerUrl(e.target.value)}
+              />
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+                  onClick={() => setCustomServerUrl('https://commandflow-ai.onrender.com')}
+                >
+                  Cloud (Render)
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+                  onClick={() => setCustomServerUrl('http://localhost:5000')}
+                >
+                  Localhost:5000
+                </button>
+                {customServerUrl && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem', color: 'var(--text-muted)' }}
+                    onClick={() => setCustomServerUrl('')}
+                  >
+                    Reset to Default
+                  </button>
+                )}
+              </div>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.4rem', display: 'block' }}>
+                Active Connection: <strong style={{ color: 'var(--text-primary)' }}>{SERVER_BASE_URL}</strong>
+              </span>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
