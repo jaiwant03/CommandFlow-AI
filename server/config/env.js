@@ -18,7 +18,7 @@ const config = {
   groqModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
 
   // n8n Workflow Automation
-  n8nBaseUrl: process.env.N8N_BASE_URL || 'http://localhost:5678',
+  n8nBaseUrl: process.env.N8N_BASE_URL || (process.env.RENDER === 'true' || process.env.NODE_ENV === 'production' ? 'https://commandflow-ai-n8n.onrender.com' : 'http://localhost:5678'),
   n8nWebhookSecret: process.env.N8N_WEBHOOK_SECRET || 'n8n_sec_commandflow_2026',
 
   // Google OAuth
