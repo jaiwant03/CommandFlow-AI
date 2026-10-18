@@ -190,9 +190,14 @@ class N8nService {
           console.warn(`[n8n Engine] n8n failover note: ${n8nErr.message}`);
         }
 
-        const errMsg = emailErr.message.startsWith('Gmail delivery failed:')
+        let errMsg = emailErr.message.startsWith('Gmail delivery failed:')
           ? emailErr.message
           : `Gmail delivery failed: ${emailErr.message}`;
+
+        if (errMsg.includes('Connection timeout') || errMsg.includes('ETIMEDOUT')) {
+          errMsg = `${errMsg} (Outbound SMTP ports 465/587 may be blocked by cloud firewall. Use local server on http://localhost:5000 or add BREVO_API_KEY/RESEND_API_KEY for Port 443 HTTPS).`;
+        }
+
         return {
           success: false,
           error: errMsg
