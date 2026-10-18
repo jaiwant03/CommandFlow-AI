@@ -727,18 +727,32 @@ html, body {
 }
 
 
+/* QUEUED */
+.status-queued {
+  background: #FFFBEB;
+  color: #D97706;
+  border: 1px solid #FDE68A;
+}
+
+/* SENDING */
+.status-sending {
+  background: #F0FDFA;
+  color: #0D9488;
+  border: 1px solid #99F6E4;
+}
+
+/* RETRYING */
+.status-retrying {
+  background: #FFF7ED;
+  color: #EA580C;
+  border: 1px solid #FFEDD5;
+}
+
 /* FAILED */
-
 .status-failed {
-
-  background:
-    #FEF2F2;
-
-  color:
-    #DC2626;
-
-  border:
-    1px solid #FECACA;
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
 }
 
 
