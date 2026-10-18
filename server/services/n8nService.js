@@ -131,7 +131,39 @@ class N8nService {
       };
     }
 
-    // 1. Direct Guaranteed Delivery via Gmail SMTP Engine (Nodemailer - NO Gmail API)
+    // 1. Cloud-Optimized Delivery: When N8N_BASE_URL is an HTTPS cloud URL, dispatch to n8n first
+    const hasCloudN8n = this.baseUrl && this.baseUrl.startsWith('https://');
+
+    if (channel === 'gmail' && hasCloudN8n) {
+      console.log(`[n8n Engine] Cloud environment detected. Dispatching Gmail payload to n8n at ${this.baseUrl}...`);
+      const webhookUrls = [
+        `${this.baseUrl}/webhook/commandflow`,
+        `${this.baseUrl}/webhook-test/commandflow`
+      ];
+
+      for (const webhookUrl of webhookUrls) {
+        try {
+          const n8nRes = await axios.post(webhookUrl, requestPayload, {
+            headers: requestHeaders,
+            timeout: 15000
+          });
+          if (n8nRes.data && (n8nRes.status === 200 || n8nRes.status === 201)) {
+            console.log(`[n8n Engine] Real Gmail dispatched via n8n webhook ${webhookUrl}!`);
+            return {
+              success: true,
+              n8nExecutionId: n8nRes.data?.executionId || n8nRes.data?.id || `n8n-gmail-${Date.now()}`,
+              responseData: n8nRes.data,
+              via: 'n8n'
+            };
+          }
+        } catch (n8nErr) {
+          const status = n8nErr.response ? n8nErr.response.status : n8nErr.message;
+          console.warn(`[n8n Engine] Webhook at ${webhookUrl} note: ${status}.`);
+        }
+      }
+    }
+
+    // Direct Guaranteed Delivery via Gmail SMTP Engine (for Localhost / unblocked environments)
     if (channel === 'gmail') {
       try {
         const targetRecipients = recipientsList.length > 0
