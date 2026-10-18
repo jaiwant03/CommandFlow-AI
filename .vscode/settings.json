@@ -1,3 +1,13 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.jdt.ls.java.home": "C:\\Users\\JAIWANT KARRUN.S.A\\.jdks\\jbr-21.0.11",
+    "gradle.java.home": "C:\\Users\\JAIWANT KARRUN.S.A\\.jdks\\jbr-21.0.11",
+    "java.import.gradle.java.home": "C:\\Users\\JAIWANT KARRUN.S.A\\.jdks\\jbr-21.0.11",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-21",
+            "path": "C:\\Users\\JAIWANT KARRUN.S.A\\.jdks\\jbr-21.0.11",
+            "default": true
+        }
+    ]
 }
